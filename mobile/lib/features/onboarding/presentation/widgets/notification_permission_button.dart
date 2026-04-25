@@ -54,20 +54,29 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.success.withOpacity(0.5)),
+          color: AppColors.success.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.success.withValues(alpha: 0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.success.withValues(alpha: 0.15),
+              blurRadius: 20,
+              spreadRadius: 2,
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle, color: AppColors.success),
-            const SizedBox(width: 8),
+            const Icon(Icons.check_circle_outline, color: AppColors.success, size: 28),
+            const SizedBox(width: 12),
             Text(
               'Notifications Enabled',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppColors.success,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
               ),
             ),
           ],
@@ -75,26 +84,51 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
       );
     }
 
-    return ElevatedButton.icon(
-      onPressed: _isRequesting ? null : _requestPermission,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: AppColors.primaryGradient,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.4),
+            blurRadius: 24,
+            spreadRadius: 2,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      icon: _isRequesting 
-          ? const SizedBox(
-              width: 20, 
-              height: 20, 
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
-            )
-          : const Icon(Icons.notifications_active),
-      label: const Text(
-        'Enable Notifications',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _isRequesting ? null : _requestPermission,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 32),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _isRequesting 
+                    ? const SizedBox(
+                        width: 24, 
+                        height: 24, 
+                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white)
+                      )
+                    : const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
+                const Text(
+                  'Enable Notifications',
+                  style: TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.w700, 
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
