@@ -1,0 +1,68 @@
+# FLIGHTLY — .gitignore
+# Keep secrets and build artifacts out of version control
+
+# ─── Environment files (NEVER commit these) ──────────────────────────────────
+.env
+!.env.example
+**/.env
+!**/.env.example
+
+# ─── Node.js ──────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+*.log
+
+# ─── Flutter / Dart ───────────────────────────────────────────────────────────
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/.packages
+mobile/pubspec.lock
+mobile/android/local.properties
+mobile/android/.gradle/
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+mobile/android/key.jks
+mobile/android/key.properties
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/web/
+
+# Firebase config files (contain API keys — keep out of public repos)
+mobile/android/app/google-services.json
+mobile/ios/Runner/GoogleService-Info.plist
+
+# ─── Docker ───────────────────────────────────────────────────────────────────
+# Docker data volumes (local machine only)
+.docker/
+
+# ─── OS Generated ─────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── IDEs ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# ─── Test Coverage ────────────────────────────────────────────────────────────
+coverage/
+*.lcov
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.tmp
+*.temp
+dist/

@@ -1,0 +1,78 @@
+name: flightly
+description: "FLIGHTLY — Flight Booking App (Graduation Project)"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ─── State Management ────────────────────────────────────────────────────────
+  flutter_riverpod: ^2.5.1       # Reactive state management
+  riverpod_annotation: ^2.3.5    # Code generation annotations for Riverpod
+
+  # ─── Navigation ──────────────────────────────────────────────────────────────
+  go_router: ^14.2.1             # Declarative routing with deep linking
+
+  # ─── Networking ──────────────────────────────────────────────────────────────
+  dio: ^5.4.3                    # HTTP client with interceptors
+  connectivity_plus: ^6.0.3      # Network connectivity detection
+
+  # ─── Secure Storage ──────────────────────────────────────────────────────────
+  flutter_secure_storage: ^9.0.0 # Encrypted storage for JWT tokens
+  shared_preferences: ^2.3.2     # Key-value storage for preferences/flags
+
+  # ─── UI / Icons ──────────────────────────────────────────────────────────────
+  cupertino_icons: ^1.0.8
+  lucide_icons: ^0.257.0         # Consistent icon system (lucide.dev)
+  google_fonts: ^6.2.1           # Inter font from Google Fonts
+
+  # ─── Animations ──────────────────────────────────────────────────────────────
+  confetti: ^0.7.0               # Confetti animation for booking confirmation
+  shimmer: ^3.0.0                # Shimmer skeleton loading effect
+  flutter_spinkit: ^5.2.1        # Animated loading spinners
+  lottie: ^3.1.2                 # Lottie animations for empty/success states
+
+  # ─── Forms & UX ──────────────────────────────────────────────────────────────
+  introduction_screen: ^3.1.14   # Onboarding screens with swipe + dots
+  table_calendar: ^3.1.2         # Calendar for date selection
+  flutter_datetime_picker_plus: ^2.1.0  # Wheel-style DOB picker
+
+  # ─── Dialogs & Toasts ────────────────────────────────────────────────────────
+  awesome_dialog: ^3.2.0         # Beautiful dialog components
+  top_snackbar_flutter: ^3.1.0   # Top-positioned toast notifications
+
+  # ─── Images ──────────────────────────────────────────────────────────────────
+  cached_network_image: ^3.3.1   # Efficient network image with cache
+  image_picker: ^1.1.2           # Profile photo picker (gallery/camera)
+
+  # ─── Data & Utilities ────────────────────────────────────────────────────────
+  intl: ^0.19.0                  # Date/number formatting (i18n)
+  uuid: ^4.4.0                   # UUID generation
+  equatable: ^2.0.5              # Value equality for model classes
+
+  # ─── Firebase ────────────────────────────────────────────────────────────────
+  firebase_core: ^3.4.0          # Firebase initialization
+  firebase_messaging: ^15.1.1    # FCM push notifications
+  flutter_local_notifications: ^17.2.2  # Local notification display
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
+  riverpod_generator: ^2.4.3    # Code generation for Riverpod providers
+  build_runner: ^2.4.11         # Code generation runner
+
+flutter:
+  uses-material-design: true
+
+  # Asset directories (will be populated as we build)
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/icons/
