@@ -10,12 +10,8 @@ import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_colors.dart';
 
-// ─── Feature screen imports (will be filled in per phase) ────────────────────
-// Phase 1: Onboarding
-// import 'features/onboarding/presentation/screens/onboarding_screen.dart';
-// Phase 2: Auth
-// import 'features/auth/presentation/screens/auth_landing_screen.dart';
-// etc.
+import 'core/routing/app_router.dart';
+import 'core/providers/storage_provider.dart';
 
 
 void main() async {
@@ -38,94 +34,34 @@ void main() async {
     ),
   );
 
-  // Check first-launch state to determine initial route
+  // Initialize SharedPreferences synchronously before app startup
   final prefs = await SharedPreferences.getInstance();
-  final onboardingCompleted = prefs.getBool(AppConstants.keyOnboardingCompleted) ?? false;
 
   runApp(
     // ProviderScope wraps the entire app — required for Riverpod
     ProviderScope(
-      child: FlightlyApp(showOnboarding: !onboardingCompleted),
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const FlightlyApp(),
     ),
   );
 }
 
-class FlightlyApp extends StatelessWidget {
-  final bool showOnboarding;
-
-  const FlightlyApp({super.key, required this.showOnboarding});
+class FlightlyApp extends ConsumerWidget {
+  const FlightlyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
       title: 'FLIGHTLY',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
-
-      // Initial route based on onboarding state
-      // Phase 1 will replace this with GoRouter
-      home: showOnboarding ? const _PlaceholderScreen(label: 'Onboarding') : const _PlaceholderScreen(label: 'Auth Landing'),
+      routerConfig: router,
     );
   }
 }
 
-// ─── Temporary placeholder screen ────────────────────────────────────────────
-// This will be replaced by real screens starting Phase 1
-class _PlaceholderScreen extends StatelessWidget {
-  final String label;
 
-  const _PlaceholderScreen({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // FLIGHTLY logo placeholder
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.flight_takeoff_rounded,
-                  color: Colors.white,
-                  size: 44,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'FLIGHTLY',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Phase 0 — $label (coming in next phase)',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

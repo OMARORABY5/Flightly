@@ -54,10 +54,11 @@ dependencies:
   uuid: ^4.4.0                   # UUID generation
   equatable: ^2.0.5              # Value equality for model classes
 
-  # ─── Firebase ────────────────────────────────────────────────────────────────
+  # ─── Firebase & Permissions ──────────────────────────────────────────────────
   firebase_core: ^3.4.0          # Firebase initialization
   firebase_messaging: ^15.1.1    # FCM push notifications
   flutter_local_notifications: ^17.2.2  # Local notification display
+  permission_handler: ^11.3.1    # Native OS permission prompts
 
 dev_dependencies:
   flutter_test:
