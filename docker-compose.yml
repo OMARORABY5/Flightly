@@ -3,8 +3,6 @@
 # Run with: docker-compose up -d
 # Stop with: docker-compose down
 
-version: "3.9"
-
 networks:
   flightly-network:
     driver: bridge
@@ -18,7 +16,7 @@ volumes:
 services:
   # ─── PostgreSQL Database ──────────────────────────────────────────────────────
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: flightly-postgres
     restart: unless-stopped
     environment:
@@ -41,7 +39,7 @@ services:
 
   # ─── Redis Cache ──────────────────────────────────────────────────────────────
   redis:
-    image: redis:7-alpine
+    image: redis:7
     container_name: flightly-redis
     restart: unless-stopped
     ports:
@@ -193,7 +191,7 @@ services:
 
   # ─── NGINX API Gateway (Port 80) ─────────────────────────────────────────────
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     container_name: flightly-nginx
     restart: unless-stopped
     ports:
