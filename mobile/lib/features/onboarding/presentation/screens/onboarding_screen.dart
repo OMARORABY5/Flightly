@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../../core/constants/route_constants.dart';
-import '../../../core/theme/app_colors.dart';
-import '../providers/onboarding_provider.dart';
-import 'widgets/notification_permission_button.dart';
+import 'package:flightly/core/constants/route_constants.dart';
+import 'package:flightly/core/theme/app_colors.dart';
+import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
+import 'package:flightly/features/onboarding/presentation/widgets/notification_permission_button.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -59,9 +59,9 @@ class OnboardingScreen extends ConsumerWidget {
             title: "Stay Updated",
             body: "Never miss a flight update. Enable notifications to receive instant alerts about gate changes, delays, and exclusive deals.",
             image: const _IllustrationPlaceholder(icon: LucideIcons.bellRing),
-            footer: const Padding(
-              padding: EdgeInsets.only(top: 32.0),
-              child: NotificationPermissionButton(),
+            footer: Padding(
+              padding: const EdgeInsets.only(top: 32.0),
+              child: const NotificationPermissionButton(),
             ),
             decoration: pageDecoration,
           ),
@@ -81,7 +81,7 @@ class OnboardingScreen extends ConsumerWidget {
         controlsPadding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
         dotsDecorator: const DotsDecorator(
           size: Size(10.0, 10.0),
-          color: AppColors.surfaceLight,
+          color: AppColors.surface,
           activeSize: Size(22.0, 10.0),
           activeColor: AppColors.primary,
           activeShape: RoundedRectangleBorder(

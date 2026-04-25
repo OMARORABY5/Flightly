@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/providers/storage_provider.dart';
+import 'package:flightly/core/providers/storage_provider.dart';
 
 class OnboardingNotifier extends StateNotifier<bool> {
   final Ref _ref;

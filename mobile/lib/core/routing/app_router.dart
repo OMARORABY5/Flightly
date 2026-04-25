@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../constants/route_constants.dart';
-import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/screens/auth_landing_screen.dart';
-import '../../features/onboarding/providers/onboarding_provider.dart';
+import 'package:flightly/core/constants/route_constants.dart';
+import 'package:flightly/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:flightly/features/auth/presentation/screens/auth_landing_screen.dart';
+import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingProvider);

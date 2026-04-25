@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../core/providers/storage_provider.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:flightly/core/providers/storage_provider.dart';
+import 'package:flightly/core/theme/app_colors.dart';
 
 class NotificationPermissionButton extends ConsumerStatefulWidget {
   const NotificationPermissionButton({super.key});

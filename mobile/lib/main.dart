@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'core/constants/app_constants.dart';
-import 'core/theme/app_theme.dart';
-import 'core/theme/app_colors.dart';
 
-import 'core/routing/app_router.dart';
-import 'core/providers/storage_provider.dart';
+import 'package:flightly/core/theme/app_theme.dart';
+import 'package:flightly/core/theme/app_colors.dart';
+
+import 'package:flightly/core/routing/app_router.dart';
+import 'package:flightly/core/providers/storage_provider.dart';
 
 
 void main() async {
