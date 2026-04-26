@@ -27,9 +27,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',') 
-    : '*';
+let allowedOrigins = '*';
+if (process.env.ALLOWED_ORIGINS && process.env.ALLOWED_ORIGINS !== '*') {
+  allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+}
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10kb' }));
 

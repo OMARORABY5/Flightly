@@ -78,7 +78,7 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
                 suffixIcon: query.isNotEmpty
                     ? IconButton(
                         icon: const Icon(LucideIcons.x, color: AppColors.textSecondary),
-                        onTap: () {
+                        onPressed: () {
                           _searchController.clear();
                           _onSearchChanged('');
                         },
@@ -99,7 +99,7 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Popular Airports', style: AppTextStyles.h3),
+                child: Text('Popular Airports', style: AppTextStyles.headingMedium),
               ),
             ),
           Expanded(
@@ -112,7 +112,7 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
                       children: [
                         Icon(LucideIcons.plane, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
                         const SizedBox(height: 16),
-                        Text('No airports found', style: AppTextStyles.h3),
+                        Text('No airports found', style: AppTextStyles.headingMedium),
                         const SizedBox(height: 8),
                         Text('Try searching for another city or code.',
                             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),

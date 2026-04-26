@@ -4,6 +4,7 @@
 //      and errors are consistently translated into Failure objects
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/app_constants.dart';
 import '../errors/failures.dart';
@@ -126,11 +127,17 @@ class _AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Skip auth for public endpoints
-    final publicPaths = ['/auth/login', '/auth/register', '/auth/forgot-password'];
+    // Skip auth for public endpoints (auth routes + flight search = no token needed)
+    final publicPaths = [
+      '/auth/login',
+      '/auth/register',
+      '/auth/forgot-password',
+      '/flights/',   // airport search is public
+    ];
     final isPublic = publicPaths.any((path) => options.path.contains(path));
 
-    if (!isPublic) {
+    // flutter_secure_storage is not supported on Web — skip token read on web
+    if (!isPublic && !kIsWeb) {
       final token = await _storage.read(key: AppConstants.jwtStorageKey);
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';

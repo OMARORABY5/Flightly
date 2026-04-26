@@ -36,7 +36,7 @@ class HomeSearchScreen extends ConsumerWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Where to?', style: AppTextStyles.h1),
+                              Text('Where to?', style: AppTextStyles.displayLarge),
                               const SizedBox(height: 4),
                               Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
                             ],
@@ -204,7 +204,7 @@ class HomeSearchScreen extends ConsumerWidget {
                                   elevation: query.isValid ? 8 : 0,
                                   shadowColor: AppColors.primary.withOpacity(0.5),
                                 ),
-                                child: Text('Search Flights', style: AppTextStyles.buttonText),
+                                child: Text('Search Flights', style: AppTextStyles.button),
                               ),
                             ),
                           ],
@@ -286,7 +286,7 @@ class HomeSearchScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(value, style: AppTextStyles.h3),
+                        Text(value, style: AppTextStyles.headingMedium),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(subValue ?? '', 
@@ -297,7 +297,7 @@ class HomeSearchScreen extends ConsumerWidget {
                       ],
                     )
                   else
-                    Text('Select Airport', style: AppTextStyles.h3.copyWith(color: AppColors.textSecondary.withOpacity(0.5))),
+                    Text('Select Airport', style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary.withOpacity(0.5))),
                 ],
               ),
             ),

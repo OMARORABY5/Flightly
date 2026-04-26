@@ -24,9 +24,10 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 
 // Parse comma-separated ALLOWED_ORIGINS (same pattern as auth-service)
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : '*';
+let allowedOrigins = '*';
+if (process.env.ALLOWED_ORIGINS && process.env.ALLOWED_ORIGINS !== '*') {
+  allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+}
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10kb' }));
 

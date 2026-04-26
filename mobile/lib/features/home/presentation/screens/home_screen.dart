@@ -17,9 +17,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final List<Widget> _screens = [
     const HomeSearchScreen(),
-    const Center(child: Text('My Trips', style: AppTextStyles.h2)),
-    const Center(child: Text('Watchlist', style: AppTextStyles.h2)),
-    const Center(child: Text('Account', style: AppTextStyles.h2)),
+    Center(child: Text('My Trips', style: AppTextStyles.headingLarge)),
+    Center(child: Text('Watchlist', style: AppTextStyles.headingLarge)),
+    Center(child: Text('Account', style: AppTextStyles.headingLarge)),
   ];
 
   @override

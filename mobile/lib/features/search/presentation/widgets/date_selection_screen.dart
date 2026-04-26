@@ -105,11 +105,11 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
               children: [
                 Text(
                   query.tripType == TripType.oneWay ? 'Select Departure' : 'Select Dates',
-                  style: AppTextStyles.h2,
+                  style: AppTextStyles.headingLarge,
                 ),
                 IconButton(
                   icon: const Icon(LucideIcons.x, color: AppColors.textSecondary),
-                  onTap: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context).pop(),
                 )
               ],
             ),
@@ -139,7 +139,7 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
                   headerStyle: HeaderStyle(
                     formatButtonVisible: false,
                     titleCentered: true,
-                    titleTextStyle: AppTextStyles.h3,
+                    titleTextStyle: AppTextStyles.headingMedium,
                     leftChevronIcon: const Icon(LucideIcons.chevronLeft, color: AppColors.textPrimary),
                     rightChevronIcon: const Icon(LucideIcons.chevronRight, color: AppColors.textPrimary),
                   ),
@@ -184,7 +184,7 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
                   disabledBackgroundColor: AppColors.surface,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text('Apply Dates', style: AppTextStyles.buttonText),
+                child: Text('Apply Dates', style: AppTextStyles.button),
               ),
             ),
           ),

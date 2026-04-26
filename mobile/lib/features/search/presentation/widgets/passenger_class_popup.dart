@@ -79,10 +79,10 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Passengers & Class', style: AppTextStyles.h2),
+                Text('Passengers & Class', style: AppTextStyles.headingLarge),
                 IconButton(
                   icon: const Icon(LucideIcons.x, color: AppColors.textSecondary),
-                  onTap: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context).pop(),
                 )
               ],
             ),
@@ -124,7 +124,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Cabin Class', style: AppTextStyles.h3),
+              child: Text('Cabin Class', style: AppTextStyles.headingMedium),
             ),
           ),
           const SizedBox(height: 16),
@@ -156,7 +156,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text('Apply', style: AppTextStyles.buttonText),
+                child: Text('Apply', style: AppTextStyles.button),
               ),
             ),
           ),
@@ -190,7 +190,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
               SizedBox(
                 width: 40,
                 child: Center(
-                  child: Text('$value', style: AppTextStyles.h3),
+                  child: Text('$value', style: AppTextStyles.headingMedium),
                 ),
               ),
               _buildRoundButton(LucideIcons.plus, onIncrease),
