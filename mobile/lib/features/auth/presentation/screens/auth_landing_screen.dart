@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flightly/core/theme/app_colors.dart';
+import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 
@@ -64,11 +66,9 @@ class AuthLandingScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
-                    // Action Buttons (Mocked for now)
+                    // Action Buttons
                     ElevatedButton(
-                      onPressed: () {
-                        // Phase 2 implementation
-                      },
+                      onPressed: () => context.push(RouteConstants.login),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         elevation: 5,
@@ -88,9 +88,7 @@ class AuthLandingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton(
-                      onPressed: () {
-                        // Phase 2 implementation
-                      },
+                      onPressed: () => context.push(RouteConstants.register),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: AppColors.white.withValues(alpha: 0.2)),
@@ -99,6 +97,17 @@ class AuthLandingScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text('Create new account', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+                    ),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () => context.go(RouteConstants.home),
+                      child: Text(
+                        'Skip and continue as Guest',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.textSecondary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),
