@@ -1,16 +1,22 @@
 // app_constants.dart — FLIGHTLY Global Constants
 // API URLs, timeouts, pagination sizes, and other magic numbers
 // WHY: Avoiding magic numbers makes code maintainable and easy to update
+import 'package:flutter/foundation.dart';
 
 class AppConstants {
   AppConstants._();
 
   // ─── API Configuration ────────────────────────────────────────────────────
-  // In development: NGINX runs on localhost:80 and routes all requests
-  // Change to production URL before deployment
-  static const String baseUrl = 'http://10.0.2.2:80/api'; // Android emulator → host localhost
-  // For Chrome (web): use http://localhost:80/api
-  // For physical device: use your machine's local IP, e.g., http://192.168.1.x:80/api
+  // Dynamically points to the correct local address depending on the platform:
+  // Web (Chrome) uses localhost. Android Emulator uses 10.0.2.2.
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:80/api'; // Chrome / Web
+    }
+    // TODO: For iOS simulator, use 'http://localhost:80/api'
+    // TODO: For physical devices, use your local network IP (e.g., http://192.168.1.X:80/api)
+    return 'http://10.0.2.2:80/api'; // Android Emulator
+  }
 
   // ─── Request Timeouts ────────────────────────────────────────────────────
   static const int connectTimeoutSeconds = 10;   // Connection timeout

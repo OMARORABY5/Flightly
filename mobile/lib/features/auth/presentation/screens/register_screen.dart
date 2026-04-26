@@ -229,7 +229,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     CustomTextField(
                       label: 'Confirm Password',
                       hint: 'Repeat your password',
-                      prefixIcon: LucideIcons.lockCheck,
+                      prefixIcon: LucideIcons.lock,
                       isPassword: true,
                       controller: _confirmPasswordController,
                       textInputAction: TextInputAction.done,
