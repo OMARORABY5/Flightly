@@ -23,7 +23,11 @@ const logger = winston.createLogger({
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
+// Parse comma-separated ALLOWED_ORIGINS (same pattern as auth-service)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : '*';
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '10kb' }));
 
 const db = new Pool({
@@ -47,13 +51,8 @@ async function connectRedis() {
   }
 }
 
-// Mount flight routes (populated in Phase 3+)
-const flightRoutes = require('./src/routes/flight.routes');
-app.use('/flights', (req, res, next) => {
-  req.db = db;
-  req.redis = redisClient;
-  next();
-}, flightRoutes);
+// Routes are mounted inside start() after Redis connects — same pattern as auth-service
+// WHY: Ensures req.redis is a live client, not undefined, when controllers use it
 
 app.get('/health', async (req, res) => {
   try {
@@ -71,11 +70,7 @@ app.get('/health', async (req, res) => {
   }
 });
 
-app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
-app.use((err, req, res, next) => {
-  logger.error(`Unhandled error: ${err.message}`);
-  res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
-});
+
 
 async function start() {
   await connectRedis();
@@ -86,6 +81,22 @@ async function start() {
     logger.error(`PostgreSQL connection failed: ${err.message}`);
     process.exit(1);
   }
+
+  // Mount routes AFTER Redis is connected so controllers receive a live client
+  const flightRoutes = require('./src/routes/flight.routes');
+  app.use('/flights', (req, res, next) => {
+    req.db = db;
+    req.redis = redisClient;
+    next();
+  }, flightRoutes);
+
+  // 404 handler AFTER routes
+  app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
+  app.use((err, req, res, next) => {
+    logger.error(`Unhandled error: ${err.message}`);
+    res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
+  });
+
   app.listen(PORT, () => logger.info(`Flight Service running on port ${PORT}`));
 }
 

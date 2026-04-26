@@ -14,7 +14,8 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<bool> forgotPassword({required String email});
+  /// Returns the OTP string in development mode, or null in production.
+  Future<String?> forgotPassword({required String email});
 
   Future<void> resetPassword({
     required String email,

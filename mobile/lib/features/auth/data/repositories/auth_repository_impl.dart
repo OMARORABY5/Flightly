@@ -71,12 +71,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> forgotPassword({required String email}) async {
+  Future<String?> forgotPassword({required String email}) async {
     final response = await _dioClient.post(
       '/auth/forgot-password',
       data: {'email': email},
     );
-    return response.data['success'] == true;
+    if (response.data['success'] == true && response.data['data'] != null) {
+      return response.data['data']['otp'] as String?;
+    }
+    return null;
   }
 
   @override

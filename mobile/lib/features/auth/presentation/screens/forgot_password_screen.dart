@@ -52,17 +52,27 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     try {
       final repo = ref.read(authRepositoryProvider);
-      await repo.forgotPassword(email: _emailController.text);
+      final otp = await repo.forgotPassword(email: _emailController.text);
       
       if (mounted) {
         setState(() {
           _otpSent = true;
           _isRequestingOtp = false;
         });
-        showTopSnackBar(
-          Overlay.of(context),
-          const CustomSnackBar.info(message: 'If registered, an OTP has been sent to your email.'),
-        );
+        
+        if (otp != null) {
+          // In development mode, auto-fill the OTP or show it clearly
+          _otpController.text = otp;
+          showTopSnackBar(
+            Overlay.of(context),
+            CustomSnackBar.success(message: 'DEV MODE: OTP auto-filled ($otp)'),
+          );
+        } else {
+          showTopSnackBar(
+            Overlay.of(context),
+            const CustomSnackBar.info(message: 'If registered, an OTP has been sent to your email.'),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
