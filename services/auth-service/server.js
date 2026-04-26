@@ -52,6 +52,9 @@ const db = new Pool({
 });
 
 // ─── Redis Connection ─────────────────────────────────────────────────────────
+// WHY: redisClient is declared here so it can be referenced by the controller.
+// connectRedis() assigns to this variable — routes are mounted AFTER this runs
+// so the controller always receives the live, connected client.
 let redisClient;
 async function connectRedis() {
   try {
@@ -63,11 +66,6 @@ async function connectRedis() {
     logger.warn(`Redis unavailable: ${err.message} — continuing without cache`);
   }
 }
-
-// ─── Routes ───────────────────────────────────────────────────────────────────
-// Import and mount routes (defined after DB/Redis are ready)
-const authRoutes = require('./src/routes/auth.routes');
-app.use('/auth', authRoutes(db, redisClient));
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', async (req, res) => {
@@ -86,20 +84,6 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// ─── 404 Handler ─────────────────────────────────────────────────────────────
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'Endpoint not found' });
-});
-
-// ─── Global Error Handler ─────────────────────────────────────────────────────
-app.use((err, req, res, next) => {
-  logger.error(`Unhandled error: ${err.message}`);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error',
-  });
-});
-
 // ─── Start Server ─────────────────────────────────────────────────────────────
 async function start() {
   await connectRedis();
@@ -112,6 +96,25 @@ async function start() {
     logger.error(`PostgreSQL connection failed: ${err.message}`);
     process.exit(1);
   }
+
+  // Mount routes AFTER Redis is connected so the AuthController gets the live client
+  // WHY: Routes must be registered before the 404/error handlers
+  const authRoutes = require('./src/routes/auth.routes');
+  app.use('/auth', authRoutes(db, redisClient));
+
+  // ─── 404 Handler — must come AFTER all routes ─────────────────────────────
+  app.use((req, res) => {
+    res.status(404).json({ success: false, message: 'Endpoint not found' });
+  });
+
+  // ─── Global Error Handler ─────────────────────────────────────────────────
+  app.use((err, req, res, next) => {
+    logger.error(`Unhandled error: ${err.message}`);
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Internal server error',
+    });
+  });
 
   app.listen(PORT, () => {
     logger.info(`Auth Service running on port ${PORT}`);
