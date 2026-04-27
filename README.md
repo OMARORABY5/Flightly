@@ -58,4 +58,4 @@ flutter run
 
 ## Project Phases
 
-This project is built incrementally in 13 phases. Currently **Phase 0 (Project Setup & Environment)** is completed. Please refer to `CLAUDE.md` and `task.md` for detailed progression and architecture plans.
+This project is built incrementally in 13 phases. Currently **Phase 3 (Flight Search Flow)** is completed. Please refer to `CLAUDE.md` and `task.md` for detailed progression and architecture plans.
