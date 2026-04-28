@@ -8,6 +8,10 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const { createClient } = require('redis');
 const winston = require('winston');
+const { initFirebase } = require('./src/services/fcm.service');
+
+// Initialise Firebase Admin SDK (no-op if credentials not set)
+initFirebase();
 
 const logger = winston.createLogger({
   level: 'info',

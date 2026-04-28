@@ -12,6 +12,7 @@ import 'package:flightly/core/theme/app_colors.dart';
 
 import 'package:flightly/core/routing/app_router.dart';
 import 'package:flightly/core/providers/storage_provider.dart';
+import 'package:flightly/features/notifications/services/push_notification_service.dart';
 
 
 void main() async {
@@ -46,13 +47,25 @@ void main() async {
       child: const FlightlyApp(),
     ),
   );
-}
-
-class FlightlyApp extends ConsumerWidget {
+class FlightlyApp extends ConsumerStatefulWidget {
   const FlightlyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FlightlyApp> createState() => _FlightlyAppState();
+}
+
+class _FlightlyAppState extends ConsumerState<FlightlyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize push notifications gracefully
+    Future.microtask(() {
+      ref.read(pushNotificationServiceProvider).initialize();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(

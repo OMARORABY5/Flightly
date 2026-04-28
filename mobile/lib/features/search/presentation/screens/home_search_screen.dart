@@ -12,6 +12,8 @@ import 'package:flightly/features/search/presentation/widgets/airport_search_pop
 import 'package:flightly/features/search/presentation/widgets/date_selection_screen.dart';
 import 'package:flightly/features/search/presentation/widgets/passenger_class_popup.dart';
 import 'package:flightly/features/search/presentation/screens/search_results_screen.dart';
+import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeSearchScreen extends ConsumerWidget {
   const HomeSearchScreen({super.key});
@@ -42,10 +44,53 @@ class HomeSearchScreen extends ConsumerWidget {
                               Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
                             ],
                           ),
-                          const CircleAvatar(
-                            backgroundColor: AppColors.surface,
-                            child: Icon(LucideIcons.user, color: AppColors.textSecondary),
-                          )
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => context.push('/notifications'),
+                                child: Stack(
+                                  children: [
+                                    const CircleAvatar(
+                                      backgroundColor: AppColors.surface,
+                                      child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
+                                    ),
+                                    Consumer(
+                                      builder: (context, ref, child) {
+                                        final notificationState = ref.watch(notificationNotifierProvider);
+                                        if (notificationState.unreadCount > 0) {
+                                          return Positioned(
+                                            top: 0,
+                                            right: 0,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.error,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Text(
+                                                '${notificationState.unreadCount}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return const SizedBox.shrink();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const CircleAvatar(
+                                backgroundColor: AppColors.surface,
+                                child: Icon(LucideIcons.user, color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: 32),

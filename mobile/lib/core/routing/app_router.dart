@@ -16,6 +16,8 @@ import 'package:flightly/features/booking/presentation/screens/add_edit_passenge
 import 'package:flightly/features/booking/presentation/screens/booking_overview_screen.dart';
 import 'package:flightly/features/payment/presentation/screens/payment_screen.dart';
 import 'package:flightly/features/payment/presentation/screens/booking_confirmation_screen.dart';
+import 'package:flightly/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:flightly/features/notifications/presentation/screens/notification_preferences_screen.dart';
 import 'package:flutter/material.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -112,6 +114,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/my-trips',
         builder: (context, state) => const Scaffold(body: Center(child: Text('My Trips Screen (Phase 10)'))),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/notification-preferences',
+        builder: (context, state) => const NotificationPreferencesScreen(),
       ),
     ],
   );

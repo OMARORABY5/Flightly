@@ -179,6 +179,10 @@ services:
       DB_PASSWORD: flightly_pass
       REDIS_URL: redis://redis:6379
       JWT_SECRET: flightly_jwt_secret_change_in_production_use_256bit_random_string
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-credentials.json
+      FIREBASE_PROJECT_ID: flightly-oraby
+    volumes:
+      - ./flightly-oraby-firebase-adminsdk-fbsvc-af56f5f7ac.json:/run/secrets/firebase-credentials.json:ro
     ports:
       - "3005:3005"
     networks:

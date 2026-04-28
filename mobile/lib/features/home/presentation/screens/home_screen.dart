@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/features/search/presentation/screens/home_search_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +20,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const HomeSearchScreen(),
     Center(child: Text('My Trips', style: AppTextStyles.headingLarge)),
     Center(child: Text('Watchlist', style: AppTextStyles.headingLarge)),
-    Center(child: Text('Account', style: AppTextStyles.headingLarge)),
+    // 3: Account Placeholder
+    Builder(
+      builder: (context) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.surface,
+          elevation: 0,
+          title: const Text('Account', style: AppTextStyles.headingMedium),
+        ),
+        body: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          children: [
+            ListTile(
+              leading: const Icon(LucideIcons.bell, color: AppColors.textPrimary),
+              title: const Text('Notification Preferences', style: AppTextStyles.bodyLarge),
+              trailing: const Icon(LucideIcons.chevronRight, color: AppColors.textSecondary),
+              onTap: () => context.push('/notification-preferences'),
+            ),
+          ],
+        ),
+      ),
+    ),
   ];
 
   @override
