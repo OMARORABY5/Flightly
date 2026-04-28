@@ -31,7 +31,7 @@ dependencies:
   google_fonts: ^6.2.1           # Inter font from Google Fonts
 
   # ─── Animations ──────────────────────────────────────────────────────────────
-  confetti: ^0.7.0               # Confetti animation for booking confirmation
+  confetti: ^0.8.0               # Confetti animation for booking confirmation
   shimmer: ^3.0.0                # Shimmer skeleton loading effect
   flutter_spinkit: ^5.2.1        # Animated loading spinners
   lottie: ^3.1.2                 # Lottie animations for empty/success states
@@ -59,6 +59,7 @@ dependencies:
   firebase_messaging: ^15.1.1    # FCM push notifications
   flutter_local_notifications: ^17.2.2  # Local notification display
   permission_handler: ^11.3.1    # Native OS permission prompts
+  country_picker: ^2.0.27
 
 dev_dependencies:
   flutter_test:

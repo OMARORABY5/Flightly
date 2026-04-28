@@ -11,6 +11,7 @@ import 'package:flightly/features/search/domain/providers/search_form_provider.d
 import 'package:flightly/features/search/presentation/widgets/airport_search_popup.dart';
 import 'package:flightly/features/search/presentation/widgets/date_selection_screen.dart';
 import 'package:flightly/features/search/presentation/widgets/passenger_class_popup.dart';
+import 'package:flightly/features/search/presentation/screens/search_results_screen.dart';
 
 class HomeSearchScreen extends ConsumerWidget {
   const HomeSearchScreen({super.key});
@@ -191,12 +192,17 @@ class HomeSearchScreen extends ConsumerWidget {
                               width: double.infinity,
                               height: 56,
                               child: ElevatedButton(
-                                onPressed: query.isValid ? () {
-                                  // TODO: Navigate to Results Screen
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Searching flights...')),
-                                  );
-                                } : null,
+                                onPressed: () {
+                                  if (query.isValid) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Please select origin, destination, and dates.')),
+                                    );
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   disabledBackgroundColor: AppColors.surface,

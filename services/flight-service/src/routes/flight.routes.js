@@ -42,6 +42,13 @@ router.get('/airlines', async (req, res) => {
   await getController(req).getAvailableAirlines(req, res);
 });
 
+// GET /flights/:id/price-check?seen_price=<number>
+// Phase 5: Real-time price change check — called just before "Book Now".
+// WHY: Must be BEFORE /:id to avoid "price-check" being swallowed by :id param
+router.get('/:id/price-check', async (req, res) => {
+  await getController(req).priceCheck(req, res);
+});
+
 // GET /flights/:id
 // Returns full detail for one flight (used by Flight Details screen)
 router.get('/:id', async (req, res) => {

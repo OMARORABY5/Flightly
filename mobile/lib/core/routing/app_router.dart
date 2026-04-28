@@ -10,6 +10,13 @@ import 'package:flightly/features/auth/presentation/screens/forgot_password_scre
 import 'package:flightly/features/home/presentation/screens/home_screen.dart';
 import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
+import 'package:flightly/features/booking/presentation/screens/booking_screen.dart';
+import 'package:flightly/features/booking/presentation/screens/passengers_screen.dart';
+import 'package:flightly/features/booking/presentation/screens/add_edit_passenger_screen.dart';
+import 'package:flightly/features/booking/presentation/screens/booking_overview_screen.dart';
+import 'package:flightly/features/payment/presentation/screens/payment_screen.dart';
+import 'package:flightly/features/payment/presentation/screens/booking_confirmation_screen.dart';
+import 'package:flutter/material.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingProvider);
@@ -51,6 +58,60 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/booking',
+        builder: (context, state) {
+          final flight = state.extra as dynamic; // Flight model
+          return BookingScreen(flight: flight);
+        },
+        routes: [
+          GoRoute(
+            path: 'passengers',
+            builder: (context, state) => const PassengersScreen(),
+            routes: [
+              GoRoute(
+                path: 'add',
+                builder: (context, state) => const AddEditPassengerScreen(),
+              ),
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) {
+                  final passenger = state.extra as dynamic; // Passenger model
+                  return AddEditPassengerScreen(passenger: passenger);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'overview',
+            builder: (context, state) {
+              final flight = state.extra as dynamic; // Flight model
+              return BookingOverviewScreen(flight: flight);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/payment',
+        builder: (context, state) {
+          final booking = state.extra as dynamic; // Booking model
+          return PaymentScreen(booking: booking);
+        },
+        routes: [
+          GoRoute(
+            path: 'confirmation',
+            builder: (context, state) {
+              final booking = state.extra as dynamic; // Booking model
+              return BookingConfirmationScreen(booking: booking);
+            },
+          ),
+        ],
+      ),
+      // Placeholder for my-trips
+      GoRoute(
+        path: '/my-trips',
+        builder: (context, state) => const Scaffold(body: Center(child: Text('My Trips Screen (Phase 10)'))),
       ),
     ],
   );

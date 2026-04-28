@@ -58,8 +58,8 @@ class DioClient {
   }
 
   /// DELETE request
-  Future<Response> delete(String path) async {
-    return _execute(() => _dio.delete(path));
+  Future<Response> delete(String path, {Map<String, dynamic>? queryParams}) async {
+    return _execute(() => _dio.delete(path, queryParameters: queryParams));
   }
 
   /// Execute a request and translate DioException → typed Failure

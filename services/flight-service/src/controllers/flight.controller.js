@@ -1,6 +1,7 @@
 // flight.controller.js — FLIGHTLY Flight Service Controller
 // Phase 3: Airport search & popular airports
 // Phase 4: Flight search with filtering, sorting, pagination + flight detail
+// Phase 5: Enhanced flight details, smart pricing, price-check endpoint
 // WHY: Separating business logic from routing keeps the codebase maintainable
 
 class FlightController {
@@ -234,9 +235,8 @@ class FlightController {
         departure_asc: 'f.departure_time ASC',
         arrival_asc:   'f.arrival_time ASC',
       };
-      const orderClause = ORDER_MAP[sort] || ORDER_MAP.best;
+      const orderClause = ORDER_MAP[sort] ?? ORDER_MAP.best;
 
-      // ── Main query ───────────────────────────────────────────────────────────
       const flightQuery = `
         SELECT
           f.id,
@@ -341,7 +341,8 @@ class FlightController {
 
   // ─── GET /flights/:id ────────────────────────────────────────────────────────
   // Returns full details for a single flight (used on the Flight Details screen).
-  // WHY: Card list shows summary; details screen needs all fields.
+  // Phase 5: Enhanced with smart pricing data, seat availability indicator,
+  //          fare class display label, and refund/change policy fields.
   async getFlightById(req, res) {
     try {
       const { id } = req.params;
@@ -362,14 +363,14 @@ class FlightController {
       const result = await this.db.query(
         `SELECT
            f.*,
-           oa.name     AS origin_name,
-           oa.city     AS origin_city,
-           oa.country  AS origin_country,
-           oa.timezone AS origin_timezone,
-           da.name     AS destination_name,
-           da.city     AS destination_city,
-           da.country  AS destination_country,
-           da.timezone AS destination_timezone
+           oa.name       AS origin_name,
+           oa.city       AS origin_city,
+           oa.country    AS origin_country,
+           oa.timezone   AS origin_timezone,
+           da.name       AS destination_name,
+           da.city       AS destination_city,
+           da.country    AS destination_country,
+           da.timezone   AS destination_timezone
          FROM flights f
          JOIN airports oa ON oa.iata_code = f.origin_iata
          JOIN airports da ON da.iata_code = f.destination_iata
@@ -381,20 +382,162 @@ class FlightController {
         return res.status(404).json({ success: false, message: 'Flight not found.' });
       }
 
-      const flight = {
-        ...result.rows[0],
-        base_price: parseFloat(result.rows[0].base_price),
+      const raw    = result.rows[0];
+      const price  = parseFloat(raw.base_price);
+      const seats  = parseInt(raw.available_seats, 10);
+
+      // ── Smart Pricing: Seat availability indicator ───────────────────────────
+      // WHY: "Only 3 seats left!" creates urgency, drives conversions.
+      // We bucket availability into levels without revealing exact seat count (airline best practice).
+      let seatAvailability;
+      if (seats <= 3)       seatAvailability = 'critical';   // "Only 3 left!"
+      else if (seats <= 9)  seatAvailability = 'low';        // "Almost full"
+      else if (seats <= 20) seatAvailability = 'limited';    // "Limited seats"
+      else                  seatAvailability = 'available';  // Normal state
+
+      // ── Smart Pricing: Price trend simulation ────────────────────────────────
+      // WHY: Shows users if prices are rising or falling to nudge booking decisions.
+      // In production this would compare against a historical price table.
+      // For this MVP we derive it deterministically from the flight ID + price
+      // so it's stable across page refreshes but varies by flight.
+      const idSum  = id.replace(/-/g, '').split('').reduce((s, c) => s + c.charCodeAt(0), 0);
+      const trends = ['rising', 'stable', 'stable', 'falling', 'stable'];
+      const priceTrend = trends[idSum % trends.length];
+
+      // ── Smart Pricing: Price change percentage (vs "yesterday") ──────────────
+      // Deterministic simulation: stable ± 0%, rising +5-15%, falling -3-12%
+      let priceChangePercent = 0;
+      if (priceTrend === 'rising')  priceChangePercent = +((idSum % 11) + 5);   // +5..+15%
+      if (priceTrend === 'falling') priceChangePercent = -((idSum % 10) + 3);   // -3..-12%
+
+      // ── Fare class label mapping ──────────────────────────────────────────────
+      // WHY: DB stores machine-readable cabin class; UI needs a display label
+      const FARE_LABELS = {
+        economy:         'Economy',
+        premium_economy: 'Premium Economy',
+        business:        'Business Class',
+        first:           'First Class',
       };
 
-      // Cache for 10 minutes
+      // ── Refund & Change Policy ────────────────────────────────────────────────
+      // WHY: Required info for details screen; derived from is_refundable + cabin_class.
+      // Business/First are always changeable for a fee; economy varies by refundability.
+      const isHighCabin = ['business', 'first'].includes(raw.cabin_class);
+      const policy = {
+        is_refundable:       raw.is_refundable,
+        cancellation_policy: raw.is_refundable
+          ? 'Free cancellation up to 24 hours before departure.'
+          : 'Non-refundable. Credit valid for 12 months.',
+        change_policy: isHighCabin
+          ? 'Date/time changes permitted for a fee.'
+          : (raw.is_refundable ? 'Changes allowed with fare difference.' : 'No changes permitted.'),
+        change_fee: isHighCabin ? 75 : (raw.is_refundable ? 50 : null), // USD
+      };
+
+      const flight = {
+        ...raw,
+        base_price:           price,
+        // Smart pricing enrichments
+        seat_availability:    seatAvailability,
+        seats_remaining:      seats,
+        price_trend:          priceTrend,
+        price_change_percent: priceChangePercent,
+        // Display helpers
+        fare_label:           FARE_LABELS[raw.cabin_class] ?? raw.cabin_class,
+        // Policy
+        policy,
+      };
+
+      // Cache for 5 minutes (shorter than Phase 4 to keep seat count fresh)
       if (this.redis?.isOpen) {
-        await this.redis.setEx(cacheKey, 600, JSON.stringify(flight));
+        await this.redis.setEx(cacheKey, 300, JSON.stringify(flight));
       }
 
       return res.json({ success: true, data: flight });
     } catch (err) {
       console.error('[Flight] getFlightById error:', err.message);
       return res.status(500).json({ success: false, message: 'Failed to fetch flight details.' });
+    }
+  }
+
+  // ─── GET /flights/:id/price-check ────────────────────────────────────────────
+  // Phase 5: Real-time price change check (called just before "Book Now" taps).
+  // WHY: Airlines dynamically adjust prices; FLIGHTLY must warn users if the
+  //      price changed between viewing details and tapping Book Now.
+  //
+  // Query params:
+  //   seen_price  - The price the user saw on the details screen (number)
+  //
+  // Returns:
+  //   price_changed  - boolean
+  //   current_price  - actual current price
+  //   seen_price     - what the user saw
+  //   difference     - current - seen (positive = more expensive, negative = cheaper)
+  async priceCheck(req, res) {
+    try {
+      const { id } = req.params;
+      const { seen_price } = req.query;
+
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidPattern.test(id)) {
+        return res.status(400).json({ success: false, message: 'Invalid flight ID format.' });
+      }
+
+      if (!seen_price || isNaN(parseFloat(seen_price))) {
+        return res.status(400).json({ success: false, message: 'seen_price query parameter is required.' });
+      }
+
+      const result = await this.db.query(
+        `SELECT base_price, available_seats, is_active FROM flights WHERE id = $1`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Flight not found.' });
+      }
+
+      const { base_price, available_seats, is_active } = result.rows[0];
+
+      if (!is_active) {
+        return res.json({
+          success: true,
+          data: {
+            flight_id:     id,
+            price_changed: true,
+            unavailable:   true,
+            message:       'This flight is no longer available.',
+            current_price: null,
+            seen_price:    parseFloat(seen_price),
+          },
+        });
+      }
+
+      const currentPrice = parseFloat(base_price);
+      const userSeenPrice = parseFloat(seen_price);
+      const difference = Math.round((currentPrice - userSeenPrice) * 100) / 100;
+      // Price changed if it differs by more than $0.50 (avoids floating-point noise)
+      const priceChanged = Math.abs(difference) > 0.50;
+
+      return res.json({
+        success: true,
+        data: {
+          flight_id:        id,
+          price_changed:    priceChanged,
+          unavailable:      false,
+          current_price:    currentPrice,
+          seen_price:       userSeenPrice,
+          difference,
+          seats_remaining:  parseInt(available_seats, 10),
+          message: priceChanged
+            ? (difference > 0
+                ? `Price increased by $${Math.abs(difference).toFixed(2)}.`
+                : `Good news! Price dropped by $${Math.abs(difference).toFixed(2)}.`)
+            : 'Price is unchanged. Proceed to booking.',
+        },
+      });
+    } catch (err) {
+      console.error('[Flight] priceCheck error:', err.message);
+      return res.status(500).json({ success: false, message: 'Failed to check flight price.' });
     }
   }
 

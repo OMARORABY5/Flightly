@@ -11,7 +11,7 @@ class AppConstants {
   // Web (Chrome) uses localhost. Android Emulator uses 10.0.2.2.
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:80/api'; // Chrome / Web
+      return 'http://127.0.0.1:80/api'; // Chrome / Web
     }
     // TODO: For iOS simulator, use 'http://localhost:80/api'
     // TODO: For physical devices, use your local network IP (e.g., http://192.168.1.X:80/api)
