@@ -137,7 +137,6 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _buildClassChip(CabinClass.economy, 'Economy'),
-                _buildClassChip(CabinClass.premiumEconomy, 'Premium Eco'),
                 _buildClassChip(CabinClass.business, 'Business'),
                 _buildClassChip(CabinClass.first, 'First'),
               ],

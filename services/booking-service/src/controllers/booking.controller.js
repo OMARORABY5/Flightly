@@ -308,7 +308,8 @@ class BookingController {
                f.origin_iata, f.destination_iata,
                f.departure_time, f.arrival_time, f.duration_minutes,
                ao.city AS origin_city, ad.city AS destination_city,
-               (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count
+               (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count,
+               (SELECT json_agg(json_build_object('id', p.id, 'full_name', p.full_name)) FROM booking_passengers bp JOIN passengers p ON bp.passenger_id = p.id WHERE bp.booking_id = b.id) AS passengers
         FROM bookings b
         JOIN flights f ON b.flight_id = f.id
         JOIN airports ao ON f.origin_iata = ao.iata_code
@@ -336,6 +337,7 @@ class BookingController {
         contact_email: b.contact_email,
         created_at: b.created_at,
         passenger_count: parseInt(b.passenger_count),
+        passengers: b.passengers || [],
         flight: {
           flight_number: b.flight_number,
           airline_name: b.airline_name,
@@ -471,6 +473,169 @@ class BookingController {
       res.status(500).json({ success: false, message: 'Failed to cancel booking' });
     } finally {
       client.release();
+    }
+  }
+
+  // ─── GET /bookings/user/upcoming ─────────────────────────────────────────────
+  // Phase 10: Returns confirmed bookings where the outbound flight hasn't departed yet.
+  // WHY query-time: no cron needed — departure_time > NOW() handles auto-transition
+  //                  naturally without any background jobs.
+  async getUpcomingTrips(req, res) {
+    // userId is injected by auth middleware from JWT — no spoofing possible
+    const userId = req.userId;
+
+    const cacheKey = `bookings:upcoming:${userId}`;
+    if (this.redis) {
+      const cached = await this.redis.get(cacheKey).catch(() => null);
+      if (cached) return res.json({ success: true, data: JSON.parse(cached), cached: true });
+    }
+
+    try {
+      const result = await this.db.query(
+        `SELECT b.id, b.reference, b.status, b.payment_status, b.trip_type, b.cabin_class,
+                b.total_price, b.contact_email, b.contact_phone, b.created_at,
+                f.flight_number, f.airline_name, f.airline_code, f.airline_logo_url,
+                f.origin_iata, f.destination_iata,
+                f.departure_time, f.arrival_time, f.duration_minutes, f.stops,
+                ao.city AS origin_city, ao.name AS origin_name,
+                ad.city AS destination_city, ad.name AS destination_name,
+                (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count,
+                (SELECT json_agg(json_build_object('id', p.id, 'full_name', p.full_name)) FROM booking_passengers bp JOIN passengers p ON bp.passenger_id = p.id WHERE bp.booking_id = b.id) AS passengers
+         FROM bookings b
+         JOIN flights f ON b.flight_id = f.id
+         JOIN airports ao ON f.origin_iata = ao.iata_code
+         JOIN airports ad ON f.destination_iata = ad.iata_code
+         WHERE b.user_id = $1
+           AND b.status = 'confirmed'
+           AND b.payment_status = 'paid'
+           AND f.departure_time > NOW()
+         ORDER BY f.departure_time ASC`,
+        [userId]
+      );
+
+      const bookings = result.rows.map(b => ({
+        id: b.id,
+        reference: b.reference,
+        status: b.status,
+        payment_status: b.payment_status,
+        trip_type: b.trip_type,
+        cabin_class: b.cabin_class,
+        total_price: parseFloat(b.total_price),
+        contact_email: b.contact_email,
+        contact_phone: b.contact_phone,
+        created_at: b.created_at,
+        passenger_count: parseInt(b.passenger_count),
+        passengers: b.passengers || [],
+        flight: {
+          flight_number: b.flight_number,
+          airline_name: b.airline_name,
+          airline_code: b.airline_code,
+          airline_logo_url: b.airline_logo_url,
+          origin_iata: b.origin_iata,
+          destination_iata: b.destination_iata,
+          origin_city: b.origin_city,
+          origin_name: b.origin_name,
+          destination_city: b.destination_city,
+          destination_name: b.destination_name,
+          departure_time: b.departure_time,
+          arrival_time: b.arrival_time,
+          duration_minutes: b.duration_minutes,
+          stops: b.stops,
+        },
+      }));
+
+      // Cache 2 minutes — upcoming trips don't change frequently
+      if (this.redis) {
+        await this.redis.setEx(cacheKey, 120, JSON.stringify(bookings)).catch(() => {});
+      }
+
+      res.json({ success: true, data: bookings, total: bookings.length });
+    } catch (err) {
+      console.error('getUpcomingTrips error:', err.message);
+      res.status(500).json({ success: false, message: 'Failed to fetch upcoming trips' });
+    }
+  }
+
+  // ─── GET /bookings/user/history ───────────────────────────────────────────────
+  // Phase 10: Returns bookings where the outbound flight has already departed,
+  // plus any cancelled bookings regardless of date.
+  // WHY include cancelled: users want to see their full booking history.
+  async getHistoryTrips(req, res) {
+    const userId = req.userId;
+
+    const cacheKey = `bookings:history:${userId}`;
+    if (this.redis) {
+      const cached = await this.redis.get(cacheKey).catch(() => null);
+      if (cached) return res.json({ success: true, data: JSON.parse(cached), cached: true });
+    }
+
+    try {
+      const result = await this.db.query(
+        `SELECT b.id, b.reference, b.status, b.payment_status, b.trip_type, b.cabin_class,
+                b.total_price, b.contact_email, b.contact_phone, b.created_at,
+                f.flight_number, f.airline_name, f.airline_code, f.airline_logo_url,
+                f.origin_iata, f.destination_iata,
+                f.departure_time, f.arrival_time, f.duration_minutes, f.stops,
+                ao.city AS origin_city, ao.name AS origin_name,
+                ad.city AS destination_city, ad.name AS destination_name,
+                (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count,
+                (SELECT json_agg(json_build_object('id', p.id, 'full_name', p.full_name)) FROM booking_passengers bp JOIN passengers p ON bp.passenger_id = p.id WHERE bp.booking_id = b.id) AS passengers
+         FROM bookings b
+         JOIN flights f ON b.flight_id = f.id
+         JOIN airports ao ON f.origin_iata = ao.iata_code
+         JOIN airports ad ON f.destination_iata = ad.iata_code
+         WHERE b.user_id = $1
+           AND (
+             -- Completed trips: confirmed + paid + already departed
+             (b.status = 'confirmed' AND b.payment_status = 'paid' AND f.departure_time <= NOW())
+             OR
+             -- All cancelled bookings regardless of departure date
+             (b.status = 'cancelled')
+           )
+         ORDER BY f.departure_time DESC`,
+        [userId]
+      );
+
+      const bookings = result.rows.map(b => ({
+        id: b.id,
+        reference: b.reference,
+        status: b.status,
+        payment_status: b.payment_status,
+        trip_type: b.trip_type,
+        cabin_class: b.cabin_class,
+        total_price: parseFloat(b.total_price),
+        contact_email: b.contact_email,
+        contact_phone: b.contact_phone,
+        created_at: b.created_at,
+        passenger_count: parseInt(b.passenger_count),
+        passengers: b.passengers || [],
+        flight: {
+          flight_number: b.flight_number,
+          airline_name: b.airline_name,
+          airline_code: b.airline_code,
+          airline_logo_url: b.airline_logo_url,
+          origin_iata: b.origin_iata,
+          destination_iata: b.destination_iata,
+          origin_city: b.origin_city,
+          origin_name: b.origin_name,
+          destination_city: b.destination_city,
+          destination_name: b.destination_name,
+          departure_time: b.departure_time,
+          arrival_time: b.arrival_time,
+          duration_minutes: b.duration_minutes,
+          stops: b.stops,
+        },
+      }));
+
+      // Cache 5 minutes — history is stable
+      if (this.redis) {
+        await this.redis.setEx(cacheKey, 300, JSON.stringify(bookings)).catch(() => {});
+      }
+
+      res.json({ success: true, data: bookings, total: bookings.length });
+    } catch (err) {
+      console.error('getHistoryTrips error:', err.message);
+      res.status(500).json({ success: false, message: 'Failed to fetch trip history' });
     }
   }
 }

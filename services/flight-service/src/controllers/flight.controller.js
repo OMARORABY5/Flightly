@@ -15,11 +15,12 @@ class FlightController {
   // WHY: Shown when user opens the airport picker before typing anything.
   async getPopularAirports(req, res) {
     try {
-      const popularCodes = ['DXB', 'LHR', 'JFK', 'CDG', 'SIN', 'HND', 'FRA', 'AMS', 'IST', 'CAI'];
+      // Egyptian airports first, then world hubs
+      const popularCodes = ['CAI', 'HBE', 'SSH', 'HRG', 'LXR', 'DXB', 'LHR', 'JFK', 'CDG', 'IST', 'SIN', 'FRA'];
       const placeholders = popularCodes.map((_, i) => `$${i + 1}`).join(',');
 
       // Try Redis cache first (cache for 24h — popular airports rarely change)
-      const cacheKey = 'airports:popular';
+      const cacheKey = 'airports:popular:v2';
       if (this.redis?.isOpen) {
         const cached = await this.redis.get(cacheKey);
         if (cached) return res.json({ success: true, data: JSON.parse(cached) });

@@ -8,35 +8,63 @@ class AppColors {
   // Prevent instantiation — static class only
   AppColors._();
 
-  // ─── Primary Brand Colors ─────────────────────────────────────────────────
-  // Deep sky blue — conveys trust, aviation, and sky
-  static const Color primary = Color(0xFF0066FF);
-  static const Color primaryLight = Color(0xFF3D8BFF);
-  static const Color primaryDark = Color(0xFF0047CC);
+  // ─── Brand Color Palette (User Requested) ──────────────────────────────────
+  
+  /// Primary Action Blue - Used for primary buttons, active states, main UI
+  static const Color primaryBlue = Color(0xFF0066FF);
+  
+  /// Splash Screen Sky Blue - Lighter blue for large backgrounds/splash screens
+  static const Color skyBlue = Color(0xFF0088FF);
+
+  // 🖌️ Secondary & Accent Blues
+  /// Iconography Outline Blue - Used for custom icon borders and structural lines
+  static const Color iconOutlineBlue = Color(0xFF4A89F3);
+  
+  /// Pale Ice Blue - Soft background canvas for icons and illustration blobs
+  static const Color paleIceBlue = Color(0xFFD3E3FD);
+
+  // ⚖️ Neutrals & Typography
+  /// Dark Ink / Charcoal - Primary text color, character outlines, dark elements
+  static const Color darkInk = Color(0xFF212427);
+  
+  /// Subtitle Gray - Secondary text, descriptions, placeholders
+  static const Color subtitleGray = Color(0xFF808489);
+  
+  /// UI Light Gray - Subtle UI elements, input field backgrounds, borders
+  static const Color lightGray = Color(0xFFF1F3F4);
+  
+  /// Pure White - Base background color and text on primary buttons
+  static const Color white = Color(0xFFFFFFFF); 
+
+  // ─── Functional Aliases ───────────────────────────────────────────────────
+  // Mapping brand colors to functional roles used in the app logic
+  
+  static const Color primary = primaryBlue;
+  static const Color primaryLight = skyBlue;
+  static const Color primaryDark = Color(0xFF0052CC);
 
   // ─── Secondary / Accent ───────────────────────────────────────────────────
-  // Warm amber — used for highlights, badges, and CTAs
-  static const Color accent = Color(0xFFFF9500);
-  static const Color accentLight = Color(0xFFFFB443);
+  static const Color accent = iconOutlineBlue;
+  static const Color accentLight = paleIceBlue;
 
-  // ─── Background Colors ────────────────────────────────────────────────────
-  // Dark mode backgrounds (main app uses dark theme)
-  static const Color background = Color(0xFF0A0E1A);      // Page background
-  static const Color surface = Color(0xFF141927);          // Card surface
-  static const Color surfaceElevated = Color(0xFF1E2537);  // Elevated cards
-  static const Color surfaceBorder = Color(0xFF2A3347);    // Borders / dividers
+  // ─── Background & Surface ─────────────────────────────────────────────────
+  // Updated to reflect the new Light Theme palette
+  static const Color background = white;      
+  static const Color surface = lightGray;          
+  static const Color surfaceElevated = white;  
+  static const Color surfaceBorder = Color(0xFFE8EAED); // Subtle border
 
   // ─── Text Colors ──────────────────────────────────────────────────────────
-  static const Color textPrimary = Color(0xFFF0F4FF);      // Main text (off-white)
-  static const Color textSecondary = Color(0xFF8892A4);    // Secondary / labels
-  static const Color textHint = Color(0xFF50596B);         // Placeholders / hints
-  static const Color textDisabled = Color(0xFF3A4152);     // Disabled text
+  static const Color textPrimary = darkInk;      
+  static const Color textSecondary = subtitleGray;         
+  static const Color textHint = Color(0xFFB0B3B8);         
+  static const Color textDisabled = Color(0xFFD2D5D8);     
 
   // ─── Status Colors ────────────────────────────────────────────────────────
-  static const Color success = Color(0xFF22C55E);          // Confirmed, OK
-  static const Color error = Color(0xFFEF4444);            // Error states
-  static const Color warning = Color(0xFFF59E0B);          // Warnings / alerts
-  static const Color info = Color(0xFF3B82F6);             // Info messages
+  static const Color success = Color(0xFF22C55E);          
+  static const Color error = Color(0xFFEF4444);            
+  static const Color warning = Color(0xFFF59E0B);          
+  static const Color info = primaryBlue;             
 
   // ─── Badge / Label Colors ────────────────────────────────────────────────
   static const Color badgeBest = Color(0xFF7C3AED);       // "Best" badge (purple)
@@ -45,21 +73,19 @@ class AppColors {
   static const Color badgeValue = Color(0xFFD97706);      // "Value" badge (amber)
 
   // ─── Common ───────────────────────────────────────────────────────────────
-  static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color transparent = Colors.transparent;
 
-  // Gradient: hero/home screen gradient overlay
+  // ─── Gradients ────────────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0066FF), Color(0xFF7C3AED)],
+    colors: [primaryBlue, Color(0xFF7C3AED)], // Mixing in a purple for depth
   );
 
-  // Subtle card gradient for depth
-  static const LinearGradient cardGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF1E2537), Color(0xFF141927)],
+  static const LinearGradient surfaceGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [white, lightGray],
   );
 }

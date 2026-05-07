@@ -21,7 +21,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('Notification Preferences', style: AppTextStyles.headingMedium),
+        title: Text('Notification Preferences', style: AppTextStyles.headingMedium),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => context.pop(),

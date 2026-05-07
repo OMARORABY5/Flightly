@@ -47,12 +47,16 @@ async function connectRedis() {
   }
 }
 
+const authMiddleware = require('./src/middleware/auth.middleware');
 const userRoutes = require('./src/routes/user.routes');
+
+// WHY: All /users routes require authentication — users must be logged in
+//      to view/modify their own data. Auth middleware extracts req.userId from JWT.
 app.use('/users', (req, res, next) => {
   req.db = db;
   req.redis = redisClient;
   next();
-}, userRoutes);
+}, authMiddleware, userRoutes);
 
 app.get('/health', async (req, res) => {
   try {

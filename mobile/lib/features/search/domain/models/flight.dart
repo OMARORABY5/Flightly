@@ -68,7 +68,7 @@ class Flight {
 
   factory Flight.fromJson(Map<String, dynamic> json) {
     return Flight(
-      id: json['id'] ?? '',
+      id: json['id'] ?? json['flight_id'] ?? '',
       flightNumber: json['flight_number'] ?? '',
       airlineCode: json['airline_code'] ?? '',
       airlineName: json['airline_name'] ?? '',

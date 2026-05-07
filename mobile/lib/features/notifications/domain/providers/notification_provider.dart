@@ -36,7 +36,7 @@ class NotificationState {
 class NotificationNotifier extends _$NotificationNotifier {
   @override
   NotificationState build() {
-    _fetchNotifications();
+    Future.microtask(_fetchNotifications);
     return NotificationState(isLoading: true);
   }
 

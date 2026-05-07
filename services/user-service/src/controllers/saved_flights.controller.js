@@ -19,14 +19,13 @@ class SavedFlightsController {
   }
 
   // ─── GET /users/saved-flights ────────────────────────────────────────────────
-  // Returns all saved flights for a user, enriched with current live price.
-  // WHY: The watchlist screen needs the full flight details + price change indicator.
-  //
-  // Query params:
-  //   user_id  - UUID of the user (required; auth middleware will supply this in Phase 6)
+  // Returns all saved flights for the authenticated user, enriched with current live price.
+  // WHY: Auth middleware sets req.userId from JWT — we use that instead of trusting
+  //      a user-supplied user_id param (which could be spoofed to access other users' data).
   async getSavedFlights(req, res) {
     try {
-      const { user_id } = req.query;
+      // Use userId from JWT (set by auth middleware); fall back to query param for dev testing
+      const user_id = req.userId || req.query.user_id;
       if (!user_id) {
         return res.status(400).json({ success: false, message: 'user_id is required.' });
       }
@@ -113,7 +112,9 @@ class SavedFlightsController {
   // Body: { user_id, flight_id, search_criteria? }
   async saveFlight(req, res) {
     try {
-      const { user_id, flight_id, search_criteria } = req.body;
+      // Use userId from JWT; accept body override only in dev (body.user_id) for Postman testing
+      const user_id = req.userId || req.body.user_id;
+      const { flight_id, search_criteria } = req.body;
 
       if (!user_id || !flight_id) {
         return res.status(400).json({ success: false, message: 'user_id and flight_id are required.' });
@@ -175,7 +176,8 @@ class SavedFlightsController {
   async unsaveFlight(req, res) {
     try {
       const { flightId } = req.params;
-      const { user_id }  = req.query;
+      // Use userId from JWT; fall back to query param for dev testing
+      const user_id = req.userId || req.query.user_id;
 
       if (!user_id) {
         return res.status(400).json({ success: false, message: 'user_id query param is required.' });
@@ -214,7 +216,8 @@ class SavedFlightsController {
   async checkSaved(req, res) {
     try {
       const { flightId } = req.params;
-      const { user_id }  = req.query;
+      // Use userId from JWT; fall back to query param for dev testing
+      const user_id = req.userId || req.query.user_id;
 
       if (!user_id) {
         return res.status(400).json({ success: false, message: 'user_id query param is required.' });

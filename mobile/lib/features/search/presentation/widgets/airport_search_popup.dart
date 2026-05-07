@@ -28,6 +28,16 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
   Timer? _debounce;
 
   @override
+  void initState() {
+    super.initState();
+    // Reset query every time popup opens so popular airports always show first
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(airportSearchQueryProvider.notifier).state = '';
+      _searchController.clear();
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();

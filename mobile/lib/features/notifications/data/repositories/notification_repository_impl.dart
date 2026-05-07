@@ -18,15 +18,15 @@ class NotificationRepositoryImpl implements NotificationRepository {
     bool unreadOnly = false,
   }) async {
     final response = await _dioClient.get(
-      '/notifications',
-      queryParameters: {
+      '/notifications/',
+      queryParams: {
         'limit': limit,
         'offset': offset,
         'unread_only': unreadOnly,
       },
     );
 
-    final data = response['data'] as Map<String, dynamic>;
+    final data = response.data['data'] as Map<String, dynamic>;
     final notificationsList = data['notifications'] as List;
     final notifications = notificationsList.map((n) => AppNotification.fromJson(n)).toList();
     final unreadCount = data['unread_count'] as int;
@@ -60,7 +60,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Future<NotificationPreferences> getPreferences() async {
     final response = await _dioClient.get('/notifications/preferences');
-    return NotificationPreferences.fromJson(response['data'] as Map<String, dynamic>);
+    return NotificationPreferences.fromJson(response.data['data'] as Map<String, dynamic>);
   }
 
   @override

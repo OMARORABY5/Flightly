@@ -7,9 +7,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/presentation/widgets/ambient_background.dart';
-import 'package:flightly/core/presentation/widgets/glass_card.dart';
-import 'package:flightly/core/presentation/widgets/custom_text_field.dart';
+import 'package:flightly/core/widgets/sky_background.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -122,13 +120,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
+  Widget _buildInput({
+    required TextEditingController controller,
+    required String hint,
+    bool isPassword = false,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: keyboardType,
+        validator: validator,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: AppColors.subtitleGray.withOpacity(0.7)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primary, width: 1)),
+          filled: true,
+          fillColor: AppColors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -138,161 +173,115 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: AmbientBackground(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: GlassCard(
-              blur: 20.0,
-              opacity: 0.08,
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SkyBackground(
+        showClouds: true,
+        illustration: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Register',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w800,
+                color: AppColors.white,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                _buildInput(
+                  controller: _nameController,
+                  hint: 'Full Name',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Please enter your name';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildInput(
+                  controller: _emailController,
+                  hint: 'name@example.com',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Please enter your email';
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) return 'Please enter a valid email';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildInput(
+                  controller: _passwordController,
+                  hint: 'Create a strong password',
+                  isPassword: true,
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildRuleItem('At least 8 characters', _hasMinLength),
+                      _buildRuleItem('Contains uppercase letter', _hasUppercase),
+                      _buildRuleItem('Contains lowercase letter', _hasLowercase),
+                      _buildRuleItem('Contains a number', _hasDigit),
+                      _buildRuleItem('Contains a special character', _hasSpecial),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildInput(
+                  controller: _confirmPasswordController,
+                  hint: 'Repeat your password',
+                  isPassword: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Please confirm your password';
+                    if (value != _passwordController.text) return 'Passwords do not match';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: isLoading ? null : _onRegister,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    minimumSize: const Size(double.infinity, 56),
+                    elevation: 0,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Text('Sign Up', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Create Account',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Join FLIGHTLY to start booking flights',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    CustomTextField(
-                      label: 'Full Name',
-                      hint: 'John Doe',
-                      prefixIcon: LucideIcons.user,
-                      controller: _nameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextField(
-                      label: 'Email',
-                      hint: 'name@example.com',
-                      prefixIcon: LucideIcons.mail,
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextField(
-                      label: 'Password',
-                      hint: 'Create a strong password',
-                      prefixIcon: LucideIcons.lock,
-                      isPassword: true,
-                      controller: _passwordController,
-                    ),
-                    const SizedBox(height: 12),
-                    // Password Rules Checklist
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceElevated.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildRuleItem('At least 8 characters', _hasMinLength),
-                          _buildRuleItem('Contains uppercase letter', _hasUppercase),
-                          _buildRuleItem('Contains lowercase letter', _hasLowercase),
-                          _buildRuleItem('Contains a number', _hasDigit),
-                          _buildRuleItem('Contains a special character', _hasSpecial),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextField(
-                      label: 'Confirm Password',
-                      hint: 'Repeat your password',
-                      prefixIcon: LucideIcons.lock,
-                      isPassword: true,
-                      controller: _confirmPasswordController,
-                      textInputAction: TextInputAction.done,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
-                        }
-                        if (value != _passwordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: isLoading ? null : _onRegister,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Already have an account? ",
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.pushReplacement(RouteConstants.login),
-                          child: const Text(
-                            'Log In',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ],
+                    const Text("Already have an account? ", style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    GestureDetector(
+                      onTap: () => context.pushReplacement(RouteConstants.login),
+                      child: const Text('Log In', style: TextStyle(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ),

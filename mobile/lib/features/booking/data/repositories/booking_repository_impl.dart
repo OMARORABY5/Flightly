@@ -71,7 +71,7 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<List<Booking>> getUserBookings(String userId) async {
-    final response = await _dioClient.get('/bookings', queryParams: {'user_id': userId});
+    final response = await _dioClient.get('/bookings/', queryParams: {'user_id': userId});
     if (response.data['success'] == true) {
       final data = response.data['data'] as List;
       return data.map((e) => Booking.fromJson(e)).toList();

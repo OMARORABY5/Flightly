@@ -51,7 +51,7 @@ class SearchRepositoryImpl implements SearchRepository {
       'origin': query.origin!.iataCode,
       'destination': query.destination!.iataCode,
       'date': query.departureDate!.toIso8601String().split('T')[0],
-      'cabin': query.cabinClass == CabinClass.premiumEconomy ? 'premium_economy' : query.cabinClass.name,
+      'cabin': query.cabinClass.name,
       'passengers': query.totalPassengers.toString(),
       'page': page.toString(),
       ...filters.toQueryParams(),

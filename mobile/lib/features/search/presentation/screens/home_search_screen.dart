@@ -3,17 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/theme/app_text_styles.dart';
-import 'package:flightly/core/presentation/widgets/ambient_background.dart';
-import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/search/domain/models/search_query.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/search/presentation/widgets/airport_search_popup.dart';
 import 'package:flightly/features/search/presentation/widgets/date_selection_screen.dart';
 import 'package:flightly/features/search/presentation/widgets/passenger_class_popup.dart';
 import 'package:flightly/features/search/presentation/screens/search_results_screen.dart';
-import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeSearchScreen extends ConsumerWidget {
   const HomeSearchScreen({super.key});
@@ -23,292 +18,317 @@ class HomeSearchScreen extends ConsumerWidget {
     final query = ref.watch(searchFormProvider);
 
     return Scaffold(
-      body: AmbientBackground(
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverPadding(
+      backgroundColor: AppColors.background,
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            // Vibrant Gradient Header
+            Container(
+              height: 320,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.skyBlue],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
+                ),
+              ),
+            ),
+            
+            // Content
+            SafeArea(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                sliver: SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Where to?', style: AppTextStyles.displayLarge),
-                              const SizedBox(height: 4),
-                              Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-                            ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Bar with Profile Picture
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
                           ),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () => context.push('/notifications'),
-                                child: Stack(
-                                  children: [
-                                    const CircleAvatar(
-                                      backgroundColor: AppColors.surface,
-                                      child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
-                                    ),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final notificationState = ref.watch(notificationNotifierProvider);
-                                        if (notificationState.unreadCount > 0) {
-                                          return Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: const BoxDecoration(
-                                                color: AppColors.error,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Text(
-                                                '${notificationState.unreadCount}',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                        return const SizedBox.shrink();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              const CircleAvatar(
-                                backgroundColor: AppColors.surface,
-                                child: Icon(LucideIcons.user, color: AppColors.textSecondary),
-                              ),
-                            ],
+                          child: const CircleAvatar(
+                            radius: 24,
+                            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'), // Mock profile pic
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Title (White for contrast against gradient)
+                    Text(
+                      'Travel made\nsimple.',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withOpacity(0.95),
+                        height: 1.1,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    
+                    // Main Search Card (Softer, colored shadow)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.08),
+                            blurRadius: 30,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
-                      
-                      // Search Card
-                      GlassCard(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            // Trip Type Toggle
-                            Container(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          // Origin and Destination with Swap
+                          Stack(
+                            alignment: Alignment.centerRight,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildLocationRow(
+                                    context: context,
+                                    ref: ref,
+                                    icon: LucideIcons.mapPin,
+                                    label: query.origin?.iataCode != null ? '${query.origin?.city} (${query.origin?.iataCode})' : 'Where from?',
+                                    isOrigin: true,
+                                    hasValue: query.origin != null,
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 11, top: 8, bottom: 8),
+                                    height: 24,
+                                    width: 2,
+                                    child: CustomPaint(painter: _DottedLinePainter()),
+                                  ),
+                                  _buildLocationRow(
+                                    context: context,
+                                    ref: ref,
+                                    icon: LucideIcons.plane,
+                                    label: query.destination?.iataCode != null ? '${query.destination?.city} (${query.destination?.iataCode})' : 'Where to?',
+                                    isOrigin: false,
+                                    hasValue: query.destination != null,
+                                  ),
+                                ],
+                              ),
+                              // Swap Button
+                              GestureDetector(
+                                onTap: () {
+                                  ref.read(searchFormProvider.notifier).swapOriginDestination();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [AppColors.primary, AppColors.skyBlue],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withOpacity(0.3),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      )
+                                    ],
+                                  ),
+                                  child: const Icon(LucideIcons.arrowUpDown, color: Colors.white, size: 20),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          
+                          // Dates Row
+                          GestureDetector(
+                            onTap: () => DateSelectionScreen.show(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                               decoration: BoxDecoration(
-                                color: AppColors.surface.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(12),
+                                color: AppColors.paleIceBlue.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppColors.paleIceBlue.withOpacity(0.5)),
                               ),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Expanded(
-                                    child: _buildTripTypeButton(
-                                      title: 'One-way',
-                                      isSelected: query.tripType == TripType.oneWay,
-                                      onTap: () {
-                                        ref.read(searchFormProvider.notifier).updateQuery(
-                                          query.copyWith(tripType: TripType.oneWay, returnDate: null),
-                                        );
-                                      },
+                                  Text(
+                                    query.departureDate != null ? DateFormat('E, MMM d').format(query.departureDate!) : 'Select Date',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: query.departureDate != null ? AppColors.primary : AppColors.textSecondary,
+                                      fontWeight: query.departureDate != null ? FontWeight.w600 : FontWeight.w500,
                                     ),
                                   ),
-                                  Expanded(
-                                    child: _buildTripTypeButton(
-                                      title: 'Round-trip',
-                                      isSelected: query.tripType == TripType.roundTrip,
-                                      onTap: () {
-                                        ref.read(searchFormProvider.notifier).updateQuery(
-                                          query.copyWith(tripType: TripType.roundTrip),
-                                        );
-                                      },
+                                  if (query.tripType == TripType.roundTrip) ...[
+                                    const Text('-', style: TextStyle(color: AppColors.textSecondary)),
+                                    Text(
+                                      query.returnDate != null ? DateFormat('E, MMM d').format(query.returnDate!) : 'Select Date',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: query.returnDate != null ? AppColors.primary : AppColors.textSecondary,
+                                        fontWeight: query.returnDate != null ? FontWeight.w600 : FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Filters Row
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: GestureDetector(
+                            onTap: () {
+                              // Toggle trip type
+                              final newType = query.tripType == TripType.oneWay ? TripType.roundTrip : TripType.oneWay;
+                              ref.read(searchFormProvider.notifier).updateQuery(
+                                query.copyWith(tripType: newType, returnDate: newType == TripType.oneWay ? null : query.returnDate),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.04),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(LucideIcons.arrowRightLeft, size: 18, color: query.tripType == TripType.roundTrip ? AppColors.primary : AppColors.textSecondary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    query.tripType == TripType.roundTrip ? 'Return' : 'One-way',
+                                    style: TextStyle(
+                                      fontSize: 15, 
+                                      color: query.tripType == TripType.roundTrip ? AppColors.primary : AppColors.textSecondary,
+                                      fontWeight: query.tripType == TripType.roundTrip ? FontWeight.w600 : FontWeight.normal,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            
-                            // Origin & Destination
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Column(
-                                  children: [
-                                    _buildAirportField(
-                                      context: context,
-                                      ref: ref,
-                                      icon: LucideIcons.planeTakeoff,
-                                      label: 'From',
-                                      value: query.origin?.iataCode,
-                                      subValue: query.origin?.city,
-                                      isOrigin: true,
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 40),
-                                      child: Divider(color: AppColors.surface, height: 1),
-                                    ),
-                                    _buildAirportField(
-                                      context: context,
-                                      ref: ref,
-                                      icon: LucideIcons.planeLanding,
-                                      label: 'To',
-                                      value: query.destination?.iataCode,
-                                      subValue: query.destination?.city,
-                                      isOrigin: false,
-                                    ),
-                                  ],
-                                ),
-                                Positioned(
-                                  right: 16,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      ref.read(searchFormProvider.notifier).swapOriginDestination();
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.primary.withOpacity(0.3),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
-                                          )
-                                        ],
-                                      ),
-                                      child: const Icon(LucideIcons.arrowUpDown, color: Colors.white, size: 20),
-                                    ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 5,
+                          child: GestureDetector(
+                            onTap: () => PassengerClassPopup.show(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.04),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Dates
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildInfoField(
-                                    context: context,
-                                    icon: LucideIcons.calendar,
-                                    label: 'Departure',
-                                    value: query.departureDate != null ? DateFormat('E, d MMM').format(query.departureDate!) : 'Select',
-                                    onTap: () => DateSelectionScreen.show(context),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Opacity(
-                                    opacity: query.tripType == TripType.oneWay ? 0.3 : 1.0,
-                                    child: _buildInfoField(
-                                      context: context,
-                                      icon: LucideIcons.calendarClock,
-                                      label: 'Return',
-                                      value: query.returnDate != null ? DateFormat('E, d MMM').format(query.returnDate!) : 'Select',
-                                      onTap: query.tripType == TripType.roundTrip ? () => DateSelectionScreen.show(context) : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Passengers & Class
-                            _buildInfoField(
-                              context: context,
-                              icon: LucideIcons.users,
-                              label: 'Passengers & Class',
-                              value: '${query.totalPassengers} Passenger${query.totalPassengers > 1 ? 's' : ''}',
-                              subValue: query.cabinClass.name.replaceAll('Economy', ' Economy').toUpperCase(),
-                              onTap: () => PassengerClassPopup.show(context),
-                            ),
-                            const SizedBox(height: 24),
-                            
-                            // Search Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (query.isValid) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Please select origin, destination, and dates.')),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  disabledBackgroundColor: AppColors.surface,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  elevation: query.isValid ? 8 : 0,
-                                  shadowColor: AppColors.primary.withOpacity(0.5),
-                                ),
-                                child: Text('Search Flights', style: AppTextStyles.button),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(LucideIcons.users, size: 18, color: AppColors.primary),
+                                  const SizedBox(width: 6),
+                                  Text('${query.totalPassengers}', style: const TextStyle(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                                  const SizedBox(width: 12),
+                                  const Icon(Icons.child_care, size: 18, color: AppColors.primary),
+                                  const SizedBox(width: 6),
+                                  const Text('0', style: TextStyle(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                                  const SizedBox(width: 12),
+                                  const Icon(LucideIcons.briefcase, size: 18, color: AppColors.primary),
+                                  const SizedBox(width: 6),
+                                  const Text('0', style: TextStyle(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    
+                    // Search Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (query.isValid) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(query.validationError ?? 'Invalid search query.')),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          disabledBackgroundColor: AppColors.surface,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          elevation: 0,
+                          shadowColor: AppColors.primary.withOpacity(0.5),
+                        ).copyWith(
+                          elevation: WidgetStateProperty.resolveWith<double>(
+                            (Set<WidgetState> states) {
+                              if (states.contains(WidgetState.pressed)) return 4;
+                              return 12; // Nice healthy shadow
+                            },
+                          ),
+                        ),
+                        child: const Text('Search Flights', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTripTypeButton({required String title, required bool isSelected, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            )
-          ] : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          title,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAirportField({
+  Widget _buildLocationRow({
     required BuildContext context,
     required WidgetRef ref,
     required IconData icon,
     required String label,
-    required String? value,
-    required String? subValue,
     required bool isOrigin,
+    required bool hasValue,
   }) {
     return InkWell(
       onTap: () async {
@@ -321,81 +341,53 @@ class HomeSearchScreen extends ConsumerWidget {
         }
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 24),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.paleIceBlue.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 20),
+            ),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                  const SizedBox(height: 4),
-                  if (value != null)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(value, style: AppTextStyles.headingMedium),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(subValue ?? '', 
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
-                  else
-                    Text('Select Airport', style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary.withOpacity(0.5))),
-                ],
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: hasValue ? FontWeight.bold : FontWeight.w600,
+                  color: hasValue ? AppColors.textPrimary : AppColors.textSecondary.withOpacity(0.6),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.primary.withOpacity(0.3)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    const double dashHeight = 4;
+    const double dashSpace = 4;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(Offset(0, startY), Offset(0, startY + dashHeight), paint);
+      startY += dashHeight + dashSpace;
+    }
   }
 
-  Widget _buildInfoField({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required String value,
-    String? subValue,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                  const SizedBox(height: 4),
-                  Text(value, style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-                  if (subValue != null) ...[
-                    const SizedBox(height: 2),
-                    Text(subValue, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                  ]
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flightly/core/providers/storage_provider.dart';
@@ -22,29 +23,42 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
   }
 
   Future<void> _checkStatus() async {
-    final status = await Permission.notification.status;
-    if (mounted) {
-      setState(() {
-        _isGranted = status.isGranted;
-      });
+    try {
+      final status = await Permission.notification.status;
+      if (mounted) {
+        setState(() {
+          _isGranted = status.isGranted;
+        });
+      }
+    } catch (e) {
+      debugPrint('Permission check failed: $e');
     }
   }
 
   Future<void> _requestPermission() async {
     setState(() => _isRequesting = true);
     
-    final status = await Permission.notification.request();
-    
-    // Save the outcome
-    await ref.read(storageServiceProvider).setNotificationPermissionStatus(
-      status.isGranted ? 'granted' : 'denied'
-    );
+    try {
+      final status = await Permission.notification.request();
+      
+      // Save the outcome
+      await ref.read(storageServiceProvider).setNotificationPermissionStatus(
+        status.isGranted ? 'granted' : 'denied'
+      );
 
-    if (mounted) {
-      setState(() {
-        _isGranted = status.isGranted;
-        _isRequesting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isGranted = status.isGranted;
+          _isRequesting = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Permission request failed: $e');
+      if (mounted) {
+        setState(() {
+          _isRequesting = false;
+        });
+      }
     }
   }
 

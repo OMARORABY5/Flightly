@@ -25,13 +25,13 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // Transparent status bar with dark icons on the app's dark background
+  // Transparent status bar with dark icons on the app's light background
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light, // Light icons on dark bg
-      systemNavigationBarColor: AppColors.background,
-      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark, // Dark icons on light bg
+      systemNavigationBarColor: AppColors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -47,6 +47,8 @@ void main() async {
       child: const FlightlyApp(),
     ),
   );
+}
+
 class FlightlyApp extends ConsumerStatefulWidget {
   const FlightlyApp({super.key});
 
@@ -71,7 +73,7 @@ class _FlightlyAppState extends ConsumerState<FlightlyApp> {
     return MaterialApp.router(
       title: 'FLIGHTLY',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       routerConfig: router,
     );
   }

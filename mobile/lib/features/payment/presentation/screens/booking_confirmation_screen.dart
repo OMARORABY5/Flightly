@@ -2,32 +2,39 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/booking/domain/models/booking.dart';
+import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:confetti/confetti.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-class BookingConfirmationScreen extends StatefulWidget {
+class BookingConfirmationScreen extends ConsumerStatefulWidget {
   final Booking booking;
 
   const BookingConfirmationScreen({super.key, required this.booking});
 
   @override
-  State<BookingConfirmationScreen> createState() => _BookingConfirmationScreenState();
+  ConsumerState<BookingConfirmationScreen> createState() => _BookingConfirmationScreenState();
 }
 
-class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
+class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationScreen> {
   late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
+    // Invalidate trips providers so My Trips auto-refreshes on next visit
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(upcomingTripsProvider);
+      ref.invalidate(historyTripsProvider);
+    });
     _confettiController = ConfettiController(duration: const Duration(seconds: 4));
     // Start confetti when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -105,7 +112,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => context.go('/my-trips'), // Phase 10 placeholder
+                            onPressed: () => context.go('/home', extra: {'tabIndex': 1}),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

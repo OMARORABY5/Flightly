@@ -1,7 +1,7 @@
 import 'package:flightly/features/search/domain/models/airport.dart';
 
 enum TripType { oneWay, roundTrip }
-enum CabinClass { economy, premiumEconomy, business, first }
+enum CabinClass { economy, business, first }
 
 class SearchQuery {
   final TripType tripType;
@@ -32,17 +32,21 @@ class SearchQuery {
     Airport? destination,
     DateTime? departureDate,
     DateTime? returnDate,
+    bool clearReturnDate = false,
     int? adults,
     int? children,
     int? infants,
     CabinClass? cabinClass,
   }) {
+    final newTripType = tripType ?? this.tripType;
     return SearchQuery(
-      tripType: tripType ?? this.tripType,
+      tripType: newTripType,
       origin: origin ?? this.origin,
       destination: destination ?? this.destination,
       departureDate: departureDate ?? this.departureDate,
-      returnDate: returnDate ?? this.returnDate,
+      returnDate: newTripType == TripType.oneWay 
+          ? null 
+          : (clearReturnDate ? null : (returnDate ?? this.returnDate)),
       adults: adults ?? this.adults,
       children: children ?? this.children,
       infants: infants ?? this.infants,
@@ -52,15 +56,17 @@ class SearchQuery {
 
   int get totalPassengers => adults + children + infants;
   
-  bool get isValid {
-    if (origin == null || destination == null) return false;
-    if (origin == destination) return false;
-    if (departureDate == null) return false;
-    if (tripType == TripType.roundTrip && returnDate == null) return false;
-    if (returnDate != null && returnDate!.isBefore(departureDate!)) return false;
-    if (adults < 1) return false;
-    if (infants > adults) return false;
-    if (totalPassengers > 8) return false;
-    return true;
+  bool get isValid => validationError == null;
+
+  String? get validationError {
+    if (origin == null || destination == null) return 'Please select origin and destination airports.';
+    if (origin == destination) return 'Origin and destination cannot be the same.';
+    if (departureDate == null) return 'Please select a departure date.';
+    if (tripType == TripType.roundTrip && returnDate == null) return 'Please select a return date.';
+    if (returnDate != null && returnDate!.isBefore(departureDate!)) return 'Return date cannot be before departure date.';
+    if (adults < 1) return 'Please select at least 1 adult passenger.';
+    if (infants > adults) return 'Number of infants cannot exceed number of adults.';
+    if (totalPassengers > 8) return 'Maximum 8 passengers allowed per booking.';
+    return null;
   }
 }

@@ -6,8 +6,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
 import '../errors/failures.dart';
+
+final dioClientProvider = Provider<DioClient>((ref) => DioClient.instance());
 
 class DioClient {
   static DioClient? _instance;
@@ -136,8 +139,8 @@ class _AuthInterceptor extends Interceptor {
     ];
     final isPublic = publicPaths.any((path) => options.path.contains(path));
 
-    // flutter_secure_storage is not supported on Web — skip token read on web
-    if (!isPublic && !kIsWeb) {
+    // Read token from secure storage (works on Web via flutter_secure_storage_web)
+    if (!isPublic) {
       final token = await _storage.read(key: AppConstants.jwtStorageKey);
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';

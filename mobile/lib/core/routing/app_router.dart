@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,12 +19,20 @@ import 'package:flightly/features/payment/presentation/screens/payment_screen.da
 import 'package:flightly/features/payment/presentation/screens/booking_confirmation_screen.dart';
 import 'package:flightly/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:flightly/features/notifications/presentation/screens/notification_preferences_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:flightly/features/trips/presentation/screens/trip_detail_screen.dart';
+import 'package:flightly/features/trips/domain/models/trip.dart';
+import 'package:flightly/features/account/presentation/screens/profile_screen.dart';
+import 'package:flightly/features/account/presentation/screens/change_password_screen.dart';
+import 'package:flightly/features/account/presentation/screens/settings_screen.dart';
+import 'package:flightly/features/account/presentation/screens/my_cards_screen.dart';
+
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingProvider);
 
-  final authState = ref.watch(authProvider);
+  // Use read instead of watch to prevent the router from fully resetting
+  // and destroying the navigation stack every time auth state changes (e.g. to Loading)
+  final authState = ref.read(authProvider);
 
   String initial = RouteConstants.onboarding;
   if (isOnboardingCompleted) {
@@ -59,13 +68,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: RouteConstants.home,
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final tabIndex = extra?['tabIndex'] as int? ?? 0;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: HomeScreen(initialIndex: tabIndex),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          );
+        },
       ),
       GoRoute(
         path: '/booking',
         builder: (context, state) {
-          final flight = state.extra as dynamic; // Flight model
-          return BookingScreen(flight: flight);
+          final extra = state.extra as Map<String, dynamic>;
+          final flight = extra['flight'] as dynamic;
+          final returnFlight = extra['returnFlight'] as dynamic;
+          return BookingScreen(flight: flight, returnFlight: returnFlight);
         },
         routes: [
           GoRoute(
@@ -79,7 +103,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'edit',
                 builder: (context, state) {
-                  final passenger = state.extra as dynamic; // Passenger model
+                  final passenger = state.extra as dynamic;
                   return AddEditPassengerScreen(passenger: passenger);
                 },
               ),
@@ -88,8 +112,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'overview',
             builder: (context, state) {
-              final flight = state.extra as dynamic; // Flight model
-              return BookingOverviewScreen(flight: flight);
+              final extra = state.extra as Map<String, dynamic>;
+              final flight = extra['flight'] as dynamic;
+              final returnFlight = extra['returnFlight'] as dynamic;
+              return BookingOverviewScreen(flight: flight, returnFlight: returnFlight);
             },
           ),
         ],
@@ -110,10 +136,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      // Placeholder for my-trips
+      // Phase 10: Trip detail — receives Trip object via extra
       GoRoute(
-        path: '/my-trips',
-        builder: (context, state) => const Scaffold(body: Center(child: Text('My Trips Screen (Phase 10)'))),
+        path: '/trips/:id',
+        builder: (context, state) {
+          final trip = state.extra as Trip;
+          return TripDetailScreen(trip: trip);
+        },
       ),
       GoRoute(
         path: '/notifications',
@@ -122,6 +151,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/notification-preferences',
         builder: (context, state) => const NotificationPreferencesScreen(),
+      ),
+      // Phase 11: Account & Profile Management
+      GoRoute(
+        path: '/account/profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/account/password',
+        builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/account/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/account/cards',
+        builder: (context, state) => const MyCardsScreen(),
+      ),
+      GoRoute(
+        path: '/account/passengers',
+        builder: (context, state) => const PassengersScreen(isBookingFlow: false),
       ),
     ],
   );

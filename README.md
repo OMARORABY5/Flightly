@@ -58,4 +58,36 @@ flutter run
 
 ## Project Phases
 
-This project is built incrementally in 13 phases. Currently **Phase 7 (Payment & Booking Confirmation)** is completed. Please refer to `CLAUDE.md` and `task.md` for detailed progression and architecture plans.
+This project is built incrementally in 13 phases. **All 13 phases are now complete.** Please refer to `CLAUDE.md` and `task.md` for detailed progression and architecture plans.
+
+## Running Tests
+
+### Backend Unit Tests (Jest)
+```bash
+# Auth Service — 11 tests
+cd services/auth-service && npm test
+
+# Flight Service — 7 tests
+cd services/flight-service && npm test
+
+# Booking Service — 9 tests
+cd services/booking-service && npm test
+```
+
+### Flutter Unit & Widget Tests
+```bash
+# Validator unit tests — 33 tests
+flutter test test/validators_test.dart
+
+# Widget tests — 12 tests
+flutter test test/widget_test.dart
+
+# All Flutter tests
+flutter test
+```
+
+### Integration Tests (requires Docker running)
+```bash
+docker-compose up -d
+flutter test integration_test/
+```

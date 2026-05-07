@@ -158,3 +158,132 @@ class ButtonSpinner extends StatelessWidget {
     );
   }
 }
+
+// ─── Trip Card Shimmer ────────────────────────────────────────────────────────
+
+/// Shimmer card that matches the shape of a TripCard for My Trips loading state
+class TripCardShimmer extends StatelessWidget {
+  const TripCardShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.surfaceBorder),
+        ),
+        child: Shimmer.fromColors(
+          baseColor: AppColors.surface,
+          highlightColor: AppColors.surfaceElevated,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Status badge + date row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(width: 80, height: 22, decoration: BoxDecoration(color: AppColors.surfaceElevated, borderRadius: BorderRadius.circular(8))),
+                  Container(width: 60, height: 14, color: AppColors.surfaceElevated),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Route row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(width: 50, height: 28, color: AppColors.surfaceElevated),
+                  Container(width: 60, height: 12, color: AppColors.surfaceElevated),
+                  Container(width: 50, height: 28, color: AppColors.surfaceElevated),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(width: 120, height: 12, color: AppColors.surfaceElevated),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// List of trip card shimmer skeletons for My Trips loading
+class TripListShimmer extends StatelessWidget {
+  final int count;
+  const TripListShimmer({super.key, this.count = 4});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: count,
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemBuilder: (_, __) => const TripCardShimmer(),
+    );
+  }
+}
+
+// ─── Generic Card Shimmer ─────────────────────────────────────────────────────
+
+/// Generic shimmer card — used for notifications, passengers, settings lists
+class GenericCardShimmer extends StatelessWidget {
+  final double height;
+  const GenericCardShimmer({super.key, this.height = 72});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.surfaceBorder),
+        ),
+        child: Shimmer.fromColors(
+          baseColor: AppColors.surface,
+          highlightColor: AppColors.surfaceElevated,
+          child: Row(
+            children: [
+              Container(width: 40, height: 40, decoration: const BoxDecoration(color: AppColors.surfaceElevated, shape: BoxShape.circle)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(height: 14, color: AppColors.surfaceElevated),
+                    const SizedBox(height: 6),
+                    Container(width: 120, height: 10, color: AppColors.surfaceElevated),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// List of generic card shimmers
+class GenericListShimmer extends StatelessWidget {
+  final int count;
+  const GenericListShimmer({super.key, this.count = 5});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: count,
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemBuilder: (_, __) => const GenericCardShimmer(),
+    );
+  }
+}
+

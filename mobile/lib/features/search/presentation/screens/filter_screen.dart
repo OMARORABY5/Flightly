@@ -135,10 +135,10 @@ class _FilterScreenState extends ConsumerState<FilterScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Max Price', style: AppTextStyles.headingMedium),
+                          Text('Max Price (EGP)', style: AppTextStyles.headingMedium),
                           if (_maxPrice != null)
                             Text(
-                              '\$${_maxPrice!.toStringAsFixed(0)}',
+                              'EGP ${_maxPrice!.toStringAsFixed(0)}',
                               style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary),
                             ),
                         ],
@@ -157,11 +157,11 @@ class _FilterScreenState extends ConsumerState<FilterScreen> {
                                 valueIndicatorTextStyle: AppTextStyles.labelSmall,
                               ),
                               child: Slider(
-                                value: _maxPrice ?? 2000,
-                                min: 50,
-                                max: 2000,
-                                divisions: 39, // $50 increments
-                                label: '\$${(_maxPrice ?? 2000).toStringAsFixed(0)}',
+                                value: _maxPrice ?? 100000,
+                                min: 500,
+                                max: 100000,
+                                divisions: 40,
+                                label: 'EGP ${(_maxPrice ?? 100000).toStringAsFixed(0)}',
                                 onChanged: (value) => setState(() => _maxPrice = value),
                               ),
                             ),
@@ -170,8 +170,8 @@ class _FilterScreenState extends ConsumerState<FilterScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('\$50', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
-                                  Text('\$2000+', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                                  Text('EGP 500', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                                  Text('EGP 100,000+', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
                                 ],
                               ),
                             ),

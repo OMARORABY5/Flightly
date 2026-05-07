@@ -1,5 +1,5 @@
 // app_theme.dart — FLIGHTLY Full ThemeData
-// Configures the entire Material 3 dark theme for the app
+// Configures the entire Material 3 theme for the app
 // WHY: Centralizing theme prevents scattered styling and ensures consistency
 
 import 'package:flutter/material.dart';
@@ -10,16 +10,16 @@ import 'app_text_styles.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get dark {
+  static ThemeData get light {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
 
       // ─── Color Scheme ────────────────────────────────────────────────────
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.accent,
-        surface: AppColors.surface,
+        surface: AppColors.background,
         error: AppColors.error,
         onPrimary: AppColors.white,
         onSecondary: AppColors.white,
@@ -31,9 +31,8 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
 
       // ─── Typography ───────────────────────────────────────────────────────
-      // Base text theme uses Inter font
       textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
+        ThemeData.light().textTheme,
       ).apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
@@ -51,8 +50,9 @@ class AppTheme {
 
       // ─── Card ─────────────────────────────────────────────────────────────
       cardTheme: CardThemeData(
-        color: AppColors.surface,
-        elevation: 0,
+        color: AppColors.white,
+        elevation: 2,
+        shadowColor: AppColors.darkInk.withValues(alpha: 0.05),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.surfaceBorder, width: 1),
@@ -63,7 +63,7 @@ class AppTheme {
       // ─── Input Fields ─────────────────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.lightGray,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -81,16 +81,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1),
         ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
-        ),
         hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
         errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
       ),
 
-      // ─── Elevated Button ──────────────────────────────────────────────────
+      // ─── Buttons ──────────────────────────────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -102,61 +98,61 @@ class AppTheme {
         ),
       ),
 
-      // ─── Outlined Button ──────────────────────────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          textStyle: AppTextStyles.button.copyWith(color: AppColors.primary),
+          textStyle: AppTextStyles.button,
         ),
       ),
 
-      // ─── Text Button ─────────────────────────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          textStyle: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+          textStyle: AppTextStyles.labelLarge,
         ),
       ),
 
       // ─── Bottom Navigation Bar ───────────────────────────────────────────
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.white,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondary,
+        unselectedItemColor: AppColors.subtitleGray,
         type: BottomNavigationBarType.fixed,
-        elevation: 0,
+        elevation: 10,
       ),
 
-      // ─── Chip (filter tags) ───────────────────────────────────────────────
+      // ─── Other ───────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surface,
-        selectedColor: AppColors.primary.withAlpha((0.2 * 255).round()),
+        backgroundColor: AppColors.lightGray,
+        selectedColor: AppColors.paleIceBlue,
         checkmarkColor: AppColors.primary,
         labelStyle: AppTextStyles.labelMedium,
         side: const BorderSide(color: AppColors.surfaceBorder),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
 
-      // ─── Divider ─────────────────────────────────────────────────────────
       dividerTheme: const DividerThemeData(
         color: AppColors.surfaceBorder,
         thickness: 1,
         space: 1,
       ),
 
-      // ─── Icon ────────────────────────────────────────────────────────────
-      iconTheme: const IconThemeData(color: AppColors.textSecondary, size: 24),
+      iconTheme: const IconThemeData(color: AppColors.iconOutlineBlue, size: 24),
+    );
+  }
 
-      // ─── Page Transitions ─────────────────────────────────────────────────
-      pageTransitionsTheme: const PageTransitionsTheme(
-        builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        },
+  // Keeping dark theme just in case, but updating it slightly
+  static ThemeData get dark {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color(0xFF0A0E1A),
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primaryBlue,
+        surface: Color(0xFF141927),
       ),
     );
   }

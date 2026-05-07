@@ -1,8 +1,10 @@
 // empty_widget.dart — FLIGHTLY Empty States
 // Shown when a list/screen has no data (no trips, no saved flights, etc.)
-// WHY: Empty states guide users to take action instead of seeing a blank screen
+// WHY: Empty states guide users to take action instead of seeing a blank screen,
+//      reducing abandonment when there's no content to show.
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
@@ -12,6 +14,7 @@ class AppEmptyWidget extends StatelessWidget {
   final String? ctaLabel;
   final VoidCallback? onCta;
   final IconData icon;
+  final String? imagePath;
 
   const AppEmptyWidget({
     super.key,
@@ -19,7 +22,8 @@ class AppEmptyWidget extends StatelessWidget {
     required this.message,
     this.ctaLabel,
     this.onCta,
-    this.icon = Icons.inbox_outlined,
+    this.icon = LucideIcons.inbox,
+    this.imagePath,
   });
 
   @override
@@ -30,33 +34,57 @@ class AppEmptyWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha((0.1 * 255).round()),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: AppColors.primary, size: 44),
-            ),
-            const SizedBox(height: 20),
+            if (imagePath != null)
+              Image.asset(
+                imagePath!,
+                width: 180,
+                height: 180,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => _buildIcon(),
+              )
+            else
+              _buildIcon(),
+            const SizedBox(height: 24),
             Text(title, style: AppTextStyles.headingMedium, textAlign: TextAlign.center),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               message,
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             if (ctaLabel != null && onCta != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               ElevatedButton(
                 onPressed: onCta,
-                style: ElevatedButton.styleFrom(minimumSize: const Size(180, 48)),
-                child: Text(ctaLabel!),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.white,
+                  minimumSize: const Size(180, 48),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(ctaLabel!, style: AppTextStyles.button),
               ),
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildIcon() {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.6, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.elasticOut,
+      builder: (_, scale, child) => Transform.scale(scale: scale, child: child),
+      child: Container(
+        width: 96,
+        height: 96,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: AppColors.primary, size: 48),
       ),
     );
   }

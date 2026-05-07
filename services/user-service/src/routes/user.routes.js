@@ -12,6 +12,16 @@ router.get('/ping', (req, res) => res.json({ success: true, message: 'user-servi
 const savedFlightsRoutes = require('./saved_flights.routes');
 router.use('/saved-flights', savedFlightsRoutes);
 
+// ── Profile ───────────────────────────────────────────────────────────────────
+// All routes: /users/profile/...
+const profileRoutes = require('./profile.routes');
+router.use('/profile', profileRoutes);
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+// All routes: /users/settings/...
+const settingsRoutes = require('./settings.routes');
+router.use('/settings', settingsRoutes);
+
 // ── Passengers CRUD ───────────────────────────────────────────────────────────
 // All routes: /users/passengers/...
 const passengersRoutes = require('./passengers.routes');

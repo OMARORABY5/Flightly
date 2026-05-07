@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
+import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/notifications/domain/models/app_notification.dart';
 import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
 
@@ -14,6 +15,12 @@ class NotificationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
+    if (authState is! AuthAuthenticated) {
+      return _buildGuestState(context);
+    }
+
     final notificationState = ref.watch(notificationNotifierProvider);
     final notifier = ref.read(notificationNotifierProvider.notifier);
 
@@ -22,7 +29,7 @@ class NotificationsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('Notifications', style: AppTextStyles.headingMedium),
+        title: Text('Notifications', style: AppTextStyles.headingMedium),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
@@ -76,7 +83,7 @@ class NotificationsScreen extends ConsumerWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: state.notifications.length,
-      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.border),
+      separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.surfaceBorder),
       itemBuilder: (context, index) {
         final notification = state.notifications[index];
         return _buildNotificationItem(context, notification, notifier);
@@ -105,6 +112,59 @@ class NotificationsScreen extends ConsumerWidget {
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGuestState(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        title: Text('Notifications', style: AppTextStyles.headingMedium),
+        leading: IconButton(
+          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.surfaceBorder),
+                ),
+                child: const Icon(LucideIcons.bellRing, size: 60, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 24),
+              Text('Log in to see updates', style: AppTextStyles.headingMedium, textAlign: TextAlign.center),
+              const SizedBox(height: 12),
+              Text(
+                'Sign in to receive alerts about your flights, gate changes, and exclusive deals.',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () => context.push('/auth/login'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text('Log In', style: AppTextStyles.button),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
