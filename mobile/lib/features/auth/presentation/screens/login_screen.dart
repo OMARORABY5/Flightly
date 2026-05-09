@@ -7,8 +7,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/constants/app_assets.dart';
-import 'package:flightly/core/widgets/sky_background.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/home/presentation/screens/home_screen.dart';
 
@@ -61,42 +59,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
-      body: SkyBackground(
-        showClouds: true,
-        illustration: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Login',
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.w800,
-                color: AppColors.white,
-                letterSpacing: 0.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
+      body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
+                const Text(
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 40),
                 _buildInput(
                   controller: _emailController,
                   hint: 'Enter your email',
@@ -148,10 +138,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () {},
-                        icon: Image.asset(AppAssets.icGoogle, width: 20, height: 20, errorBuilder: (c, e, s) => const Icon(LucideIcons.chrome, color: Colors.red)),
+                        icon: const Icon(LucideIcons.chrome, color: Colors.blue),
                         label: const Text('Google', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
                         style: OutlinedButton.styleFrom(
-                          backgroundColor: AppColors.white,
                           side: const BorderSide(color: AppColors.surfaceBorder),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -165,7 +154,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         icon: const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 24),
                         label: const Text('Facebook', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
                         style: OutlinedButton.styleFrom(
-                          backgroundColor: AppColors.white,
                           side: const BorderSide(color: AppColors.surfaceBorder),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -203,29 +191,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: TextFormField(
         controller: controller,
         obscureText: isPassword,
         keyboardType: keyboardType,
         validator: validator,
+        style: const TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: AppColors.subtitleGray.withOpacity(0.7)),
+          hintStyle: const TextStyle(color: AppColors.textHint),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primary, width: 1)),
           filled: true,
-          fillColor: AppColors.white,
+          fillColor: AppColors.surface,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         ),
       ),

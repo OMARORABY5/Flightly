@@ -10,7 +10,6 @@ import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/filter_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flightly/core/widgets/empty_widget.dart';
-import 'package:flightly/core/constants/app_assets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class SearchResultsScreen extends ConsumerStatefulWidget {
@@ -65,11 +64,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
               Container(
                 height: 140,
                 decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.skyBlue],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: AppColors.surface,
                 ),
                 padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10, left: 16, right: 16),
                 child: Row(
@@ -157,8 +152,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                         ),
                         Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppColors.paleIceBlue.withOpacity(0.4),
+                          decoration: const BoxDecoration(
+                            color: AppColors.surfaceElevated,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(LucideIcons.arrowUpDown, color: AppColors.primary, size: 16),
@@ -171,9 +166,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: AppColors.paleIceBlue.withOpacity(0.3),
+                        color: AppColors.surfaceElevated,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.paleIceBlue.withOpacity(0.5)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -247,26 +241,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
-                        gradient: isSelected ? const LinearGradient(
-                          colors: [AppColors.primary, AppColors.skyBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ) : null,
-                        color: isSelected ? null : AppColors.white,
+                        color: isSelected ? AppColors.primary : AppColors.surfaceElevated,
                         borderRadius: BorderRadius.circular(24),
-                        boxShadow: isSelected ? [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          )
-                        ] : [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          )
-                        ],
                       ),
                       child: Text(
                         option.label,
@@ -309,7 +285,6 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                         ? const AppEmptyWidget(
                             title: 'No flights found',
                             message: 'Try adjusting your filters or changing dates',
-                            imagePath: AppAssets.emptySearch,
                             icon: Icons.airplanemode_inactive,
                           )
                         : RefreshIndicator(

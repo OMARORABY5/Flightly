@@ -7,7 +7,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/widgets/sky_background.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -129,29 +128,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: TextFormField(
         controller: controller,
         obscureText: isPassword,
         keyboardType: keyboardType,
         validator: validator,
+        style: const TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: AppColors.subtitleGray.withOpacity(0.7)),
+          hintStyle: const TextStyle(color: AppColors.textHint),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1)),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.primary, width: 1)),
           filled: true,
-          fillColor: AppColors.white,
+          fillColor: AppColors.surface,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         ),
       ),
@@ -164,33 +157,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
-      body: SkyBackground(
-        showClouds: true,
-        illustration: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Register',
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.w800,
-                color: AppColors.white,
-                letterSpacing: 0.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
+      body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(

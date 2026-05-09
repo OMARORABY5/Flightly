@@ -22,22 +22,6 @@ class HomeSearchScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
-            // Vibrant Gradient Header
-            Container(
-              height: 320,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.skyBlue],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-              ),
-            ),
-            
             // Content
             SafeArea(
               child: Padding(
@@ -45,50 +29,25 @@ class HomeSearchScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Top Bar with Profile Picture
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
-                          ),
-                          child: const CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'), // Mock profile pic
-                            backgroundColor: Colors.transparent,
-                          ),
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 24),
                     
-                    // Title (White for contrast against gradient)
-                    Text(
-                      'Travel made\nsimple.',
+                    // Title
+                    const Text(
+                      'Search Flights',
                       style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                         height: 1.1,
-                        letterSpacing: -1,
                       ),
                     ),
                     const SizedBox(height: 40),
                     
-                    // Main Search Card (Softer, colored shadow)
+                    // Main Search Card
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.08),
-                            blurRadius: 30,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
                       ),
                       padding: const EdgeInsets.all(24),
                       child: Column(
@@ -132,21 +91,10 @@ class HomeSearchScreen extends ConsumerWidget {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [AppColors.primary, AppColors.skyBlue],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
+                                    color: AppColors.surfaceElevated,
                                     shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withOpacity(0.3),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      )
-                                    ],
                                   ),
-                                  child: const Icon(LucideIcons.arrowUpDown, color: Colors.white, size: 20),
+                                  child: const Icon(LucideIcons.arrowUpDown, color: AppColors.primary, size: 20),
                                 ),
                               ),
                             ],
@@ -159,9 +107,8 @@ class HomeSearchScreen extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                               decoration: BoxDecoration(
-                                color: AppColors.paleIceBlue.withOpacity(0.3),
+                                color: AppColors.surfaceElevated,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: AppColors.paleIceBlue.withOpacity(0.5)),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -210,15 +157,8 @@ class HomeSearchScreen extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: AppColors.surfaceElevated,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -246,15 +186,8 @@ class HomeSearchScreen extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: AppColors.surfaceElevated,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -347,7 +280,7 @@ class HomeSearchScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.paleIceBlue.withOpacity(0.5),
+                color: AppColors.surfaceElevated,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: AppColors.primary, size: 20),
@@ -374,7 +307,7 @@ class _DottedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.primary.withOpacity(0.3)
+      ..color = AppColors.primary.withValues(alpha: 0.3)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 

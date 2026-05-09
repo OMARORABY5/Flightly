@@ -8,8 +8,6 @@ import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flightly/features/saved_flights/presentation/widgets/saved_flight_card.dart';
 import 'package:flightly/core/widgets/empty_widget.dart';
-import 'package:flightly/core/constants/app_assets.dart';
-
 class WatchlistScreen extends ConsumerWidget {
   const WatchlistScreen({super.key});
 
@@ -34,7 +32,7 @@ class WatchlistScreen extends ConsumerWidget {
     return AppEmptyWidget(
       title: 'Log in to save flights',
       message: 'Track prices and get notified when fares change for your favorite routes.',
-      imagePath: AppAssets.emptySaved,
+      icon: LucideIcons.heart,
       ctaLabel: 'Log In',
       onCta: () => context.push('/auth/login'),
     );
@@ -82,7 +80,6 @@ class WatchlistScreen extends ConsumerWidget {
         AppEmptyWidget(
           title: 'Your watchlist is empty',
           message: 'Search for flights and tap the heart icon to save them here for later.',
-          imagePath: AppAssets.emptySaved,
           icon: LucideIcons.heart,
         ),
       ],

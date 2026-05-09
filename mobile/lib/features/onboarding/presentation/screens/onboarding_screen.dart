@@ -6,10 +6,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/constants/app_assets.dart';
+
 import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
 import 'package:flightly/features/onboarding/presentation/widgets/notification_permission_button.dart';
-import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -50,36 +49,27 @@ class OnboardingScreen extends ConsumerWidget {
             PageViewModel(
               title: "Find Your Perfect Flight",
               body: "Explore the world's best destinations with our intelligent search engine. We make discovering your next journey effortless.",
-              image: Image.asset(
-                AppAssets.welcomeOne,
-                errorBuilder: (context, error, stackTrace) => const _IllustrationPlaceholder(
-                  icon: LucideIcons.globe,
-                  color: AppColors.primary,
-                ),
+              image: const _IllustrationPlaceholder(
+                icon: LucideIcons.globe,
+                color: AppColors.primary,
               ),
               decoration: pageDecoration,
             ),
             PageViewModel(
               title: "Compare & Save",
               body: "Seamless booking experience with smart pricing. We compare thousands of flights to get you the absolute best deal.",
-              image: Image.asset(
-                AppAssets.welcomeTwo,
-                errorBuilder: (context, error, stackTrace) => const _IllustrationPlaceholder(
-                  icon: LucideIcons.planeTakeoff,
-                  color: AppColors.accent,
-                ),
+              image: const _IllustrationPlaceholder(
+                icon: LucideIcons.planeTakeoff,
+                color: AppColors.accent,
               ),
               decoration: pageDecoration,
             ),
             PageViewModel(
               title: "Stay Updated",
               body: "Never miss a flight update. Enable notifications to receive instant alerts about gate changes, delays, and exclusive deals.",
-              image: Image.asset(
-                AppAssets.welcomeThree,
-                errorBuilder: (context, error, stackTrace) => const _IllustrationPlaceholder(
-                  icon: LucideIcons.bellRing,
-                  color: AppColors.success,
-                ),
+              image: const _IllustrationPlaceholder(
+                icon: LucideIcons.bellRing,
+                color: AppColors.success,
               ),
               footer: const Padding(
                 padding: const EdgeInsets.only(top: 40.0),
@@ -103,7 +93,7 @@ class OnboardingScreen extends ConsumerWidget {
           controlsPadding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
           dotsDecorator: DotsDecorator(
             size: const Size(10.0, 10.0),
-            color: AppColors.lightGray,
+            color: AppColors.surfaceBorder,
             activeSize: const Size(24.0, 10.0),
             activeColor: AppColors.primary,
             activeShape: const RoundedRectangleBorder(

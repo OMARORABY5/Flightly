@@ -16,8 +16,6 @@ import 'package:flightly/features/trips/presentation/widgets/trip_card.dart';
 import 'package:flightly/core/widgets/loading_widget.dart';
 import 'package:flightly/core/widgets/error_widget.dart' as app;
 import 'package:flightly/core/widgets/empty_widget.dart';
-import 'package:flightly/core/constants/app_assets.dart';
-
 class MyTripsScreen extends ConsumerStatefulWidget {
   const MyTripsScreen({super.key});
 
@@ -95,7 +93,6 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
                   emptyTitle: 'No travel history',
                   emptySubtitle: 'Your completed and cancelled trips will appear here.',
                   showBookCTA: false,
-                  imagePath: AppAssets.emptyTrips,
                 ),
               ],
             ),
