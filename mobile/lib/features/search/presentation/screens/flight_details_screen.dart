@@ -118,7 +118,10 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   void _proceedToBooking() {
     final flight = ref.read(flightDetailsProvider(widget.flightId)).value;
     if (flight != null) {
-      context.push('/booking', extra: flight);
+      context.push('/booking', extra: {
+        'flight': flight,
+        'returnFlight': null,
+      });
     } else {
       showTopSnackBar(
         Overlay.of(context),
