@@ -5,10 +5,7 @@ import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/search/domain/providers/search_provider.dart';
-import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
-import 'package:flightly/features/search/domain/models/search_query.dart';
-import 'package:flightly/features/search/presentation/screens/return_flight_results_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -78,108 +75,78 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   }
 
   Future<void> _handleBookNow() async {
-    // Flight is guaranteed non-null here — the button only renders
-    // inside flightAsync.when(data:), so the provider has resolved.
-    final flight = ref.read(flightDetailsProvider(widget.flightId)).value;
-    if (flight == null) return;
+    setState(() => _isCheckingPrice = true);
 
-    // ── Price check (outbound only — API doesn't support return-leg IDs) ──
-    if (!widget.isReturnLeg) {
-      setState(() => _isCheckingPrice = true);
-      try {
-        final repo = ref.read(searchRepositoryProvider);
-        final result = await repo.priceCheck(widget.flightId, widget.seenPrice);
-        setState(() => _isCheckingPrice = false);
-        if (!mounted) return;
+    try {
+      final repo = ref.read(searchRepositoryProvider);
+      final result = await repo.priceCheck(widget.flightId, widget.seenPrice);
 
-        if (result.unavailable) {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.bottomSlide,
-            title: 'Flight Unavailable',
-            desc: result.message,
-            btnOkOnPress: () {},
-            btnOkText: 'OK',
-          ).show();
-          return;
-        }
+      setState(() => _isCheckingPrice = false);
 
-        if (result.priceChanged) {
-          final isIncrease = result.difference > 0;
-          bool accepted = false;
-          await AwesomeDialog(
-            context: context,
-            dialogType: isIncrease ? DialogType.warning : DialogType.success,
-            animType: AnimType.bottomSlide,
-            title: 'Price Updated',
-            desc: result.message,
-            btnCancelOnPress: () {},
-            btnCancelText: 'Cancel',
-            btnOkOnPress: () => accepted = true,
-            btnOkText: 'Accept & Continue',
-          ).show();
-          if (!accepted || !mounted) return;
-        }
-      } catch (e) {
-        setState(() => _isCheckingPrice = false);
-        if (!mounted) return;
-        showTopSnackBar(
-          Overlay.of(context),
-          const CustomSnackBar.error(message: 'Failed to verify price. Please try again.'),
-        );
+      if (!mounted) return;
+
+      if (result.unavailable) {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.bottomSlide,
+          title: 'Flight Unavailable',
+          desc: result.message,
+          btnOkOnPress: () {},
+          btnOkText: 'OK',
+        ).show();
         return;
       }
-    }
 
-    if (!mounted) return;
-
-    // ── Navigate ──
-    if (widget.isReturnLeg) {
-      // Return leg done → booking with both flights
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BookingScreen(
-            flight: widget.outboundFlight!,
-            returnFlight: flight,
-          ),
-        ),
-      );
-    } else if (ref.read(searchFormProvider).tripType == TripType.roundTrip) {
-      // Outbound done → show return flight results
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight),
-        ),
-      );
-    } else {
-      // One-way → booking directly
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BookingScreen(flight: flight),
-        ),
+      if (result.priceChanged) {
+        final isIncrease = result.difference > 0;
+        AwesomeDialog(
+          context: context,
+          dialogType: isIncrease ? DialogType.warning : DialogType.success,
+          animType: AnimType.bottomSlide,
+          title: 'Price Updated',
+          desc: result.message,
+          btnCancelOnPress: () {},
+          btnCancelText: 'Cancel',
+          btnOkOnPress: _proceedToBooking,
+          btnOkText: 'Accept & Continue',
+        ).show();
+      } else {
+        _proceedToBooking();
+      }
+    } catch (e) {
+      setState(() => _isCheckingPrice = false);
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.error(message: 'Failed to verify price. Please try again.'),
       );
     }
+  }
+
+  void _proceedToBooking() {
+    final flight = ref.read(flightDetailsProvider(widget.flightId)).value;
+    if (flight == null) {
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.error(message: 'Error: Flight details not loaded'),
+      );
+      return;
+    }
+
+    // ── Navigate to booking ──
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BookingScreen(flight: flight),
+      ),
+    );
   }
 
   /// Label for the primary action button.
-  String get _buttonLabel {
-    if (widget.isReturnLeg) return 'Book Now';
-    final query = ref.read(searchFormProvider);
-    if (query.tripType == TripType.roundTrip) return 'Select Return Flight';
-    return 'Book Now';
-  }
+  String get _buttonLabel => 'Book Now';
 
   /// Icon shown beside the button label.
-  IconData get _buttonIcon {
-    if (widget.isReturnLeg) return LucideIcons.plane;
-    final query = ref.read(searchFormProvider);
-    if (query.tripType == TripType.roundTrip) return LucideIcons.arrowRight;
-    return LucideIcons.plane;
-  }
+  IconData get _buttonIcon => LucideIcons.plane;
 
   @override
   Widget build(BuildContext context) {

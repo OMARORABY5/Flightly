@@ -15,7 +15,7 @@ class SearchQuery {
   final CabinClass cabinClass;
 
   SearchQuery({
-    this.tripType = TripType.roundTrip,
+    this.tripType = TripType.oneWay,
     this.origin,
     this.destination,
     this.departureDate,

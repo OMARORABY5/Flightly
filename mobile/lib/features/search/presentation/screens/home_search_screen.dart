@@ -192,32 +192,13 @@ class HomeSearchScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 16),
                             
-                            // Dates
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildInfoField(
-                                    context: context,
-                                    icon: LucideIcons.calendar,
-                                    label: 'Departure',
-                                    value: query.departureDate != null ? DateFormat('E, d MMM').format(query.departureDate!) : 'Select',
-                                    onTap: () => DateSelectionScreen.show(context),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Opacity(
-                                    opacity: query.tripType == TripType.oneWay ? 0.3 : 1.0,
-                                    child: _buildInfoField(
-                                      context: context,
-                                      icon: LucideIcons.calendarClock,
-                                      label: 'Return',
-                                      value: query.returnDate != null ? DateFormat('E, d MMM').format(query.returnDate!) : 'Select',
-                                      onTap: query.tripType == TripType.roundTrip ? () => DateSelectionScreen.show(context) : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            // Departure Date
+                            _buildInfoField(
+                              context: context,
+                              icon: LucideIcons.calendar,
+                              label: 'Departure',
+                              value: query.departureDate != null ? DateFormat('E, d MMM').format(query.departureDate!) : 'Select',
+                              onTap: () => DateSelectionScreen.show(context),
                             ),
                             const SizedBox(height: 16),
                             
