@@ -78,88 +78,65 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   }
 
   Future<void> _handleBookNow() async {
-    // Return leg: skip priceCheck — API only supports outbound flights.
-    if (widget.isReturnLeg) {
-      _proceedToBooking();
-      return;
-    }
+    // Flight is guaranteed non-null here — the button only renders
+    // inside flightAsync.when(data:), so the provider has resolved.
+    final flight = ref.read(flightDetailsProvider(widget.flightId)).value;
+    if (flight == null) return;
 
-    setState(() => _isCheckingPrice = true);
-
-    try {
-      final repo = ref.read(searchRepositoryProvider);
-      final result = await repo.priceCheck(widget.flightId, widget.seenPrice);
-
-      setState(() => _isCheckingPrice = false);
-
-      if (!mounted) return;
-
-      if (result.unavailable) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.bottomSlide,
-          title: 'Flight Unavailable',
-          desc: result.message,
-          btnOkOnPress: () {},
-          btnOkText: 'OK',
-        ).show();
-        return;
-      }
-
-      if (result.priceChanged) {
-        final isIncrease = result.difference > 0;
-        AwesomeDialog(
-          context: context,
-          dialogType: isIncrease ? DialogType.warning : DialogType.success,
-          animType: AnimType.bottomSlide,
-          title: 'Price Updated',
-          desc: result.message,
-          btnCancelOnPress: () {},
-          btnCancelText: 'Cancel',
-          btnOkOnPress: _proceedToBooking,
-          btnOkText: 'Accept & Continue',
-        ).show();
-      } else {
-        _proceedToBooking();
-      }
-    } catch (e) {
-      setState(() => _isCheckingPrice = false);
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.error(message: 'Failed to verify price. Please try again.'),
-      );
-    }
-  }
-
-  Future<void> _proceedToBooking() async {
-    final asyncValue = ref.read(flightDetailsProvider(widget.flightId));
-    Flight? flight;
-
-    if (asyncValue.hasValue) {
-      flight = asyncValue.value;
-    } else {
-      // Provider still loading — fetch directly from API
+    // ── Price check (outbound only — API doesn't support return-leg IDs) ──
+    if (!widget.isReturnLeg) {
       setState(() => _isCheckingPrice = true);
       try {
         final repo = ref.read(searchRepositoryProvider);
-        flight = await repo.getFlightDetails(widget.flightId);
-      } catch (_) {}
-      if (mounted) setState(() => _isCheckingPrice = false);
-    }
+        final result = await repo.priceCheck(widget.flightId, widget.seenPrice);
+        setState(() => _isCheckingPrice = false);
+        if (!mounted) return;
 
-    if (flight == null || !mounted) {
-      if (mounted) {
+        if (result.unavailable) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.bottomSlide,
+            title: 'Flight Unavailable',
+            desc: result.message,
+            btnOkOnPress: () {},
+            btnOkText: 'OK',
+          ).show();
+          return;
+        }
+
+        if (result.priceChanged) {
+          final isIncrease = result.difference > 0;
+          bool accepted = false;
+          await AwesomeDialog(
+            context: context,
+            dialogType: isIncrease ? DialogType.warning : DialogType.success,
+            animType: AnimType.bottomSlide,
+            title: 'Price Updated',
+            desc: result.message,
+            btnCancelOnPress: () {},
+            btnCancelText: 'Cancel',
+            btnOkOnPress: () => accepted = true,
+            btnOkText: 'Accept & Continue',
+          ).show();
+          if (!accepted || !mounted) return;
+        }
+      } catch (e) {
+        setState(() => _isCheckingPrice = false);
+        if (!mounted) return;
         showTopSnackBar(
           Overlay.of(context),
-          const CustomSnackBar.error(message: 'Error: Flight details not loaded'),
+          const CustomSnackBar.error(message: 'Failed to verify price. Please try again.'),
         );
+        return;
       }
-      return;
     }
 
+    if (!mounted) return;
+
+    // ── Navigate ──
     if (widget.isReturnLeg) {
-      // Return leg selected — go straight to booking with both legs
+      // Return leg done → booking with both flights
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -169,25 +146,22 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
           ),
         ),
       );
+    } else if (ref.read(searchFormProvider).tripType == TripType.roundTrip) {
+      // Outbound done → show return flight results
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight),
+        ),
+      );
     } else {
-      final query = ref.read(searchFormProvider);
-      if (query.tripType == TripType.roundTrip) {
-        // Outbound selected for a round-trip — show return results screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight!),
-          ),
-        );
-      } else {
-        // One-way — go directly to booking
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BookingScreen(flight: flight!),
-          ),
-        );
-      }
+      // One-way → booking directly
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BookingScreen(flight: flight),
+        ),
+      );
     }
   }
 
