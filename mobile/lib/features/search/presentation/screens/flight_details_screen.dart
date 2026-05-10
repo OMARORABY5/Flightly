@@ -176,7 +176,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight),
+            builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight!),
           ),
         );
       } else {
@@ -184,7 +184,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BookingScreen(flight: flight),
+            builder: (_) => BookingScreen(flight: flight!),
           ),
         );
       }
