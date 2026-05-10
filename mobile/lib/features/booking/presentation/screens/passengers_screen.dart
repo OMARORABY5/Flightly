@@ -30,7 +30,7 @@ class PassengersScreen extends ConsumerWidget {
           centerTitle: true,
         ),
         body: Stack(children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
@@ -77,8 +77,9 @@ class PassengersScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           passengersAsync.when(
             loading: () => const Padding(
               padding: EdgeInsets.only(top: 120),

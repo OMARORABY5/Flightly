@@ -225,8 +225,9 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       backgroundColor: AppColors.background,
       extendBody: true,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           flightAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, _) => Center(
@@ -238,11 +239,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
               }
               return CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
-                    ),
-                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverList(

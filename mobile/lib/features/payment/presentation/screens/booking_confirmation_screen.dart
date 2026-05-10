@@ -73,8 +73,9 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
         elevation: 0,
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           
           SafeArea(
             child: Center(

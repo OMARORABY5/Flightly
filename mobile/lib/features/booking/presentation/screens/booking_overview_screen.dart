@@ -117,8 +117,9 @@ class _BookingOverviewScreenState
         centerTitle: true,
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           CustomScrollView(
             slivers: [
               SliverToBoxAdapter(

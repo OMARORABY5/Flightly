@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 
-/// A reusable dark-surface card with a subtle gradient, border, and shadow.
-/// Previously used BackdropFilter blur (glassmorphism) but it caused mouse
-/// tracker assertion failures on web/desktop. Now uses solid dark surfaces.
+/// A reusable dark-surface card with rounded corners, border, and shadow.
+/// Uses Container.clipBehavior instead of a separate ClipRRect so that the
+/// card decoration (border, shadow) renders outside the clip boundary and
+/// content inside is properly clipped to the border radius.
 class GlassCard extends StatelessWidget {
   final Widget child;
-  final double blur;   // kept for API compatibility — no longer used
-  final double opacity; // kept for API compatibility — no longer used
+  final double blur;    // kept for API compat — not used
+  final double opacity; // kept for API compat — not used
   final BorderRadius? borderRadius;
   final EdgeInsetsGeometry padding;
   final double? width;
@@ -32,6 +33,9 @@ class GlassCard extends StatelessWidget {
       width: width,
       height: height,
       padding: padding,
+      // clipBehavior on the Container itself clips children to the border
+      // radius without a separate ClipRRect that can cut content too early.
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: effectiveBorderRadius,
         gradient: LinearGradient(
@@ -55,10 +59,7 @@ class GlassCard extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: effectiveBorderRadius,
-        child: child,
-      ),
+      child: child,
     );
   }
 }

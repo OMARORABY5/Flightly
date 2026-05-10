@@ -88,8 +88,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         centerTitle: true,
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
+          AmbientBackground(child: SizedBox.shrink()),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
