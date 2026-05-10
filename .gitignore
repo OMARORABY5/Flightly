@@ -2,10 +2,6 @@
 # Keep secrets and build artifacts out of version control
 
 # ─── Environment files (NEVER commit these) ──────────────────────────────────
-.env
-!.env.example
-**/.env
-!**/.env.example
 
 # ─── Node.js ──────────────────────────────────────────────────────────────────
 node_modules/
@@ -34,8 +30,6 @@ mobile/ios/.symlinks/
 mobile/web/
 
 # Firebase config files (contain API keys — keep out of public repos)
-mobile/android/app/google-services.json
-mobile/ios/Runner/GoogleService-Info.plist
 
 # ─── Docker ───────────────────────────────────────────────────────────────────
 # Docker data volumes (local machine only)
@@ -67,8 +61,4 @@ coverage/
 *.temp
 dist/
 
-# --- Firebase Service Accounts ----------------------------------------------
-*-firebase-adminsdk-*.json
 
-# --- Backend Service Env Files ----------------------------------------------
-services/*/.env
