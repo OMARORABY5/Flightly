@@ -66,3 +66,9 @@ coverage/
 *.tmp
 *.temp
 dist/
+
+# --- Firebase Service Accounts ----------------------------------------------
+*-firebase-adminsdk-*.json
+
+# --- Backend Service Env Files ----------------------------------------------
+services/*/.env
