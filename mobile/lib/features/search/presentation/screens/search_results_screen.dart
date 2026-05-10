@@ -8,6 +8,7 @@ import 'package:flightly/features/search/domain/providers/flight_results_provide
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/filter_screen.dart';
+import 'package:flightly/features/search/presentation/screens/flight_details_screen.dart';
 import 'package:intl/intl.dart';
 
 class SearchResultsScreen extends ConsumerStatefulWidget {
@@ -205,7 +206,16 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                                     return FlightCard(
                                       flight: resultsState.flights[index],
                                       onTap: () {
-                                        // Navigate to flight details screen in Phase 5
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => FlightDetailsScreen(
+                                              flightId: resultsState.flights[index].id,
+                                              seenPrice: resultsState.flights[index].basePrice,
+                                              isReturnLeg: false,
+                                            ),
+                                          ),
+                                        );
                                       },
                                     );
                                   },

@@ -16,7 +16,7 @@ class SkyBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.skyBlue,
+      backgroundColor: AppColors.info,
       body: Stack(
         children: [
           // Clouds and Illustrations at the top

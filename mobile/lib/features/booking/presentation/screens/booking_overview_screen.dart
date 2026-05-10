@@ -130,10 +130,8 @@ class _BookingOverviewScreenState
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    if (_isRoundTrip) ...[
-                      _buildTripTypeBadge(),
-                      const SizedBox(height: 16),
-                    ],
+                    _buildTripTypeBadge(),
+                    const SizedBox(height: 16),
                     _buildItinerary(),
                     const SizedBox(height: 16),
                     _buildPassengersList(selectedPassengers),
@@ -195,27 +193,33 @@ class _BookingOverviewScreenState
   }
 
   Widget _buildTripTypeBadge() {
+    final isRound = _isRoundTrip;
+    final color = isRound ? AppColors.primary : AppColors.textSecondary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withValues(alpha: 0.18),
-            AppColors.primary.withValues(alpha: 0.06),
+            color.withValues(alpha: 0.18),
+            color.withValues(alpha: 0.06),
           ],
         ),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(LucideIcons.arrowLeftRight,
-              size: 16, color: AppColors.primary),
+          Icon(
+            isRound ? LucideIcons.arrowLeftRight : LucideIcons.arrowRight,
+            size: 16,
+            color: color,
+          ),
           const SizedBox(width: 8),
-          Text('Round-trip',
-              style: AppTextStyles.labelMedium
-                  .copyWith(color: AppColors.primary)),
+          Text(
+            isRound ? 'Round-trip' : 'One-way',
+            style: AppTextStyles.labelMedium.copyWith(color: color),
+          ),
         ],
       ),
     );

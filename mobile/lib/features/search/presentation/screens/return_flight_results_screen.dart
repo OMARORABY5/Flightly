@@ -297,18 +297,15 @@ class _ReturnFlightResultsScreenState
                                     final flight = resultsState.flights[index];
                                     return FlightCard(
                                       flight: flight,
-                                      // Override "View Details" to open the return-leg details screen
-                                      onViewDetails: () {
+                                      onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                FlightDetailsScreen(
+                                            builder: (context) => FlightDetailsScreen(
                                               flightId: flight.id,
                                               seenPrice: flight.basePrice,
                                               isReturnLeg: true,
-                                              outboundFlight:
-                                                  widget.outboundFlight,
+                                              outboundFlight: widget.outboundFlight,
                                             ),
                                           ),
                                         );

@@ -88,6 +88,9 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                     Text('Payment Successful!', style: AppTextStyles.headingLarge),
                     const SizedBox(height: 8),
                     Text('Your flight is confirmed.', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                    const SizedBox(height: 12),
+                    // Trip-type badge
+                    _buildTripTypeBadge(),
                     const SizedBox(height: 32),
                     _buildReferenceCard(),
                     const SizedBox(height: 24),
@@ -170,6 +173,36 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
       ),
       child: const Center(
         child: Icon(LucideIcons.checkCircle, size: 40, color: AppColors.success),
+      ),
+    );
+  }
+
+  Widget _buildTripTypeBadge() {
+    final isRoundTrip = widget.booking.tripType == 'round_trip';
+    final color = isRoundTrip ? AppColors.primary : AppColors.textSecondary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.06)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isRoundTrip ? LucideIcons.arrowLeftRight : LucideIcons.arrowRight,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            isRoundTrip ? 'Round-trip' : 'One-way',
+            style: AppTextStyles.labelMedium.copyWith(color: color),
+          ),
+        ],
       ),
     );
   }
