@@ -222,18 +222,27 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
           const SizedBox(width: 8),
         ],
       ),
+      backgroundColor: AppColors.background,
+      extendBody: true,
       body: Stack(
         children: [
           Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           flightAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, _) => Center(child: Text('Error loading details', style: AppTextStyles.bodyLarge)),
+            error: (err, _) => Center(
+              child: Text('Error loading details', style: AppTextStyles.bodyLarge),
+            ),
             data: (flight) {
-              if (flight == null) return const Center(child: Text('Flight not found'));
-
+              if (flight == null) {
+                return const Center(child: Text('Flight not found'));
+              }
               return CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(child: SizedBox(height: MediaQuery.of(context).padding.top + 56)),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+                    ),
+                  ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverList(
@@ -248,7 +257,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                         _buildBaggageAndClass(flight),
                         const SizedBox(height: 24),
                         _buildPolicies(flight),
-                        const SizedBox(height: 140), // Space for sticky bottom bar
+                        const SizedBox(height: 24),
                       ]),
                     ),
                   ),
@@ -256,123 +265,132 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
               );
             },
           ),
-
-          // ── Sticky Bottom Bar ──────────────────────────────────────────────
-          flightAsync.whenData((flight) => flight != null
-              ? Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
+        ],
+      ),
+      // ── Sticky Bottom Bar via bottomNavigationBar ─────────────────────────
+      bottomNavigationBar: flightAsync.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (flight) {
+          if (flight == null) return const SizedBox.shrink();
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 16,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Outbound summary chip (only on return leg)
+                if (widget.isReturnLeg && widget.outboundFlight != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          blurRadius: 16,
-                          offset: const Offset(0, -4),
-                        ),
-                      ],
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.15),
+                          AppColors.primary.withValues(alpha: 0.05),
+                        ],
+                      ),
+                      border: Border(
+                        bottom: BorderSide(color: AppColors.surfaceBorder),
+                      ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Row(
                       children: [
-                        // Outbound summary chip (only on return leg)
-                        if (widget.isReturnLeg && widget.outboundFlight != null)
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary.withValues(alpha: 0.15),
-                                  AppColors.primary.withValues(alpha: 0.05),
-                                ],
-                              ),
-                              border: Border(
-                                bottom: BorderSide(color: AppColors.surfaceBorder),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.swap_horiz, size: 16, color: AppColors.primary),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Outbound: ${widget.outboundFlight!.originIata} → '
-                                    '${widget.outboundFlight!.destinationIata}  '
-                                    '${DateFormat('HH:mm').format(widget.outboundFlight!.departureTime)}  '
-                                    '• EGP ${widget.outboundFlight!.basePrice.toStringAsFixed(0)}',
-                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                        // Price + CTA row
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 20, right: 20, top: 14,
-                            bottom: MediaQuery.of(context).padding.bottom + 14,
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      widget.isReturnLeg ? 'Return Price' : 'Price',
-                                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary),
-                                    ),
-                                    Text(
-                                      'EGP ${flight.basePrice.toStringAsFixed(0)}',
-                                      style: AppTextStyles.displayMedium.copyWith(color: AppColors.primary),
-                                    ),
-                                    if (widget.isReturnLeg && widget.outboundFlight != null)
-                                      Text(
-                                        'Total: EGP ${(flight.basePrice + widget.outboundFlight!.basePrice).toStringAsFixed(0)}',
-                                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 52,
-                                child: ElevatedButton.icon(
-                                  onPressed: _isCheckingPrice ? null : _handleBookNow,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    disabledBackgroundColor: AppColors.surfaceElevated,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  ),
-                                  icon: _isCheckingPrice
-                                      ? const SizedBox(
-                                          width: 18, height: 18,
-                                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                        )
-                                      : Icon(_buttonIcon, size: 18, color: Colors.white),
-                                  label: _isCheckingPrice
-                                      ? Text('Checking…', style: AppTextStyles.button)
-                                      : Text(_buttonLabel, style: AppTextStyles.button),
-                                ),
-                              ),
-                            ],
+                        const Icon(Icons.swap_horiz, size: 16, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Outbound: ${widget.outboundFlight!.originIata} → '
+                            '${widget.outboundFlight!.destinationIata}  '
+                            '${DateFormat('HH:mm').format(widget.outboundFlight!.departureTime)}  '
+                            '• EGP ${widget.outboundFlight!.basePrice.toStringAsFixed(0)}',
+                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                   ),
-                )
-              : const SizedBox()).value ?? const SizedBox(),
-        ],
+
+                // Price + CTA row
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 14,
+                    bottom: MediaQuery.of(context).padding.bottom + 14,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.isReturnLeg ? 'Return Price' : 'Price',
+                              style: AppTextStyles.labelMedium
+                                  .copyWith(color: AppColors.textSecondary),
+                            ),
+                            Text(
+                              'EGP ${flight.basePrice.toStringAsFixed(0)}',
+                              style: AppTextStyles.displayMedium
+                                  .copyWith(color: AppColors.primary),
+                            ),
+                            if (widget.isReturnLeg && widget.outboundFlight != null)
+                              Text(
+                                'Total: EGP ${(flight.basePrice + widget.outboundFlight!.basePrice).toStringAsFixed(0)}',
+                                style: AppTextStyles.labelSmall
+                                    .copyWith(color: AppColors.textSecondary),
+                              ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 52,
+                        child: ElevatedButton.icon(
+                          onPressed: _isCheckingPrice ? null : _handleBookNow,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            disabledBackgroundColor: AppColors.surfaceElevated,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                          ),
+                          icon: _isCheckingPrice
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2),
+                                )
+                              : Icon(_buttonIcon, size: 18, color: Colors.white),
+                          label: _isCheckingPrice
+                              ? Text('Checking…', style: AppTextStyles.button)
+                              : Text(_buttonLabel, style: AppTextStyles.button),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
+
 
   Widget _buildFlightHeader(Flight flight) {
     return GlassCard(
