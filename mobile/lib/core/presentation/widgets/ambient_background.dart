@@ -2,8 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 
-/// A reusable animated ambient background that creates a glowing, "breathing" effect
-/// by moving blurred colored orbs around the screen.
+/// Animated ambient background with glowing orbs.
+/// Renders as a plain Stack (no Scaffold) so it can be safely nested
+/// inside any other Scaffold without causing hit-test assertion failures.
 class AmbientBackground extends StatefulWidget {
   final Widget child;
 
@@ -20,7 +21,6 @@ class _AmbientBackgroundState extends State<AmbientBackground>
   @override
   void initState() {
     super.initState();
-    // 10 second loop for a very slow, ambient breath
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
@@ -35,60 +35,53 @@ class _AmbientBackgroundState extends State<AmbientBackground>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
+    return ColoredBox(
+      color: AppColors.background,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
         children: [
           // Orb 1: Top Right (Primary Blue)
           AnimatedBuilder(
             animation: _controller,
-            builder: (context, child) {
-              return Positioned(
-                top: -100 + (sin(_controller.value * 2 * pi) * 50),
-                right: -100 + (cos(_controller.value * 2 * pi) * 30),
-                child: _buildOrb(
-                  AppColors.primary,
-                  size: 400,
-                  opacity: 0.15,
-                ),
-              );
-            },
+            builder: (context, _) => Positioned(
+              top: -100 + (sin(_controller.value * 2 * pi) * 50),
+              right: -100 + (cos(_controller.value * 2 * pi) * 30),
+              child: _buildOrb(AppColors.primary, size: 400, opacity: 0.15),
+            ),
           ),
-          
+
           // Orb 2: Bottom Left (Accent/Purple)
           AnimatedBuilder(
             animation: _controller,
-            builder: (context, child) {
-              return Positioned(
-                bottom: -150 + (cos(_controller.value * 2 * pi) * 60),
-                left: -100 + (sin(_controller.value * 2 * pi) * 40),
-                child: _buildOrb(
-                  AppColors.badgeBest, // Purple color
-                  size: 450,
-                  opacity: 0.12,
-                ),
-              );
-            },
+            builder: (context, _) => Positioned(
+              bottom: -150 + (cos(_controller.value * 2 * pi) * 60),
+              left: -100 + (sin(_controller.value * 2 * pi) * 40),
+              child: _buildOrb(AppColors.badgeBest, size: 450, opacity: 0.12),
+            ),
           ),
-          
-          // The actual screen content
-          SafeArea(child: widget.child),
+
+          // Screen content on top
+          widget.child,
         ],
       ),
     );
   }
 
   Widget _buildOrb(Color color, {required double size, required double opacity}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color.withValues(alpha: opacity),
-            color.withValues(alpha: 0),
-          ],
+    return IgnorePointer(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                color.withValues(alpha: opacity),
+                color.withValues(alpha: 0),
+              ],
+            ),
+          ),
         ),
       ),
     );

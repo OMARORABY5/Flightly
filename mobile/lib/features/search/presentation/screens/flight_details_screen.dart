@@ -224,7 +224,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           flightAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, _) => Center(child: Text('Error loading details', style: AppTextStyles.bodyLarge)),

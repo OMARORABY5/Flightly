@@ -118,7 +118,7 @@ class _BookingOverviewScreenState
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           CustomScrollView(
             slivers: [
               SliverToBoxAdapter(

@@ -89,7 +89,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),

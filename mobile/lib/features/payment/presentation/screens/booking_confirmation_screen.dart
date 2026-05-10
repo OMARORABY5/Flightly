@@ -74,7 +74,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           
           SafeArea(
             child: Center(

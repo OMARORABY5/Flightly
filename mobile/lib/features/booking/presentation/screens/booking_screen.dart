@@ -144,7 +144,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           CustomScrollView(
             slivers: [
               SliverToBoxAdapter(

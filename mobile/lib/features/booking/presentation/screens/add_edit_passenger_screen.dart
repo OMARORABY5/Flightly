@@ -212,7 +212,7 @@ class _AddEditPassengerScreenState extends ConsumerState<AddEditPassengerScreen>
       ),
       body: Stack(
         children: [
-          const AmbientBackground(child: SizedBox()),
+          Positioned.fill(child: AmbientBackground(child: SizedBox.shrink())),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
