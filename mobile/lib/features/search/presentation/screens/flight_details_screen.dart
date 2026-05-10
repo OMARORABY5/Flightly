@@ -78,6 +78,12 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   }
 
   Future<void> _handleBookNow() async {
+    // Return leg: skip priceCheck — API only supports outbound flights.
+    if (widget.isReturnLeg) {
+      _proceedToBooking();
+      return;
+    }
+
     setState(() => _isCheckingPrice = true);
 
     try {
@@ -126,13 +132,29 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
     }
   }
 
-  void _proceedToBooking() {
-    final flight = ref.read(flightDetailsProvider(widget.flightId)).value;
-    if (flight == null) {
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.error(message: 'Error: Flight details not loaded'),
-      );
+  Future<void> _proceedToBooking() async {
+    final asyncValue = ref.read(flightDetailsProvider(widget.flightId));
+    Flight? flight;
+
+    if (asyncValue.hasValue) {
+      flight = asyncValue.value;
+    } else {
+      // Provider still loading — fetch directly from API
+      setState(() => _isCheckingPrice = true);
+      try {
+        final repo = ref.read(searchRepositoryProvider);
+        flight = await repo.getFlightDetails(widget.flightId);
+      } catch (_) {}
+      if (mounted) setState(() => _isCheckingPrice = false);
+    }
+
+    if (flight == null || !mounted) {
+      if (mounted) {
+        showTopSnackBar(
+          Overlay.of(context),
+          const CustomSnackBar.error(message: 'Error: Flight details not loaded'),
+        );
+      }
       return;
     }
 
