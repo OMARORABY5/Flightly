@@ -8,7 +8,7 @@ import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/booking/domain/models/booking.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flightly/features/payment/presentation/screens/booking_confirmation_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -74,7 +74,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
 
     if (!mounted) return;
-    context.go('/payment/confirmation', extra: widget.booking);
+    Navigator.push(context, MaterialPageRoute(builder: (_) => BookingConfirmationScreen(booking: widget.booking)));
   }
 
   @override

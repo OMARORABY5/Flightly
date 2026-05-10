@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flightly/features/booking/presentation/screens/booking_screen.dart';
 
 class FlightDetailsScreen extends ConsumerStatefulWidget {
   final String flightId;
@@ -95,7 +95,8 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
           animType: AnimType.bottomSlide,
           title: 'Flight Unavailable',
           desc: result.message,
-          btnOkOnPress: () => Navigator.pop(context),
+          btnOkOnPress: () {},
+          btnOkText: 'OK',
         ).show();
         return;
       }
@@ -137,10 +138,15 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
 
     if (widget.isReturnLeg) {
       // Return leg selected — go straight to booking with both legs
-      context.push('/booking', extra: {
-        'flight': widget.outboundFlight!,
-        'returnFlight': flight,
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BookingScreen(
+            flight: widget.outboundFlight!,
+            returnFlight: flight,
+          ),
+        ),
+      );
     } else {
       final query = ref.read(searchFormProvider);
       if (query.tripType == TripType.roundTrip) {
@@ -153,17 +159,19 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
         );
       } else {
         // One-way — go directly to booking
-        context.push('/booking', extra: {
-          'flight': flight,
-          'returnFlight': null,
-        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookingScreen(flight: flight),
+          ),
+        );
       }
     }
   }
 
   /// Label for the primary action button.
   String get _buttonLabel {
-    if (widget.isReturnLeg) return 'Complete Booking';
+    if (widget.isReturnLeg) return 'Book Now';
     final query = ref.read(searchFormProvider);
     if (query.tripType == TripType.roundTrip) return 'Select Return Flight';
     return 'Book Now';
@@ -171,7 +179,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
 
   /// Icon shown beside the button label.
   IconData get _buttonIcon {
-    if (widget.isReturnLeg) return LucideIcons.checkCircle2;
+    if (widget.isReturnLeg) return LucideIcons.plane;
     final query = ref.read(searchFormProvider);
     if (query.tripType == TripType.roundTrip) return LucideIcons.arrowRight;
     return LucideIcons.plane;

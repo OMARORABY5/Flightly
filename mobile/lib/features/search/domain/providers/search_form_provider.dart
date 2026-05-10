@@ -14,6 +14,11 @@ class SearchFormNotifier extends StateNotifier<SearchQuery> {
       destination: state.origin,
     );
   }
+
+  /// Clears all fields so the next search starts fresh.
+  void reset() {
+    state = SearchQuery();
+  }
 }
 
 final searchFormProvider = StateNotifierProvider<SearchFormNotifier, SearchQuery>((ref) {

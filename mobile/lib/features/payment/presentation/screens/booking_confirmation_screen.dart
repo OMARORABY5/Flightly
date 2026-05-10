@@ -9,6 +9,7 @@ import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/booking/domain/models/booking.dart';
 import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
+import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:confetti/confetti.dart';
@@ -34,6 +35,8 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.invalidate(upcomingTripsProvider);
       ref.invalidate(historyTripsProvider);
+      // Reset search form so next search starts fresh
+      ref.read(searchFormProvider.notifier).reset();
     });
     _confettiController = ConfettiController(duration: const Duration(seconds: 4));
     // Start confetti when screen loads
@@ -113,7 +116,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => context.go('/home', extra: {'tabIndex': 1}),
+                            onPressed: () { Navigator.of(context).popUntil((r) => r.isFirst); context.go('/home', extra: {'tabIndex': 1}); },
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 52),
                               side: const BorderSide(color: AppColors.primary),
@@ -126,7 +129,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                         const SizedBox(width: 16),
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => context.go('/home'),
+                            onPressed: () { Navigator.of(context).popUntil((r) => r.isFirst); context.go('/home'); },
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 52),
                               side: const BorderSide(color: AppColors.textSecondary),

@@ -8,7 +8,7 @@ import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
 import 'package:flightly/features/booking/domain/models/booking_request.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flightly/features/payment/presentation/screens/payment_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -84,7 +84,7 @@ class _BookingOverviewScreenState
             message: 'Booking reserved! Proceeding to Payment...'),
       );
 
-      context.go('/payment', extra: booking);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentScreen(booking: booking)));
     } catch (e) {
       showTopSnackBar(
         Overlay.of(context),

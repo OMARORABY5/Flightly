@@ -7,7 +7,8 @@ import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flightly/features/booking/presentation/screens/booking_overview_screen.dart';
+import 'package:flightly/features/booking/presentation/screens/passengers_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:flightly/features/booking/domain/models/passenger.dart';
@@ -117,10 +118,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return;
     }
 
-    context.push('/booking/overview', extra: {
-      'flight': widget.flight,
-      'returnFlight': widget.returnFlight,
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BookingOverviewScreen(
+          flight: widget.flight,
+          returnFlight: widget.returnFlight,
+        ),
+      ),
+    );
   }
 
   @override
@@ -365,7 +371,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 ],
               ),
               TextButton(
-                onPressed: () => context.push('/booking/passengers'),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PassengersScreen())),
                 child: Text(
                   selectedPassengers.isEmpty ? 'Select' : 'Manage',
                   style: AppTextStyles.button

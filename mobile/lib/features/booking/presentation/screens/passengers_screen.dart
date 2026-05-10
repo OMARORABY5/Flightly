@@ -10,6 +10,7 @@ import 'package:flightly/core/widgets/loading_widget.dart';
 import 'package:flightly/core/widgets/error_widget.dart' as app;
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flightly/features/booking/presentation/screens/add_edit_passenger_screen.dart';
 
 class PassengersScreen extends ConsumerWidget {
   final bool isBookingFlow;
@@ -140,7 +141,7 @@ class PassengersScreen extends ConsumerWidget {
                         children: [
                           IconButton(
                             icon: const Icon(LucideIcons.edit2, size: 18),
-                            onPressed: () => context.push('/booking/passengers/edit', extra: p),
+                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AddEditPassengerScreen(passenger: p))),
                           ),
                           Checkbox(
                             value: isSelected,
@@ -180,7 +181,7 @@ class PassengersScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => context.push('/booking/passengers/add'),
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddEditPassengerScreen())),
                         icon: const Icon(LucideIcons.plus, size: 20),
                         label: const Text('Add'),
                         style: OutlinedButton.styleFrom(
@@ -214,7 +215,7 @@ class PassengersScreen extends ConsumerWidget {
                   ],
                 )
               : OutlinedButton.icon(
-                  onPressed: () => context.push('/booking/passengers/add'),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddEditPassengerScreen())),
                   icon: const Icon(LucideIcons.plus, size: 20),
                   label: const Text('Add Passenger'),
                   style: OutlinedButton.styleFrom(
