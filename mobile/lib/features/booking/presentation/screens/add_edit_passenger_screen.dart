@@ -276,19 +276,16 @@ class _AddEditPassengerScreenState extends ConsumerState<AddEditPassengerScreen>
                       ),
                       const SizedBox(height: 32),
                       
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _save,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : Text('Save Passenger', style: AppTextStyles.button),
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _save,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text('Save Passenger', style: AppTextStyles.button),
                       ),
                     ],
                   ),

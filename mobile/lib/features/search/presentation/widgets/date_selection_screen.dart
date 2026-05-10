@@ -172,20 +172,17 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: (_selectedStart != null && (query.tripType == TripType.oneWay || _selectedEnd != null))
-                    ? _applyDates
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  disabledBackgroundColor: AppColors.surface,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: Text('Apply Dates', style: AppTextStyles.button),
+            child: ElevatedButton(
+              onPressed: (_selectedStart != null && (query.tripType == TripType.oneWay || _selectedEnd != null))
+                  ? _applyDates
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: AppColors.surface,
+                minimumSize: const Size(double.infinity, 56),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
+              child: Text('Apply Dates', style: AppTextStyles.button),
             ),
           ),
           const SizedBox(height: 20),

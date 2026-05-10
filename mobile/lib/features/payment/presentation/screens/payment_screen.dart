@@ -101,19 +101,16 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     const SizedBox(height: 24),
                     _buildCreditCardForm(),
                     const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _isProcessing ? null : _processPayment,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        child: _isProcessing
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text('Pay \$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.button),
+                    ElevatedButton(
+                      onPressed: _isProcessing ? null : _processPayment,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        minimumSize: const Size(double.infinity, 56),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
+                      child: _isProcessing
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text('Pay \$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.button),
                     ),
                   ],
                 ),

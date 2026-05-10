@@ -233,30 +233,27 @@ class HomeSearchScreen extends ConsumerWidget {
                             const SizedBox(height: 24),
                             
                             // Search Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (query.isValid) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Please select origin, destination, and dates.')),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  disabledBackgroundColor: AppColors.surface,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  elevation: query.isValid ? 8 : 0,
-                                  shadowColor: AppColors.primary.withOpacity(0.5),
-                                ),
-                                child: Text('Search Flights', style: AppTextStyles.button),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (query.isValid) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => const SearchResultsScreen()),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Please select origin, destination, and dates.')),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                disabledBackgroundColor: AppColors.surface,
+                                minimumSize: const Size(double.infinity, 56),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                elevation: query.isValid ? 8 : 0,
+                                shadowColor: AppColors.primary.withOpacity(0.5),
                               ),
+                              child: Text('Search Flights', style: AppTextStyles.button),
                             ),
                           ],
                         ),

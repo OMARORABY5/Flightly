@@ -146,17 +146,14 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
           const SizedBox(height: 32),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _apply,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: Text('Apply', style: AppTextStyles.button),
+            child: ElevatedButton(
+              onPressed: _apply,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                minimumSize: const Size(double.infinity, 56),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
+              child: Text('Apply', style: AppTextStyles.button),
             ),
           ),
         ],

@@ -355,13 +355,12 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 52,
-                        child: ElevatedButton.icon(
+                      ElevatedButton.icon(
                           onPressed: _isCheckingPrice ? null : _handleBookNow,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             disabledBackgroundColor: AppColors.surfaceElevated,
+                            minimumSize: const Size(160, 52),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16)),
                             padding:
@@ -379,7 +378,6 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                               ? Text('Checking…', style: AppTextStyles.button)
                               : Text(_buttonLabel, style: AppTextStyles.button),
                         ),
-                      ),
                     ],
                   ),
                 ),

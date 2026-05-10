@@ -285,17 +285,14 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
           bottom: MediaQuery.of(context).padding.bottom + 20,
           top: 20,
         ),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: _applyFilters,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
-            child: Text('Apply Filters', style: AppTextStyles.button),
+        child: ElevatedButton(
+          onPressed: _applyFilters,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            minimumSize: const Size(double.infinity, 56),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
+          child: Text('Apply Filters', style: AppTextStyles.button),
         ),
       ),
     );

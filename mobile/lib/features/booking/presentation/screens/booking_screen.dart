@@ -226,19 +226,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 56,
-                    width: 180,
-                    child: ElevatedButton(
-                      onPressed: _proceedToOverview,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                      ),
-                      child: Text('Review',
-                          style: AppTextStyles.button.copyWith(fontSize: 18)),
+                  ElevatedButton(
+                    onPressed: _proceedToOverview,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      minimumSize: const Size(180, 56),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                     ),
+                    child: Text('Review',
+                        style: AppTextStyles.button.copyWith(fontSize: 18)),
                   ),
                 ],
               ),

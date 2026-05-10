@@ -98,17 +98,14 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                     const SizedBox(height: 32),
                     
                     // Buttons
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _downloadTicket,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        child: Text('Download Ticket', style: AppTextStyles.button),
+                    ElevatedButton(
+                      onPressed: _downloadTicket,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        minimumSize: const Size(double.infinity, 56),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
+                      child: Text('Download Ticket', style: AppTextStyles.button),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -117,6 +114,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                           child: OutlinedButton(
                             onPressed: () => context.go('/home', extra: {'tabIndex': 1}),
                             style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 52),
                               side: const BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -129,6 +127,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                           child: OutlinedButton(
                             onPressed: () => context.go('/home'),
                             style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 52),
                               side: const BorderSide(color: AppColors.textSecondary),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               padding: const EdgeInsets.symmetric(vertical: 16),
