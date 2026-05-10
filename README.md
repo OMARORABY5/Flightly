@@ -36,7 +36,11 @@ A comprehensive, microservices-backed flight booking mobile application built wi
 - Node.js (for backend local development)
 
 ### Running the Backend
-Ensure Docker Desktop is running, then execute from the root directory:
+1. **Firebase Setup:** Place your Firebase Admin SDK JSON key in the root directory and name it:
+   `flightly-oraby-firebase-adminsdk-fbsvc-af56f5f7ac.json`
+   *(This file is ignored by git for security reasons)*
+
+2. **Start Services:** Ensure Docker Desktop is running, then execute from the root directory:
 ```bash
 docker-compose up -d
 ```
