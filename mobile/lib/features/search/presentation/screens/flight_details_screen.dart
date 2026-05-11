@@ -12,23 +12,18 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flightly/features/booking/presentation/screens/booking_screen.dart';
+import 'package:flightly/features/search/presentation/screens/return_flight_results_screen.dart';
+import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
+import 'package:flightly/features/search/domain/models/search_query.dart';
 
 class FlightDetailsScreen extends ConsumerStatefulWidget {
   final String flightId;
   final double seenPrice;
 
-  /// true when the user is selecting the RETURN leg of a round-trip.
-  final bool isReturnLeg;
-
-  /// The already-chosen outbound flight (only meaningful when [isReturnLeg] is true).
-  final Flight? outboundFlight;
-
   const FlightDetailsScreen({
     super.key,
     required this.flightId,
     required this.seenPrice,
-    this.isReturnLeg = false,
-    this.outboundFlight,
   });
 
   @override
@@ -133,20 +128,46 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       return;
     }
 
-    // ── Navigate to booking ──
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BookingScreen(flight: flight),
-      ),
-    );
+    final query = ref.read(searchFormProvider);
+
+    if (query.tripType == TripType.roundTrip) {
+      // Navigate to select return flight
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ReturnFlightResultsScreen(outboundFlight: flight),
+        ),
+      );
+    } else {
+      // ── Navigate to booking ──
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BookingScreen(
+            flight: flight,
+          ),
+        ),
+      );
+    }
   }
 
   /// Label for the primary action button.
-  String get _buttonLabel => 'Book Now';
+  String get _buttonLabel {
+    final query = ref.read(searchFormProvider);
+    if (query.tripType == TripType.roundTrip) {
+      return 'Choose Return';
+    }
+    return 'Book Now';
+  }
 
   /// Icon shown beside the button label.
-  IconData get _buttonIcon => LucideIcons.plane;
+  IconData get _buttonIcon {
+    final query = ref.read(searchFormProvider);
+    if (query.tripType == TripType.roundTrip) {
+      return LucideIcons.arrowLeftRight;
+    }
+    return LucideIcons.plane;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,24 +184,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: widget.isReturnLeg
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(LucideIcons.arrowLeftRight, size: 14, color: AppColors.primary),
-                    const SizedBox(width: 6),
-                    Text('Return Flight', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary)),
-                  ],
-                ),
-              )
-            : null,
+        title: null,
         centerTitle: true,
         actions: [
           IconButton(
@@ -255,40 +259,6 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Outbound summary chip (only on return leg)
-                if (widget.isReturnLeg && widget.outboundFlight != null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.15),
-                          AppColors.primary.withValues(alpha: 0.05),
-                        ],
-                      ),
-                      border: Border(
-                        bottom: BorderSide(color: AppColors.surfaceBorder),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.swap_horiz, size: 16, color: AppColors.primary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Outbound: ${widget.outboundFlight!.originIata} → '
-                            '${widget.outboundFlight!.destinationIata}  '
-                            '${DateFormat('HH:mm').format(widget.outboundFlight!.departureTime)}  '
-                            '• EGP ${widget.outboundFlight!.basePrice.toStringAsFixed(0)}',
-                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                 // Price + CTA row
                 Padding(
                   padding: EdgeInsets.only(
@@ -305,7 +275,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              widget.isReturnLeg ? 'Return Price' : 'Price',
+                              'Price',
                               style: AppTextStyles.labelMedium
                                   .copyWith(color: AppColors.textSecondary),
                             ),
@@ -314,12 +284,6 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                               style: AppTextStyles.displayMedium
                                   .copyWith(color: AppColors.primary),
                             ),
-                            if (widget.isReturnLeg && widget.outboundFlight != null)
-                              Text(
-                                'Total: EGP ${(flight.basePrice + widget.outboundFlight!.basePrice).toStringAsFixed(0)}',
-                                style: AppTextStyles.labelSmall
-                                    .copyWith(color: AppColors.textSecondary),
-                              ),
                           ],
                         ),
                       ),

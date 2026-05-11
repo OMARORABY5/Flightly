@@ -201,6 +201,18 @@ class HomeSearchScreen extends ConsumerWidget {
                               onTap: () => DateSelectionScreen.show(context),
                             ),
                             const SizedBox(height: 16),
+
+                            // Return Date (only for round-trip)
+                            if (query.tripType == TripType.roundTrip) ...[
+                              _buildInfoField(
+                                context: context,
+                                icon: LucideIcons.calendarCheck,
+                                label: 'Return',
+                                value: query.returnDate != null ? DateFormat('E, d MMM').format(query.returnDate!) : 'Select',
+                                onTap: () => DateSelectionScreen.show(context),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
                             
                             // Passengers & Class
                             _buildInfoField(

@@ -6,6 +6,7 @@ import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/features/search/domain/models/filter_options.dart';
 import 'package:flightly/features/search/domain/providers/flight_results_provider.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
+import 'package:flightly/features/search/domain/models/search_query.dart';
 import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/filter_screen.dart';
 import 'package:flightly/features/search/presentation/screens/flight_details_screen.dart';
@@ -118,6 +119,35 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                 ),
               ),
 
+              // Step indicator for round-trip
+              if (query.tripType == TripType.roundTrip) ...[
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.15),
+                        AppColors.primary.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.looks_one, size: 18, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Step 1: Select Outbound Flight',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+
               // Sort Chips
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -212,7 +242,6 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                                             builder: (_) => FlightDetailsScreen(
                                               flightId: resultsState.flights[index].id,
                                               seenPrice: resultsState.flights[index].basePrice,
-                                              isReturnLeg: false,
                                             ),
                                           ),
                                         );

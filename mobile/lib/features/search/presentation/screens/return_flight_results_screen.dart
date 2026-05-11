@@ -1,7 +1,7 @@
 // return_flight_results_screen.dart
 // Shows available return flights for the second leg of a round-trip.
 // Mirrors SearchResultsScreen but uses returnFlightResultsProvider
-// and passes isReturnLeg: true to FlightDetailsScreen.
+// Mirrors SearchResultsScreen but uses returnFlightResultsProvider
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +15,7 @@ import 'package:flightly/features/search/domain/providers/return_flight_provider
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/return_filter_screen.dart';
-import 'package:flightly/features/search/presentation/screens/flight_details_screen.dart';
+import 'package:flightly/features/search/presentation/screens/round_trip_summary_screen.dart';
 import 'package:intl/intl.dart';
 
 class ReturnFlightResultsScreen extends ConsumerStatefulWidget {
@@ -148,7 +148,7 @@ class _ReturnFlightResultsScreenState
                 ),
               ),
 
-              // ── Return leg context chip ─────────────────────────────────────
+              // ── Step 2 indicator + Return leg context chip ──────────────────
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding:
@@ -164,21 +164,36 @@ class _ReturnFlightResultsScreenState
                   border: Border.all(
                       color: AppColors.primary.withValues(alpha: 0.3)),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.swap_horiz,
-                        size: 18, color: AppColors.primary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Outbound: ${widget.outboundFlight.originIata} → '
-                        '${widget.outboundFlight.destinationIata}  '
-                        '${DateFormat('HH:mm').format(widget.outboundFlight.departureTime)}  '
-                        '• EGP ${widget.outboundFlight.basePrice.toStringAsFixed(0)}',
-                        style: AppTextStyles.labelSmall
-                            .copyWith(color: AppColors.primary),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Row(
+                      children: [
+                        const Icon(Icons.looks_two, size: 18, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Step 2: Select Return Flight',
+                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Outbound: ${widget.outboundFlight.originIata} → '
+                            '${widget.outboundFlight.destinationIata}  '
+                            '${DateFormat('HH:mm').format(widget.outboundFlight.departureTime)}  '
+                            '• EGP ${widget.outboundFlight.basePrice.toStringAsFixed(0)}',
+                            style: AppTextStyles.labelSmall
+                                .copyWith(color: AppColors.textSecondary),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -301,11 +316,9 @@ class _ReturnFlightResultsScreenState
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => FlightDetailsScreen(
-                                              flightId: flight.id,
-                                              seenPrice: flight.basePrice,
-                                              isReturnLeg: true,
+                                            builder: (context) => RoundTripSummaryScreen(
                                               outboundFlight: widget.outboundFlight,
+                                              returnFlight: flight,
                                             ),
                                           ),
                                         );

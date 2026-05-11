@@ -47,6 +47,8 @@ class FlightCard extends StatelessWidget {
         onTap: () {
           if (onViewDetails != null) {
             onViewDetails!();
+          } else if (onTap != null) {
+            onTap!();
           } else {
             Navigator.push(
               context,
