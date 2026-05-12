@@ -13,6 +13,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:flightly/features/booking/domain/models/passenger.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
+import 'package:flightly/features/search/domain/smart_pricing/smart_pricing_provider.dart';
+import 'package:flightly/features/search/presentation/widgets/smart_suggestion_card.dart';
 
 class BookingScreen extends ConsumerStatefulWidget {
   /// The outbound flight (always required).
@@ -132,6 +134,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedPassengers = ref.watch(selectedPassengersProvider);
+    final recommendation = ref.watch(flightRecommendationProvider(widget.flight.id));
     final pricePerPax = widget.flight.basePrice +
         (widget.returnFlight?.basePrice ?? 0.0);
     final totalPrice =
@@ -213,36 +216,50 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                 ],
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Total (${selectedPassengers.isEmpty ? 1 : selectedPassengers.length} traveler${selectedPassengers.length == 1 ? '' : 's'})',
-                          style: AppTextStyles.labelMedium
-                              .copyWith(color: AppColors.textSecondary),
-                        ),
-                        Text(
-                          'EGP ${totalPrice.toStringAsFixed(0)}',
-                          style: AppTextStyles.displayMedium
-                              .copyWith(color: AppColors.primary),
-                        ),
-                      ],
+                  if (recommendation != null) ...[
+                    SmartSuggestionCard(
+                      recommendation: recommendation,
+                      compact: true,
+                      onViewAlternative: (_) {
+                        Navigator.pop(context); // Go back to details/results
+                      },
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _proceedToOverview,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size(180, 56),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                    child: Text('Review',
-                        style: AppTextStyles.button.copyWith(fontSize: 18)),
+                  ],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Total (${selectedPassengers.isEmpty ? 1 : selectedPassengers.length} traveler${selectedPassengers.length == 1 ? '' : 's'})',
+                              style: AppTextStyles.labelMedium
+                                  .copyWith(color: AppColors.textSecondary),
+                            ),
+                            Text(
+                              'EGP ${totalPrice.toStringAsFixed(0)}',
+                              style: AppTextStyles.displayMedium
+                                  .copyWith(color: AppColors.primary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _proceedToOverview,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size(180, 56),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                        ),
+                        child: Text('Review',
+                            style: AppTextStyles.button.copyWith(fontSize: 18)),
+                      ),
+                    ],
                   ),
                 ],
               ),

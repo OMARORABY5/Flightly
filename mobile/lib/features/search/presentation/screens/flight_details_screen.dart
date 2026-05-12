@@ -15,6 +15,8 @@ import 'package:flightly/features/booking/presentation/screens/booking_screen.da
 import 'package:flightly/features/search/presentation/screens/return_flight_results_screen.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/search/domain/models/search_query.dart';
+import 'package:flightly/features/search/domain/smart_pricing/smart_pricing_provider.dart';
+import 'package:flightly/features/search/presentation/widgets/smart_suggestion_card.dart';
 
 class FlightDetailsScreen extends ConsumerStatefulWidget {
   final String flightId;
@@ -173,6 +175,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   Widget build(BuildContext context) {
     final flightAsync = ref.watch(flightDetailsProvider(widget.flightId));
     final savedAsync = ref.watch(isFlightSavedProvider(widget.flightId));
+    final recommendation = ref.watch(flightRecommendationProvider(widget.flightId));
     final isSaved = savedAsync.value?['is_saved'] == true;
 
     return Scaffold(
@@ -214,7 +217,11 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
               }
               return CustomScrollView(
                 slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
+                    ),
+                  ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverList(
@@ -230,6 +237,23 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                         const SizedBox(height: 24),
                         _buildPolicies(flight),
                         const SizedBox(height: 24),
+                        if (recommendation != null) ...[
+                          SmartSuggestionCard(
+                            recommendation: recommendation,
+                            onViewAlternative: (altFlight) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FlightDetailsScreen(
+                                    flightId: altFlight.id,
+                                    seenPrice: altFlight.totalPrice, // Use total price or base price?
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                        const SizedBox(height: 120), // Padding for bottom booking bar
                       ]),
                     ),
                   ),

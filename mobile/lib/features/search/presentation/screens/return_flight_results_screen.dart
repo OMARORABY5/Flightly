@@ -16,6 +16,7 @@ import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/return_filter_screen.dart';
 import 'package:flightly/features/search/presentation/screens/round_trip_summary_screen.dart';
+import 'package:flightly/features/search/domain/smart_pricing/smart_pricing_provider.dart';
 import 'package:intl/intl.dart';
 
 class ReturnFlightResultsScreen extends ConsumerStatefulWidget {
@@ -67,6 +68,7 @@ class _ReturnFlightResultsScreenState
     final query = ref.watch(searchFormProvider);
     final resultsState = ref.watch(returnFlightResultsProvider);
     final filters = ref.watch(returnFilterOptionsProvider);
+    final badgeMap = ref.watch(returnFlightBadgeMapProvider);
 
     final returnDateStr = query.returnDate != null
         ? DateFormat('MMM d, yyyy').format(query.returnDate!)
@@ -312,6 +314,7 @@ class _ReturnFlightResultsScreenState
                                     final flight = resultsState.flights[index];
                                     return FlightCard(
                                       flight: flight,
+                                      badgeLabel: badgeMap[flight.id],
                                       onTap: () {
                                         Navigator.push(
                                           context,

@@ -5,16 +5,20 @@ import 'package:flightly/features/search/presentation/screens/flight_details_scr
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:flightly/features/search/presentation/widgets/smart_badge.dart';
+
 class FlightCard extends StatelessWidget {
   final Flight flight;
   final VoidCallback? onTap;
   final VoidCallback? onViewDetails;
+  final String? badgeLabel;
 
   const FlightCard({
     super.key,
     required this.flight,
     this.onTap,
     this.onViewDetails,
+    this.badgeLabel,
   });
 
   String _formatTime(DateTime time) {
@@ -67,6 +71,15 @@ class FlightCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (badgeLabel != null) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SmartBadge.fromLabel(badgeLabel!),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
               // Main Flight Leg Row
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
