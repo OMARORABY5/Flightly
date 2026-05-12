@@ -60,6 +60,11 @@ class DioClient {
     return _execute(() => _dio.put(path, data: data));
   }
 
+  /// PATCH request
+  Future<Response> patch(String path, {dynamic data}) async {
+    return _execute(() => _dio.patch(path, data: data));
+  }
+
   /// DELETE request
   Future<Response> delete(String path, {Map<String, dynamic>? queryParams}) async {
     return _execute(() => _dio.delete(path, queryParameters: queryParams));

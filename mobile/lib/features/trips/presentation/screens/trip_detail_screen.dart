@@ -26,9 +26,7 @@ class TripDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
-  final Trip trip;
-
-  const TripDetailScreen({super.key, required this.trip});
+  // ─── Constants and state variables ──────────────────────────────────────────
 
   String _formatDate(DateTime dt) => DateFormat('EEEE, d MMMM yyyy').format(dt);
   String _formatTime(DateTime dt) => DateFormat('HH:mm').format(dt);
@@ -39,7 +37,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   }
 
   void _copyReference(BuildContext context) {
-    Clipboard.setData(ClipboardData(text: trip.reference));
+    Clipboard.setData(ClipboardData(text: widget.trip.reference));
     showTopSnackBar(
       Overlay.of(context),
       const CustomSnackBar.success(message: 'Booking reference copied!'),
@@ -476,7 +474,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               Text('Passengers: ${widget.trip.passengerCount}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
               if (widget.trip.passengers.isNotEmpty) ...[
                 const SizedBox(height: 4),
-                ...trip.passengers.map((name) => Padding(
+                ...widget.trip.passengers.map((name) => Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(name, style: AppTextStyles.bodyMedium),
                     )),

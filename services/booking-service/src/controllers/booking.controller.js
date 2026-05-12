@@ -368,42 +368,93 @@ class BookingController {
   // directly. Updates status → confirmed, payment_status → paid.
   async confirmBooking(req, res) {
     const { id } = req.params;
-    const { user_id } = req.body;
+    const { user_id, use_wallet } = req.body;
 
+    const client = await this.db.connect();
     try {
-      const result = await this.db.query(
-        `UPDATE bookings
-         SET status = 'confirmed', payment_status = 'paid', updated_at = NOW()
-         WHERE id = $1 AND user_id = $2
-         RETURNING *`,
+      await client.query('BEGIN');
+
+      const bookingRes = await client.query(
+        'SELECT * FROM bookings WHERE id = $1 AND user_id = $2 FOR UPDATE',
         [id, user_id]
       );
 
-      if (result.rowCount === 0) {
+      if (bookingRes.rowCount === 0) {
+        await client.query('ROLLBACK');
         return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
       }
 
-      // Invalidate caches
+      const booking = bookingRes.rows[0];
+      if (booking.status === 'confirmed') {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ success: false, message: 'Booking is already confirmed' });
+      }
+
+      let walletDeducted = 0;
+
+      if (use_wallet) {
+        const walletRes = await client.query(
+          'SELECT * FROM wallets WHERE user_id = $1 FOR UPDATE',
+          [user_id]
+        );
+
+        if (walletRes.rowCount > 0) {
+          const wallet = walletRes.rows[0];
+          const balance = parseFloat(wallet.balance);
+          const price = parseFloat(booking.total_price);
+
+          if (balance > 0) {
+            walletDeducted = Math.min(balance, price);
+            
+            await client.query(
+              'UPDATE wallets SET balance = balance - $1, updated_at = NOW() WHERE user_id = $2',
+              [walletDeducted, user_id]
+            );
+
+            await client.query(
+              `INSERT INTO wallet_transactions (wallet_id, transaction_type, amount, reference, created_at)
+               VALUES ($1, 'payment', $2, $3, NOW())`,
+              [wallet.id, -walletDeducted, `Payment for booking ${booking.reference}`]
+            );
+          }
+        }
+      }
+
+      const updateRes = await client.query(
+        `UPDATE bookings
+         SET status = 'confirmed', payment_status = 'paid', updated_at = NOW()
+         WHERE id = $1
+         RETURNING *`,
+        [id]
+      );
+
+      await client.query('COMMIT');
+
       if (this.redis) {
         await this.redis.del(`booking:${id}`).catch(() => {});
         await this.redis.del(`bookings:user:${user_id}:all`).catch(() => {});
         await this.redis.del(`bookings:user:${user_id}:pending`).catch(() => {});
+        await this.redis.del(`wallet:${user_id}`).catch(() => {});
       }
 
-      const booking = result.rows[0];
+      const updatedBooking = updateRes.rows[0];
       res.json({
         success: true,
         message: 'Booking confirmed',
         data: {
-          id: booking.id,
-          reference: booking.reference,
-          status: booking.status,
-          payment_status: booking.payment_status,
+          id: updatedBooking.id,
+          reference: updatedBooking.reference,
+          status: updatedBooking.status,
+          payment_status: updatedBooking.payment_status,
+          wallet_deducted: walletDeducted
         },
       });
     } catch (err) {
+      await client.query('ROLLBACK');
       console.error('confirmBooking error:', err.message);
       res.status(500).json({ success: false, message: 'Failed to confirm booking' });
+    } finally {
+      client.release();
     }
   }
 

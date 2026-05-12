@@ -12,5 +12,5 @@ abstract class BookingRepository {
   Future<Booking> createBooking(BookingRequest request);
   Future<Booking> getBookingById(String bookingId, String userId);
   Future<List<Booking>> getUserBookings(String userId);
-  Future<void> confirmBooking(String bookingId, String userId);
+  Future<void> confirmBooking(String bookingId, String userId, {bool useWallet = true});
 }

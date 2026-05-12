@@ -80,10 +80,10 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<void> confirmBooking(String bookingId, String userId) async {
+  Future<void> confirmBooking(String bookingId, String userId, {bool useWallet = true}) async {
     final response = await _dioClient.post(
       '/bookings/$bookingId/confirm',
-      data: {'user_id': userId},
+      data: {'user_id': userId, 'use_wallet': useWallet},
     );
     if (response.data['success'] != true) {
       throw Exception(response.data['message'] ?? 'Failed to confirm booking');

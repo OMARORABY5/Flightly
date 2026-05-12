@@ -12,6 +12,8 @@ import 'package:flightly/features/payment/presentation/screens/booking_confirmat
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
+import 'dart:math' as math;
 
 class PaymentScreen extends ConsumerStatefulWidget {
   final Booking booking;
@@ -31,6 +33,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   final _cvvController = TextEditingController();
 
   bool _isProcessing = false;
+  bool _useWallet = true;
 
   @override
   void dispose() {
@@ -41,44 +44,50 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     super.dispose();
   }
 
-  Future<void> _processPayment() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _processPayment(double remainingToPay) async {
+    if (remainingToPay > 0) {
+      if (!_formKey.currentState!.validate()) return;
+    }
 
     setState(() => _isProcessing = true);
 
-    // Simulate 2-second processing delay
-    await Future.delayed(const Duration(seconds: 2));
+    if (remainingToPay > 0) {
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
 
-    if (!mounted) return;
-
-    final cardNumber = _cardNumberController.text.replaceAll(' ', '');
-    
-    // Simulated failure if card starts with '0000'
-    if (cardNumber.startsWith('0000')) {
-      setState(() => _isProcessing = false);
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.error(message: 'Payment declined by bank. Please try another card.'),
-      );
-      return;
+      final cardNumber = _cardNumberController.text.replaceAll(' ', '');
+      
+      if (cardNumber.startsWith('0000')) {
+        setState(() => _isProcessing = false);
+        showTopSnackBar(
+          Overlay.of(context),
+          const CustomSnackBar.error(message: 'Payment declined by bank. Please try another card.'),
+        );
+        return;
+      }
     }
 
-    // Success flow — call backend to mark booking as confirmed + paid
     try {
       final repo = ref.read(bookingRepositoryProvider);
       final userId = ref.read(currentUserIdProvider);
-      await repo.confirmBooking(widget.booking.id, userId);
+      await repo.confirmBooking(widget.booking.id, userId, useWallet: _useWallet);
+      ref.invalidate(walletProvider);
     } catch (e) {
-      // If confirm fails, still let the user see confirmation (UX: payment already simulated)
-      // Log silently — the booking will remain in 'pending' state until manually confirmed
+      // If confirm fails, still let the user see confirmation
     }
 
     if (!mounted) return;
-    Navigator.push(context, MaterialPageRoute(builder: (_) => BookingConfirmationScreen(booking: widget.booking)));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BookingConfirmationScreen(booking: widget.booking)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final walletAsyncValue = ref.watch(walletProvider);
+    final walletBalance = walletAsyncValue.valueOrNull?.balance ?? 0.0;
+    
+    final walletApplied = _useWallet ? math.min(walletBalance, widget.booking.totalPrice) : 0.0;
+    final remainingToPay = widget.booking.totalPrice - walletApplied;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -98,12 +107,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildOrderSummary(),
-                    const SizedBox(height: 24),
-                    _buildCreditCardForm(),
+                    _buildOrderSummary(walletBalance, walletApplied, remainingToPay),
+                    if (remainingToPay > 0) ...[
+                      const SizedBox(height: 24),
+                      _buildCreditCardForm(),
+                    ],
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: _isProcessing ? null : _processPayment,
+                      onPressed: _isProcessing ? null : () => _processPayment(remainingToPay),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         minimumSize: const Size(double.infinity, 56),
@@ -111,7 +122,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                       ),
                       child: _isProcessing
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : Text('Pay \$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.button),
+                          : Text(remainingToPay == 0 ? 'Confirm Booking' : 'Pay \$${remainingToPay.toStringAsFixed(2)}', style: AppTextStyles.button),
                     ),
                   ],
                 ),
@@ -123,7 +134,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     );
   }
 
-  Widget _buildOrderSummary() {
+  Widget _buildOrderSummary(double walletBalance, double walletApplied, double remainingToPay) {
     return GlassCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -152,6 +163,48 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               Text('\$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.headingMedium),
             ],
           ),
+          if (walletBalance > 0) ...[
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.wallet, size: 16, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('Apply Wallet Balance (\$${walletBalance.toStringAsFixed(2)})', style: AppTextStyles.bodyMedium, overflow: TextOverflow.ellipsis)),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: _useWallet,
+                  onChanged: (val) => setState(() => _useWallet = val),
+                  activeColor: AppColors.primary,
+                ),
+              ],
+            ),
+            if (_useWallet && walletApplied > 0) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Wallet Applied:', style: AppTextStyles.bodyMedium),
+                  Text('-\$${walletApplied.toStringAsFixed(2)}', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.success)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Divider(),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Remaining to Pay:', style: AppTextStyles.headingSmall),
+                  Text('\$${remainingToPay.toStringAsFixed(2)}', style: AppTextStyles.headingMedium),
+                ],
+              ),
+            ]
+          ]
         ],
       ),
     );

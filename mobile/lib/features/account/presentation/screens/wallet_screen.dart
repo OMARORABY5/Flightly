@@ -115,7 +115,7 @@ class WalletScreen extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                '\${isCredit ? '+' : '-'}\$${tx.amount.toStringAsFixed(2)}',
+                                '\$${tx.amount.toStringAsFixed(2)}',
                                 style: AppTextStyles.headingSmall.copyWith(color: isCredit ? AppColors.success : AppColors.textPrimary),
                               ),
                             ],
