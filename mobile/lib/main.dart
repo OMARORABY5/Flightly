@@ -14,6 +14,7 @@ import 'package:flightly/core/routing/app_router.dart';
 import 'package:flightly/core/providers/storage_provider.dart';
 import 'package:flightly/features/notifications/services/push_notification_service.dart';
 import 'package:flightly/features/notifications/services/travel_reminder_service.dart';
+import 'package:flightly/features/saved_flights/services/watchlist_price_monitor.dart';
 
 
 void main() async {
@@ -67,8 +68,16 @@ class _FlightlyAppState extends ConsumerState<FlightlyApp> {
       // Initialize travel reminder service with tap-to-navigate callback
       final router = ref.read(appRouterProvider);
       ref.read(travelReminderServiceProvider).initialize(
-        onTap: (payload) => router.push(payload),
+        onTap: (payload) {
+          if (payload == '/watchlist') {
+             router.go('/', extra: {'tabIndex': 2});
+          } else {
+             router.push(payload);
+          }
+        },
       );
+      // Initialize Smart Watchlist daily background task
+      ref.read(watchlistPriceMonitorProvider).scheduleDaily();
     });
   }
 

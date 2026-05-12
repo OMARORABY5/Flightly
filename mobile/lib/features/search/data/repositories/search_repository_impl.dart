@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flightly/core/network/dio_client.dart';
 import 'package:flightly/features/search/domain/models/airport.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
@@ -60,9 +61,37 @@ class SearchRepositoryImpl implements SearchRepository {
     final response = await _dioClient.get('/flights/search', queryParams: queryParams);
     
     if (response.data['success'] == true) {
-    return PaginatedFlightResponse.fromJson(response.data['data']);
+      final prefs = await SharedPreferences.getInstance();
+      final simDiscount = prefs.getBool('sim_discount') ?? false;
+
+      if (simDiscount) {
+         final data = response.data['data'];
+         if (data['flights'] != null) {
+            data['flights'] = (data['flights'] as List).map((e) => _applyDiscount(e)).toList();
+         }
+         return PaginatedFlightResponse.fromJson(data);
+      }
+      
+      return PaginatedFlightResponse.fromJson(response.data['data']);
     }
     return PaginatedFlightResponse(flights: [], page: 1, limit: 20, total: 0, totalPages: 1, hasNext: false, hasPrev: false);
+  }
+
+  Map<String, dynamic> _applyDiscount(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+    if (modified['base_price'] != null) {
+      modified['base_price'] = (modified['base_price'] as num) * 0.85;
+    }
+    if (modified['total_price'] != null) {
+      modified['total_price'] = (modified['total_price'] as num) * 0.85;
+    }
+    if (modified['current_price'] != null) {
+      modified['current_price'] = (modified['current_price'] as num) * 0.85;
+      if (modified['saved_price'] != null) {
+         modified['price_difference'] = (modified['current_price'] as num) - (modified['saved_price'] as num);
+      }
+    }
+    return modified;
   }
 
   // ─── Phase 5: Flight Details & Smart Pricing ───────────────────────────────
@@ -71,7 +100,13 @@ class SearchRepositoryImpl implements SearchRepository {
   Future<Flight?> getFlightDetails(String id) async {
     final response = await _dioClient.get('/flights/$id');
     if (response.data['success'] == true) {
-      return Flight.fromJson(response.data['data']);
+      final prefs = await SharedPreferences.getInstance();
+      final simDiscount = prefs.getBool('sim_discount') ?? false;
+      var data = response.data['data'];
+      if (simDiscount) {
+         data = _applyDiscount(data);
+      }
+      return Flight.fromJson(data);
     }
     return null;
   }
@@ -96,7 +131,15 @@ class SearchRepositoryImpl implements SearchRepository {
     final response = await _dioClient.get('/users/saved-flights', queryParams: {'user_id': userId});
     if (response.data['success'] == true) {
       final data = response.data['data'] as List;
-      return data.map((e) => SavedFlight.fromJson(e)).toList();
+      final prefs = await SharedPreferences.getInstance();
+      final simDiscount = prefs.getBool('sim_discount') ?? false;
+      
+      return data.map((e) {
+        if (simDiscount) {
+           return SavedFlight.fromJson(_applyDiscount(e));
+        }
+        return SavedFlight.fromJson(e);
+      }).toList();
     }
     return [];
   }

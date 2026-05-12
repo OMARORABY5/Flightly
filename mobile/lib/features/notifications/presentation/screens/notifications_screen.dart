@@ -204,6 +204,18 @@ class NotificationsScreen extends ConsumerWidget {
         iconData = LucideIcons.mapPin;
         iconColor = Colors.orange;
         break;
+      case 'watchlistPriceDrop':
+        iconData = LucideIcons.trendingDown;
+        iconColor = Colors.green;
+        break;
+      case 'watchlistFlexibleDate':
+        iconData = LucideIcons.calendarDays;
+        iconColor = Colors.orange;
+        break;
+      case 'watchlistGoodPrice':
+        iconData = LucideIcons.badgePercent;
+        iconColor = Colors.blue;
+        break;
     }
 
     return Dismissible(
@@ -227,6 +239,9 @@ class NotificationsScreen extends ConsumerWidget {
           final bookingId = notification.data?['booking_id'] as String?;
           if (bookingId != null && bookingId.isNotEmpty) {
             context.push('/trips/$bookingId');
+          } else if (notification.type.startsWith('watchlist')) {
+            // Tap navigation -> go to Home with watchlist tab active
+            context.go('/', extra: {'tabIndex': 2});
           }
         },
         child: Container(

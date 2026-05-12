@@ -102,6 +102,11 @@ class TravelReminderService {
 
   // ─── Schedule a single reminder ──────────────────────────────────────────────
   Future<void> scheduleReminder(TravelReminder reminder) async {
+    if (kIsWeb) {
+      debugPrint('[Web Simulation] Scheduled Notification: ${reminder.title} -> ${reminder.body} (at ${reminder.scheduledAt})');
+      return; // Web doesn't support zonedSchedule native notifications
+    }
+
     if (!_initialized) await initialize();
 
     // Don't schedule if time is in the past

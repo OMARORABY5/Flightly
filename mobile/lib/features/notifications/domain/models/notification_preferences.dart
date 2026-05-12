@@ -7,6 +7,7 @@ class NotificationPreferences extends Equatable {
   final bool promotional;
   final bool flightReminders;  // 24h/12h/6h/2h departure countdown
   final bool travelAdvisory;   // baggage allowance + airport arrival recommendation
+  final bool watchlistAlerts;  // price drops and flexible dates on watched routes
 
   const NotificationPreferences({
     this.bookingUpdates = true,
@@ -15,6 +16,7 @@ class NotificationPreferences extends Equatable {
     this.promotional = false,
     this.flightReminders = true,
     this.travelAdvisory = true,
+    this.watchlistAlerts = true,
   });
 
   factory NotificationPreferences.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class NotificationPreferences extends Equatable {
       promotional: json['promotional'] as bool? ?? false,
       flightReminders: json['flight_reminders'] as bool? ?? true,
       travelAdvisory: json['travel_advisory'] as bool? ?? true,
+      watchlistAlerts: json['watchlist_alerts'] as bool? ?? true,
     );
   }
 
@@ -36,6 +39,7 @@ class NotificationPreferences extends Equatable {
       'promotional': promotional,
       'flight_reminders': flightReminders,
       'travel_advisory': travelAdvisory,
+      'watchlist_alerts': watchlistAlerts,
     };
   }
 
@@ -46,6 +50,7 @@ class NotificationPreferences extends Equatable {
     bool? promotional,
     bool? flightReminders,
     bool? travelAdvisory,
+    bool? watchlistAlerts,
   }) {
     return NotificationPreferences(
       bookingUpdates: bookingUpdates ?? this.bookingUpdates,
@@ -54,9 +59,10 @@ class NotificationPreferences extends Equatable {
       promotional: promotional ?? this.promotional,
       flightReminders: flightReminders ?? this.flightReminders,
       travelAdvisory: travelAdvisory ?? this.travelAdvisory,
+      watchlistAlerts: watchlistAlerts ?? this.watchlistAlerts,
     );
   }
 
   @override
-  List<Object?> get props => [bookingUpdates, priceAlerts, scheduleUpdates, promotional, flightReminders, travelAdvisory];
+  List<Object?> get props => [bookingUpdates, priceAlerts, scheduleUpdates, promotional, flightReminders, travelAdvisory, watchlistAlerts];
 }

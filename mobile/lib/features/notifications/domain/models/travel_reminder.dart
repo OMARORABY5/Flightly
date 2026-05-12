@@ -14,6 +14,9 @@ enum TravelReminderType {
   returnFlight2h,
   returnBaggage,
   returnArrivalAdvisory,
+  watchlistPriceDrop,
+  watchlistFlexibleDate,
+  watchlistGoodPrice,
 }
 
 class TravelReminder {

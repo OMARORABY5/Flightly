@@ -117,6 +117,16 @@ class NotificationPreferencesScreen extends ConsumerWidget {
             await sp.setBool('pref_travel_advisory', val);
           },
         ),
+        _buildSwitchTile(
+          title: 'Watchlist Price Alerts',
+          subtitle: 'Automatic price drop checks and flexible date savings for saved routes.',
+          value: prefs.watchlistAlerts,
+          onChanged: (val) async {
+            notifier.updatePreferences(prefs.copyWith(watchlistAlerts: val));
+            final sp = await SharedPreferences.getInstance();
+            await sp.setBool('pref_watchlist_alerts', val);
+          },
+        ),
       ],
     );
   }
