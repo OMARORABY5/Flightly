@@ -192,6 +192,18 @@ class NotificationsScreen extends ConsumerWidget {
         iconData = LucideIcons.sparkles;
         iconColor = Colors.purple;
         break;
+      case 'flight_reminder':
+        iconData = LucideIcons.planeTakeoff;
+        iconColor = AppColors.primary;
+        break;
+      case 'baggage_reminder':
+        iconData = LucideIcons.briefcase;
+        iconColor = Colors.teal;
+        break;
+      case 'arrival_advisory':
+        iconData = LucideIcons.mapPin;
+        iconColor = Colors.orange;
+        break;
     }
 
     return Dismissible(
@@ -211,8 +223,11 @@ class NotificationsScreen extends ConsumerWidget {
           if (!notification.isRead) {
             notifier.markAsRead(notification.id);
           }
-          // Navigate to specific screen based on type/data
-          // e.g. context.push('/my-trips/${notification.data?['booking_id']}');
+          // Navigate to the related trip detail when a booking_id is present in data
+          final bookingId = notification.data?['booking_id'] as String?;
+          if (bookingId != null && bookingId.isNotEmpty) {
+            context.push('/trips/$bookingId');
+          }
         },
         child: Container(
           padding: const EdgeInsets.all(16),

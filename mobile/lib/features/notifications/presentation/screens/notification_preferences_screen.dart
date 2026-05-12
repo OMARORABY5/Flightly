@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
@@ -84,6 +85,37 @@ class NotificationPreferencesScreen extends ConsumerWidget {
           subtitle: 'Exclusive deals, discounts, and travel inspiration.',
           value: prefs.promotional,
           onChanged: (val) => notifier.updatePreferences(prefs.copyWith(promotional: val)),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Divider(),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            'SMART TRAVEL REMINDERS',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, letterSpacing: 1),
+          ),
+        ),
+        _buildSwitchTile(
+          title: 'Flight Reminders',
+          subtitle: 'Get reminded 24h, 12h, 6h, and 2h before your departure.',
+          value: prefs.flightReminders,
+          onChanged: (val) async {
+            notifier.updatePreferences(prefs.copyWith(flightReminders: val));
+            final sp = await SharedPreferences.getInstance();
+            await sp.setBool('pref_flight_reminders', val);
+          },
+        ),
+        _buildSwitchTile(
+          title: 'Travel Advisory',
+          subtitle: 'Baggage allowance tips and recommended airport arrival time.',
+          value: prefs.travelAdvisory,
+          onChanged: (val) async {
+            notifier.updatePreferences(prefs.copyWith(travelAdvisory: val));
+            final sp = await SharedPreferences.getInstance();
+            await sp.setBool('pref_travel_advisory', val);
+          },
         ),
       ],
     );

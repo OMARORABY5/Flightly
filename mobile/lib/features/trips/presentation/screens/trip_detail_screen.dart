@@ -15,6 +15,8 @@ import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flightly/features/notifications/services/travel_reminder_service.dart';
+import 'package:flightly/features/notifications/domain/logic/airport_arrival_advisor.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
   final Trip trip;
@@ -111,6 +113,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // ── Arrival Advisory Banner (upcoming confirmed trips only) ─────────
+            if (trip.isUpcoming) _buildArrivalAdvisoryBanner(trip),
 
             // ── Flight Itinerary ───────────────────────────────────────────────
             Text('Outbound Flight', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textSecondary)),
@@ -450,6 +455,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ref.invalidate(historyTripsProvider);
       // Invalidate wallet so the refund is reflected immediately
       ref.invalidate(walletProvider);
+      // Cancel all scheduled travel reminders for this booking
+      ref.read(travelReminderServiceProvider).cancelRemindersForBooking(widget.trip.id);
 
       // Pop back to trips list
       context.pop(); 
@@ -507,6 +514,80 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  // ── Arrival Advisory Banner ────────────────────────────────────────────────
+  Widget _buildArrivalAdvisoryBanner(Trip trip) {
+    final advisor = AirportArrivalAdvisor();
+    final advice = advisor.advise(
+      departureTime: trip.flight.departureTime,
+      passengerCount: trip.passengerCount,
+      baggageCheckedKg: 23, // conservative default — baggage not on Trip model
+    );
+
+    final arrivalTime = advisor.formatArrivalTime(advice.recommendedArrivalTime);
+    final depTime = DateFormat('HH:mm').format(trip.flight.departureTime);
+    final hoursUntil = trip.flight.departureTime.difference(DateTime.now()).inHours;
+    final String timeContext = hoursUntil > 24
+        ? 'in ${hoursUntil ~/ 24}d ${hoursUntil % 24}h'
+        : 'in ${hoursUntil}h';
+
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary.withValues(alpha: 0.12),
+                AppColors.primary.withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.mapPin, color: AppColors.primary, size: 18),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recommended Airport Arrival',
+                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Arrive by $arrivalTime for your $depTime departure ($timeContext).',
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Includes time for check-in, baggage drop, and security.',
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }

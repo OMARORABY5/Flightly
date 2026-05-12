@@ -58,6 +58,7 @@ dependencies:
   firebase_core: ^3.4.0          # Firebase initialization
   firebase_messaging: ^15.1.1    # FCM push notifications
   flutter_local_notifications: ^17.2.2  # Local notification display
+  timezone: ^0.9.4               # Required by flutter_local_notifications for zonedSchedule
   permission_handler: ^11.3.1    # Native OS permission prompts
   country_picker: ^2.0.27
 

@@ -10,6 +10,7 @@ import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/booking/domain/models/booking.dart';
 import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
+import 'package:flightly/features/notifications/services/travel_reminder_scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:confetti/confetti.dart';
@@ -37,6 +38,8 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
       ref.invalidate(historyTripsProvider);
       // Reset search form so next search starts fresh
       ref.read(searchFormProvider.notifier).reset();
+      // Schedule smart travel reminders for this booking
+      ref.read(travelReminderSchedulerProvider).scheduleForBooking(widget.booking);
     });
     _confettiController = ConfettiController(duration: const Duration(seconds: 4));
     // Start confetti when screen loads

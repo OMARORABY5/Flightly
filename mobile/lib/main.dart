@@ -13,6 +13,7 @@ import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/routing/app_router.dart';
 import 'package:flightly/core/providers/storage_provider.dart';
 import 'package:flightly/features/notifications/services/push_notification_service.dart';
+import 'package:flightly/features/notifications/services/travel_reminder_service.dart';
 
 
 void main() async {
@@ -63,6 +64,11 @@ class _FlightlyAppState extends ConsumerState<FlightlyApp> {
     // Initialize push notifications gracefully
     Future.microtask(() {
       ref.read(pushNotificationServiceProvider).initialize();
+      // Initialize travel reminder service with tap-to-navigate callback
+      final router = ref.read(appRouterProvider);
+      ref.read(travelReminderServiceProvider).initialize(
+        onTap: (payload) => router.push(payload),
+      );
     });
   }
 
