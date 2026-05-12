@@ -73,7 +73,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       await repo.confirmBooking(widget.booking.id, userId, useWallet: _useWallet);
       ref.invalidate(walletProvider);
     } catch (e) {
-      // If confirm fails, still let the user see confirmation
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(message: e.toString().replaceAll('Exception: ', '')),
+      );
+      return;
     }
 
     if (!mounted) return;

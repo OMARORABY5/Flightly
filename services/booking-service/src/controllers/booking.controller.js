@@ -412,9 +412,9 @@ class BookingController {
             );
 
             await client.query(
-              `INSERT INTO wallet_transactions (wallet_id, transaction_type, amount, reference, created_at)
-               VALUES ($1, 'payment', $2, $3, NOW())`,
-              [wallet.id, -walletDeducted, `Payment for booking ${booking.reference}`]
+              `INSERT INTO wallet_transactions (wallet_id, booking_id, type, amount, description, created_at)
+               VALUES ($1, $2, 'payment', $3, $4, NOW())`,
+              [wallet.id, id, walletDeducted, `Payment for booking ${booking.reference}`]
             );
           }
         }
