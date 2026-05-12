@@ -15,7 +15,7 @@ import 'package:flightly/features/search/domain/providers/return_flight_provider
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/presentation/widgets/flight_card.dart';
 import 'package:flightly/features/search/presentation/screens/return_filter_screen.dart';
-import 'package:flightly/features/search/presentation/screens/round_trip_summary_screen.dart';
+import 'package:flightly/features/search/presentation/screens/flight_details_screen.dart';
 import 'package:flightly/features/search/domain/smart_pricing/smart_pricing_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -319,9 +319,10 @@ class _ReturnFlightResultsScreenState
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => RoundTripSummaryScreen(
+                                            builder: (context) => FlightDetailsScreen(
+                                              flightId: flight.id,
+                                              seenPrice: flight.basePrice,
                                               outboundFlight: widget.outboundFlight,
-                                              returnFlight: flight,
                                             ),
                                           ),
                                         );

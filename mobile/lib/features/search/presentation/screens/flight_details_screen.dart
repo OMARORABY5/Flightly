@@ -13,6 +13,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flightly/features/booking/presentation/screens/booking_screen.dart';
 import 'package:flightly/features/search/presentation/screens/return_flight_results_screen.dart';
+import 'package:flightly/features/search/presentation/screens/round_trip_summary_screen.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/search/domain/models/search_query.dart';
 import 'package:flightly/features/search/domain/smart_pricing/smart_pricing_provider.dart';
@@ -22,10 +23,15 @@ class FlightDetailsScreen extends ConsumerStatefulWidget {
   final String flightId;
   final double seenPrice;
 
+  /// When set, this screen is acting as the return-flight details page.
+  /// The CTA will navigate to RoundTripSummaryScreen with both flights.
+  final Flight? outboundFlight;
+
   const FlightDetailsScreen({
     super.key,
     required this.flightId,
     required this.seenPrice,
+    this.outboundFlight,
   });
 
   @override
@@ -130,6 +136,20 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       return;
     }
 
+    // ── Return-flight context: go directly to trip summary ────────────────
+    if (widget.outboundFlight != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RoundTripSummaryScreen(
+            outboundFlight: widget.outboundFlight!,
+            returnFlight: flight,
+          ),
+        ),
+      );
+      return;
+    }
+
     final query = ref.read(searchFormProvider);
 
     if (query.tripType == TripType.roundTrip) {
@@ -155,19 +175,18 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
 
   /// Label for the primary action button.
   String get _buttonLabel {
+    // Return-flight context
+    if (widget.outboundFlight != null) return 'Confirm Return Flight';
     final query = ref.read(searchFormProvider);
-    if (query.tripType == TripType.roundTrip) {
-      return 'Choose Return';
-    }
+    if (query.tripType == TripType.roundTrip) return 'Choose Return';
     return 'Book Now';
   }
 
   /// Icon shown beside the button label.
   IconData get _buttonIcon {
+    if (widget.outboundFlight != null) return LucideIcons.planeLanding;
     final query = ref.read(searchFormProvider);
-    if (query.tripType == TripType.roundTrip) {
-      return LucideIcons.arrowLeftRight;
-    }
+    if (query.tripType == TripType.roundTrip) return LucideIcons.arrowLeftRight;
     return LucideIcons.plane;
   }
 
