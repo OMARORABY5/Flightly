@@ -25,7 +25,8 @@ import 'package:flightly/features/account/presentation/screens/profile_screen.da
 import 'package:flightly/features/account/presentation/screens/change_password_screen.dart';
 import 'package:flightly/features/account/presentation/screens/settings_screen.dart';
 import 'package:flightly/features/account/presentation/screens/my_cards_screen.dart';
-
+import 'package:flightly/features/account/presentation/screens/wallet_screen.dart';
+import 'package:flightly/features/trips/presentation/screens/modify_booking_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final isOnboardingCompleted = ref.read(onboardingProvider);
@@ -143,6 +144,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final trip = state.extra as Trip;
           return TripDetailScreen(trip: trip);
         },
+        routes: [
+          GoRoute(
+            path: 'modify',
+            builder: (context, state) {
+              final trip = state.extra as Trip;
+              return ModifyBookingScreen(trip: trip);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/notifications',
@@ -172,6 +182,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/account/passengers',
         builder: (context, state) => const PassengersScreen(isBookingFlow: false),
+      ),
+      GoRoute(
+        path: '/wallet',
+        builder: (context, state) => const WalletScreen(),
       ),
     ],
   );

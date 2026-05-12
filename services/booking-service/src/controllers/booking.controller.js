@@ -407,19 +407,48 @@ class BookingController {
     }
   }
 
-  // ─── DELETE /bookings/:id ─────────────────────────────────────────────────────
-  // Cancel a booking (only pending bookings can be cancelled)
+  // ─── Helper: Tiered cancellation fee ────────────────────────────────────────
+  // Returns the fee percentage based on hours remaining before departure.
+  // Policy:
+  //   > 24h  → 0%  (full refund)
+  //   16-24h → 10%
+  //   8-16h  → 20%
+  //   4-8h   → 30%
+  //   2-4h   → 40%
+  //   < 2h   → 70%
+  //   After departure → non-refundable (100% fee, caller should block this case)
+  _getCancellationFeePercent(departureTime) {
+    const now = new Date();
+    const hoursUntilDeparture = (new Date(departureTime) - now) / (1000 * 60 * 60);
+    if (hoursUntilDeparture <= 0)  return 100; // already departed
+    if (hoursUntilDeparture < 2)   return 70;
+    if (hoursUntilDeparture < 4)   return 40;
+    if (hoursUntilDeparture < 8)   return 30;
+    if (hoursUntilDeparture < 16)  return 20;
+    if (hoursUntilDeparture < 24)  return 10;
+    return 0;
+  }
+
+  // ─── POST /bookings/:id/cancel ───────────────────────────────────────────────
+  // Cancel a confirmed booking. Applies tiered refund policy based on time
+  // remaining before departure. Refund is credited to the user's virtual wallet.
+  // Body: { reason? }   — userId comes from JWT via authMiddleware (req.userId)
   async cancelBooking(req, res) {
     const { id } = req.params;
-    const { user_id } = req.body;
+    const userId = req.userId;                        // set by authMiddleware
+    const { reason } = req.body;
 
     const client = await this.db.connect();
     try {
       await client.query('BEGIN');
 
+      // 1. Fetch booking + outbound flight departure time in one query
       const bookingRow = await client.query(
-        'SELECT * FROM bookings WHERE id = $1 AND user_id = $2',
-        [id, user_id]
+        `SELECT b.*, f.departure_time
+         FROM bookings b
+         JOIN flights f ON b.flight_id = f.id
+         WHERE b.id = $1 AND b.user_id = $2`,
+        [id, userId]
       );
 
       if (bookingRow.rowCount === 0) {
@@ -429,48 +458,115 @@ class BookingController {
 
       const booking = bookingRow.rows[0];
 
+      // 2. Guard: already cancelled
       if (booking.status === 'cancelled') {
         await client.query('ROLLBACK');
         return res.status(409).json({ success: false, message: 'Booking is already cancelled' });
       }
 
-      // Restore seats on the flight
-      const passengerCount = await client.query(
+      // 3. Guard: flight has already departed — non-refundable
+      const now = new Date();
+      if (new Date(booking.departure_time) <= now) {
+        await client.query('ROLLBACK');
+        return res.status(422).json({
+          success: false,
+          message: 'This flight has already departed. Cancellations are not allowed after departure.',
+        });
+      }
+
+      // 4. Calculate refund using tiered fee policy
+      const feePercent  = this._getCancellationFeePercent(booking.departure_time);
+      const totalPrice  = parseFloat(booking.total_price);
+      const feeAmount   = parseFloat(((feePercent / 100) * totalPrice).toFixed(2));
+      const refundAmount = parseFloat((totalPrice - feeAmount).toFixed(2));
+
+      // 5. Restore available seats for outbound (and return) flight
+      const passengerRow = await client.query(
         'SELECT COUNT(*) FROM booking_passengers WHERE booking_id = $1',
         [id]
       );
-      const count = parseInt(passengerCount.rows[0].count);
+      const passengerCount = parseInt(passengerRow.rows[0].count);
 
       await client.query(
         'UPDATE flights SET available_seats = available_seats + $1 WHERE id = $2',
-        [count, booking.flight_id]
+        [passengerCount, booking.flight_id]
       );
       if (booking.return_flight_id) {
         await client.query(
           'UPDATE flights SET available_seats = available_seats + $1 WHERE id = $2',
-          [count, booking.return_flight_id]
+          [passengerCount, booking.return_flight_id]
         );
       }
 
-      // Mark as cancelled
+      // 6. Mark booking as cancelled + store refund metadata
       await client.query(
-        `UPDATE bookings SET status = 'cancelled', updated_at = NOW() WHERE id = $1`,
-        [id]
+        `UPDATE bookings
+         SET status               = 'cancelled',
+             payment_status       = 'refunded',
+             refund_amount        = $1,
+             cancellation_fee_pct = $2,
+             cancellation_reason  = $3,
+             cancelled_at         = NOW(),
+             updated_at           = NOW()
+         WHERE id = $4`,
+        [refundAmount, feePercent, reason || null, id]
+      );
+
+      // 7. Credit wallet (UPSERT — auto-creates wallet if first refund)
+      const walletRow = await client.query(
+        `INSERT INTO wallets (user_id, balance)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id) DO UPDATE
+           SET balance     = wallets.balance + EXCLUDED.balance,
+               updated_at  = NOW()
+         RETURNING id`,
+        [userId, refundAmount]
+      );
+      const walletId = walletRow.rows[0].id;
+
+      // 8. Record wallet transaction (immutable audit entry)
+      await client.query(
+        `INSERT INTO wallet_transactions
+           (wallet_id, booking_id, type, amount, fee_percent, description)
+         VALUES ($1, $2, 'refund', $3, $4, $5)`,
+        [
+          walletId,
+          id,
+          refundAmount,
+          feePercent,
+          `Refund for booking ${booking.reference}${feePercent > 0 ? ` (${feePercent}% cancellation fee applied)` : ''}`,
+        ]
       );
 
       await client.query('COMMIT');
 
-      // Invalidate caches
+      // 9. Invalidate all related Redis cache keys
       if (this.redis) {
-        await this.redis.del(`booking:${id}`).catch(() => {});
-        await this.redis.del(`bookings:user:${user_id}:all`).catch(() => {});
+        await Promise.all([
+          this.redis.del(`booking:${id}`),
+          this.redis.del(`bookings:user:${userId}:all`),
+          this.redis.del(`bookings:upcoming:${userId}`),
+          this.redis.del(`bookings:history:${userId}`),
+          this.redis.del(`wallet:${userId}`),
+        ].map(p => p.catch(() => {})));
       }
 
-      res.json({ success: true, message: 'Booking cancelled successfully' });
+      return res.json({
+        success: true,
+        message: 'Booking cancelled successfully',
+        data: {
+          booking_id:      id,
+          reference:       booking.reference,
+          refund_amount:   refundAmount,
+          fee_percent:     feePercent,
+          fee_amount:      feeAmount,
+          wallet_balance:  refundAmount, // caller can refresh wallet for exact balance
+        },
+      });
     } catch (err) {
       await client.query('ROLLBACK');
       console.error('cancelBooking error:', err.message);
-      res.status(500).json({ success: false, message: 'Failed to cancel booking' });
+      return res.status(500).json({ success: false, message: 'Failed to cancel booking' });
     } finally {
       client.release();
     }
@@ -636,6 +732,186 @@ class BookingController {
     } catch (err) {
       console.error('getHistoryTrips error:', err.message);
       res.status(500).json({ success: false, message: 'Failed to fetch trip history' });
+    }
+  }
+
+  // ─── PATCH /bookings/:id ─────────────────────────────────────────────────────
+  // Modify an upcoming confirmed booking.
+  // Allowed changes: cabin_class, contact_email, contact_phone,
+  //                  add_passenger_ids[], remove_passenger_ids[]
+  // userId comes from JWT via authMiddleware (req.userId).
+  async modifyBooking(req, res) {
+    const { id } = req.params;
+    const userId = req.userId;
+    const {
+      cabin_class,
+      contact_email,
+      contact_phone,
+      add_passenger_ids    = [],
+      remove_passenger_ids = [],
+    } = req.body;
+
+    const client = await this.db.connect();
+    try {
+      await client.query('BEGIN');
+
+      // 1. Fetch booking + flight departure time
+      const bookingRow = await client.query(
+        `SELECT b.*, f.departure_time, f.base_price
+         FROM bookings b
+         JOIN flights f ON b.flight_id = f.id
+         WHERE b.id = $1 AND b.user_id = $2`,
+        [id, userId]
+      );
+
+      if (bookingRow.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ success: false, message: 'Booking not found or access denied' });
+      }
+
+      const booking = bookingRow.rows[0];
+
+      // 2. Guard: only confirmed bookings can be modified
+      if (booking.status !== 'confirmed') {
+        await client.query('ROLLBACK');
+        return res.status(422).json({ success: false, message: 'Only confirmed bookings can be modified' });
+      }
+
+      // 3. Guard: flight must not have departed yet
+      if (new Date(booking.departure_time) <= new Date()) {
+        await client.query('ROLLBACK');
+        return res.status(422).json({ success: false, message: 'Cannot modify a booking after the flight has departed' });
+      }
+
+      // 4. Validate added passengers belong to this user
+      if (add_passenger_ids.length > 0) {
+        const check = await client.query(
+          'SELECT id FROM passengers WHERE id = ANY($1::uuid[]) AND user_id = $2',
+          [add_passenger_ids, userId]
+        );
+        if (check.rowCount !== add_passenger_ids.length) {
+          await client.query('ROLLBACK');
+          return res.status(400).json({ success: false, message: 'One or more passengers to add are invalid or do not belong to this user' });
+        }
+      }
+
+      // 5. Remove passengers (delete from junction table)
+      if (remove_passenger_ids.length > 0) {
+        await client.query(
+          'DELETE FROM booking_passengers WHERE booking_id = $1 AND passenger_id = ANY($2::uuid[])',
+          [id, remove_passenger_ids]
+        );
+        // Restore seats for removed passengers
+        await client.query(
+          'UPDATE flights SET available_seats = available_seats + $1 WHERE id = $2',
+          [remove_passenger_ids.length, booking.flight_id]
+        );
+        if (booking.return_flight_id) {
+          await client.query(
+            'UPDATE flights SET available_seats = available_seats + $1 WHERE id = $2',
+            [remove_passenger_ids.length, booking.return_flight_id]
+          );
+        }
+      }
+
+      // 6. Add new passengers (insert into junction table, ignore duplicates)
+      if (add_passenger_ids.length > 0) {
+        for (const passengerId of add_passenger_ids) {
+          await client.query(
+            `INSERT INTO booking_passengers (booking_id, passenger_id)
+             VALUES ($1, $2)
+             ON CONFLICT (booking_id, passenger_id) DO NOTHING`,
+            [id, passengerId]
+          );
+        }
+        // Decrement available seats for added passengers
+        await client.query(
+          'UPDATE flights SET available_seats = available_seats - $1 WHERE id = $2',
+          [add_passenger_ids.length, booking.flight_id]
+        );
+        if (booking.return_flight_id) {
+          await client.query(
+            'UPDATE flights SET available_seats = available_seats - $1 WHERE id = $2',
+            [add_passenger_ids.length, booking.return_flight_id]
+          );
+        }
+      }
+
+      // 7. Recalculate total price based on new passenger count
+      const newPassengerRow = await client.query(
+        'SELECT COUNT(*) FROM booking_passengers WHERE booking_id = $1',
+        [id]
+      );
+      const newPassengerCount = parseInt(newPassengerRow.rows[0].count);
+      const basePrice = parseFloat(booking.base_price);
+
+      // Price = outbound price × passengers (+ return flight price × passengers if round-trip)
+      let newTotalPrice = basePrice * newPassengerCount;
+      if (booking.return_flight_id) {
+        const returnRow = await client.query(
+          'SELECT base_price FROM flights WHERE id = $1',
+          [booking.return_flight_id]
+        );
+        if (returnRow.rowCount > 0) {
+          newTotalPrice += parseFloat(returnRow.rows[0].base_price) * newPassengerCount;
+        }
+      }
+
+      // 8. Build dynamic UPDATE for scalar fields
+      const updates  = [];
+      const values   = [];
+      let   paramIdx = 1;
+
+      if (cabin_class) {
+        updates.push(`cabin_class = $${paramIdx++}`);
+        values.push(cabin_class);
+      }
+      if (contact_email) {
+        updates.push(`contact_email = $${paramIdx++}`);
+        values.push(contact_email);
+      }
+      if (contact_phone !== undefined) {
+        updates.push(`contact_phone = $${paramIdx++}`);
+        values.push(contact_phone);
+      }
+
+      // Always update price and timestamp
+      updates.push(`total_price = $${paramIdx++}`);
+      values.push(newTotalPrice.toFixed(2));
+      updates.push(`updated_at = NOW()`);
+
+      values.push(id); // for WHERE clause
+      await client.query(
+        `UPDATE bookings SET ${updates.join(', ')} WHERE id = $${paramIdx}`,
+        values
+      );
+
+      await client.query('COMMIT');
+
+      // 9. Invalidate cache
+      if (this.redis) {
+        await Promise.all([
+          this.redis.del(`booking:${id}`),
+          this.redis.del(`bookings:user:${userId}:all`),
+          this.redis.del(`bookings:upcoming:${userId}`),
+        ].map(p => p.catch(() => {})));
+      }
+
+      return res.json({
+        success: true,
+        message: 'Booking updated successfully',
+        data: {
+          booking_id:      id,
+          new_total_price: parseFloat(newTotalPrice.toFixed(2)),
+          passenger_count: newPassengerCount,
+        },
+      });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('modifyBooking error:', err.message);
+      return res.status(500).json({ success: false, message: 'Failed to modify booking' });
+    } finally {
+      client.release();
     }
   }
 }

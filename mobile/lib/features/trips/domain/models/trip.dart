@@ -72,6 +72,11 @@ class Trip {
   final List<String> passengers;
   final TripFlight flight;
 
+  // Phase: Modify & Cancel Feature
+  final double? refundAmount;
+  final DateTime? cancelledAt;
+  final String? cancellationReason;
+
   Trip({
     required this.id,
     required this.reference,
@@ -86,6 +91,9 @@ class Trip {
     required this.passengerCount,
     required this.passengers,
     required this.flight,
+    this.refundAmount,
+    this.cancelledAt,
+    this.cancellationReason,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -103,6 +111,9 @@ class Trip {
       passengerCount: json['passenger_count'] ?? 1,
       passengers: (json['passengers'] as List<dynamic>?)?.map((e) => e['full_name'] as String).toList() ?? [],
       flight: TripFlight.fromJson(json['flight'] ?? {}),
+      refundAmount: (json['refund_amount'] as num?)?.toDouble(),
+      cancelledAt: json['cancelled_at'] != null ? DateTime.parse(json['cancelled_at']) : null,
+      cancellationReason: json['cancellation_reason'],
     );
   }
 

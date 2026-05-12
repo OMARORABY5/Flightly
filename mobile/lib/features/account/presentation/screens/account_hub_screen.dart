@@ -139,6 +139,11 @@ class AccountHubScreen extends ConsumerWidget {
             
             _buildMenuGroup('Preferences & Payment', [
               _MenuItem(
+                icon: LucideIcons.wallet,
+                title: 'My Wallet',
+                onTap: () => context.push('/wallet'),
+              ),
+              _MenuItem(
                 icon: LucideIcons.creditCard,
                 title: 'My Cards',
                 onTap: () => context.push('/account/cards'),

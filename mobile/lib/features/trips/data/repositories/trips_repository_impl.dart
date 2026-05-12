@@ -5,6 +5,7 @@
 
 import 'package:flightly/core/network/dio_client.dart';
 import 'package:flightly/features/trips/domain/models/trip.dart';
+import 'package:flightly/features/trips/domain/models/wallet.dart';
 import 'package:flightly/features/trips/domain/repositories/trips_repository.dart';
 
 class TripsRepositoryImpl implements TripsRepository {
@@ -31,5 +32,32 @@ class TripsRepositoryImpl implements TripsRepository {
       return data.map((e) => Trip.fromJson(e)).toList();
     }
     return [];
+  }
+
+  // ─── Phase: Modify & Cancel Feature ─────────────────────────────────────────
+
+  @override
+  Future<void> cancelBooking(String bookingId) async {
+    final response = await _dioClient.post('/bookings/$bookingId/cancel');
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to cancel booking');
+    }
+  }
+
+  @override
+  Future<void> modifyBooking(String bookingId, Map<String, dynamic> payload) async {
+    final response = await _dioClient.patch('/bookings/$bookingId', data: payload);
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to modify booking');
+    }
+  }
+
+  @override
+  Future<Wallet> getWallet() async {
+    final response = await _dioClient.get('/bookings/wallet');
+    if (response.data['success'] == true) {
+      return Wallet.fromJson(response.data['data']);
+    }
+    throw Exception(response.data['message'] ?? 'Failed to fetch wallet');
   }
 }
