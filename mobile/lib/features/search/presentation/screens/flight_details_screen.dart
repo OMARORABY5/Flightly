@@ -194,7 +194,9 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   Widget build(BuildContext context) {
     final flightAsync = ref.watch(flightDetailsProvider(widget.flightId));
     final savedAsync = ref.watch(isFlightSavedProvider(widget.flightId));
-    final recommendation = ref.watch(flightRecommendationProvider(widget.flightId));
+    final recommendation = widget.outboundFlight != null 
+        ? ref.watch(returnFlightRecommendationProvider(widget.flightId))
+        : ref.watch(flightRecommendationProvider(widget.flightId));
     final isSaved = savedAsync.value?['is_saved'] == true;
 
     return Scaffold(
@@ -265,7 +267,8 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                                 MaterialPageRoute(
                                   builder: (_) => FlightDetailsScreen(
                                     flightId: altFlight.id,
-                                    seenPrice: altFlight.totalPrice, // Use total price or base price?
+                                    seenPrice: altFlight.totalPrice,
+                                    outboundFlight: widget.outboundFlight, // Pass the outbound flight if we are in return mode
                                   ),
                                 ),
                               );
