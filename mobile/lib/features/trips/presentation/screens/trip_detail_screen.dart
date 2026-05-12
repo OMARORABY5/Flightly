@@ -448,6 +448,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       // Invalidate the trips provider so it fetches the fresh lists
       ref.invalidate(upcomingTripsProvider);
       ref.invalidate(historyTripsProvider);
+      // Invalidate wallet so the refund is reflected immediately
+      ref.invalidate(walletProvider);
 
       // Pop back to trips list
       context.pop(); 

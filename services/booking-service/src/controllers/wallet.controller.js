@@ -61,9 +61,9 @@ class WalletController {
         })),
       };
 
-      // Cache for 60 seconds — wallet updates on every cancellation
+      // Cache for 5 seconds only — balance changes on every payment or refund
       if (this.redis) {
-        await this.redis.setEx(cacheKey, 60, JSON.stringify(result)).catch(() => {});
+        await this.redis.setEx(cacheKey, 5, JSON.stringify(result)).catch(() => {});
       }
 
       return res.json({ success: true, data: result });

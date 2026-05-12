@@ -10,11 +10,25 @@ import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
 import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 
-class WalletScreen extends ConsumerWidget {
+class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WalletScreen> createState() => _WalletScreenState();
+}
+
+class _WalletScreenState extends ConsumerState<WalletScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Always fetch fresh data when the wallet screen is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(walletProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final walletAsync = ref.watch(walletProvider);
 
     return Scaffold(

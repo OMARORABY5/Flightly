@@ -43,7 +43,10 @@ final modifyBookingProvider = FutureProvider.family.autoDispose<void, Map<String
   return ref.read(tripsRepositoryProvider).modifyBooking(bookingId, payload);
 });
 
-final walletProvider = FutureProvider.autoDispose<Wallet>((ref) async {
+// NOTE: walletProvider is NOT autoDispose so that it can be invalidated globally
+// from anywhere in the app (payment screen, cancellation, profile) and the
+// refreshed balance will propagate to every screen watching it.
+final walletProvider = FutureProvider<Wallet>((ref) async {
   final authState = ref.watch(authProvider);
   if (authState is! AuthAuthenticated) throw Exception('Not authenticated');
   return ref.read(tripsRepositoryProvider).getWallet();

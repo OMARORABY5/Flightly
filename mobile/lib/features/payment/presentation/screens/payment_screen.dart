@@ -36,6 +36,15 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   bool _useWallet = true;
 
   @override
+  void initState() {
+    super.initState();
+    // Always fetch a fresh wallet balance when entering the payment screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(walletProvider);
+    });
+  }
+
+  @override
   void dispose() {
     _cardNumberController.dispose();
     _cardNameController.dispose();
