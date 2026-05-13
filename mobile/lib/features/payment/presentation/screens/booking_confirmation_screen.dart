@@ -242,21 +242,65 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
   }
 
   Widget _buildSummaryCard() {
-    final flight = widget.booking.outboundFlight;
+    final outbound = widget.booking.outboundFlight;
+    final returning = widget.booking.returnFlight;
+    final isRoundTrip = widget.booking.tripType == 'round_trip' && returning != null;
+
     return GlassCard(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Outbound leg ──────────────────────────────────────────────────
+          if (isRoundTrip)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.planeTakeoff, size: 13, color: AppColors.primary),
+                  const SizedBox(width: 5),
+                  Text('Outbound', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
           Row(
             children: [
-              Text('${flight.originIata} → ${flight.destinationIata}', style: AppTextStyles.headingSmall),
+              Text('${outbound.originIata} → ${outbound.destinationIata}', style: AppTextStyles.headingSmall),
               const Spacer(),
               Text('${widget.booking.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.headingSmall.copyWith(color: AppColors.primary)),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(flight.airlineName, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: 4),
+          Text(
+            outbound.airlineName,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          ),
+
+          // ── Return leg (round-trip only) ──────────────────────────────────
+          if (isRoundTrip) ...[
+            const Divider(height: 24, color: AppColors.surfaceBorder),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.planeLanding, size: 13, color: AppColors.accent),
+                  const SizedBox(width: 5),
+                  Text('Return', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Text('${returning.originIata} → ${returning.destinationIata}', style: AppTextStyles.headingSmall),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              returning.airlineName,
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
+
           const Divider(height: 24),
           Text('${widget.booking.passengers.length} Passenger${widget.booking.passengers.length == 1 ? '' : 's'}', style: AppTextStyles.labelMedium),
           const SizedBox(height: 8),

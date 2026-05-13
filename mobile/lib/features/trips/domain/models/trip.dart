@@ -1,8 +1,5 @@
 // trip.dart — FLIGHTLY My Trips Domain Model
 // Represents a summarised booking for the My Trips tab list.
-// WHY: The trips list endpoint returns a flat summary optimised for list display,
-//      not the full booking detail. We keep a separate model to avoid coupling
-//      the list view to the heavy BookingDetail response shape.
 
 class TripFlight {
   final String flightNumber;
@@ -71,8 +68,9 @@ class Trip {
   final int passengerCount;
   final List<String> passengers;
   final TripFlight flight;
+  final TripFlight? returnFlight; // Only set for round_trip bookings
 
-  // Phase: Modify & Cancel Feature
+  // Modify & Cancel Feature
   final double? refundAmount;
   final DateTime? cancelledAt;
   final String? cancellationReason;
@@ -91,10 +89,13 @@ class Trip {
     required this.passengerCount,
     required this.passengers,
     required this.flight,
+    this.returnFlight,
     this.refundAmount,
     this.cancelledAt,
     this.cancellationReason,
   });
+
+  bool get isRoundTrip => tripType == 'round_trip';
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
@@ -111,6 +112,9 @@ class Trip {
       passengerCount: json['passenger_count'] ?? 1,
       passengers: (json['passengers'] as List<dynamic>?)?.map((e) => e['full_name'] as String).toList() ?? [],
       flight: TripFlight.fromJson(json['flight'] ?? {}),
+      returnFlight: json['return_flight'] != null
+          ? TripFlight.fromJson(json['return_flight'])
+          : null,
       refundAmount: (json['refund_amount'] as num?)?.toDouble(),
       cancelledAt: json['cancelled_at'] != null ? DateTime.parse(json['cancelled_at']) : null,
       cancellationReason: json['cancellation_reason'],

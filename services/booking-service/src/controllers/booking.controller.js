@@ -646,12 +646,23 @@ class BookingController {
                 f.departure_time, f.arrival_time, f.duration_minutes, f.stops,
                 ao.city AS origin_city, ao.name AS origin_name,
                 ad.city AS destination_city, ad.name AS destination_name,
+                -- Return flight fields (NULL for one-way)
+                rf.flight_number AS rf_flight_number, rf.airline_name AS rf_airline_name,
+                rf.airline_code AS rf_airline_code, rf.airline_logo_url AS rf_airline_logo_url,
+                rf.origin_iata AS rf_origin_iata, rf.destination_iata AS rf_destination_iata,
+                rf.departure_time AS rf_departure_time, rf.arrival_time AS rf_arrival_time,
+                rf.duration_minutes AS rf_duration_minutes, rf.stops AS rf_stops,
+                rfo.city AS rf_origin_city, rfo.name AS rf_origin_name,
+                rfd.city AS rf_destination_city, rfd.name AS rf_destination_name,
                 (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count,
                 (SELECT json_agg(json_build_object('id', p.id, 'full_name', p.full_name)) FROM booking_passengers bp JOIN passengers p ON bp.passenger_id = p.id WHERE bp.booking_id = b.id) AS passengers
          FROM bookings b
          JOIN flights f ON b.flight_id = f.id
          JOIN airports ao ON f.origin_iata = ao.iata_code
          JOIN airports ad ON f.destination_iata = ad.iata_code
+         LEFT JOIN flights rf ON b.return_flight_id = rf.id
+         LEFT JOIN airports rfo ON rf.origin_iata = rfo.iata_code
+         LEFT JOIN airports rfd ON rf.destination_iata = rfd.iata_code
          WHERE b.user_id = $1
            AND b.status = 'confirmed'
            AND b.payment_status = 'paid'
@@ -689,6 +700,23 @@ class BookingController {
           duration_minutes: b.duration_minutes,
           stops: b.stops,
         },
+        // Return flight — only populated for round_trip bookings
+        return_flight: b.rf_flight_number ? {
+          flight_number: b.rf_flight_number,
+          airline_name: b.rf_airline_name,
+          airline_code: b.rf_airline_code,
+          airline_logo_url: b.rf_airline_logo_url,
+          origin_iata: b.rf_origin_iata,
+          destination_iata: b.rf_destination_iata,
+          origin_city: b.rf_origin_city,
+          origin_name: b.rf_origin_name,
+          destination_city: b.rf_destination_city,
+          destination_name: b.rf_destination_name,
+          departure_time: b.rf_departure_time,
+          arrival_time: b.rf_arrival_time,
+          duration_minutes: b.rf_duration_minutes,
+          stops: b.rf_stops,
+        } : null,
       }));
 
       // Cache 2 minutes — upcoming trips don't change frequently
@@ -720,17 +748,29 @@ class BookingController {
       const result = await this.db.query(
         `SELECT b.id, b.reference, b.status, b.payment_status, b.trip_type, b.cabin_class,
                 b.total_price, b.contact_email, b.contact_phone, b.created_at,
+                b.refund_amount, b.cancelled_at, b.cancellation_reason,
                 f.flight_number, f.airline_name, f.airline_code, f.airline_logo_url,
                 f.origin_iata, f.destination_iata,
                 f.departure_time, f.arrival_time, f.duration_minutes, f.stops,
                 ao.city AS origin_city, ao.name AS origin_name,
                 ad.city AS destination_city, ad.name AS destination_name,
+                -- Return flight fields (NULL for one-way)
+                rf.flight_number AS rf_flight_number, rf.airline_name AS rf_airline_name,
+                rf.airline_code AS rf_airline_code, rf.airline_logo_url AS rf_airline_logo_url,
+                rf.origin_iata AS rf_origin_iata, rf.destination_iata AS rf_destination_iata,
+                rf.departure_time AS rf_departure_time, rf.arrival_time AS rf_arrival_time,
+                rf.duration_minutes AS rf_duration_minutes, rf.stops AS rf_stops,
+                rfo.city AS rf_origin_city, rfo.name AS rf_origin_name,
+                rfd.city AS rf_destination_city, rfd.name AS rf_destination_name,
                 (SELECT COUNT(*) FROM booking_passengers bp WHERE bp.booking_id = b.id) AS passenger_count,
                 (SELECT json_agg(json_build_object('id', p.id, 'full_name', p.full_name)) FROM booking_passengers bp JOIN passengers p ON bp.passenger_id = p.id WHERE bp.booking_id = b.id) AS passengers
          FROM bookings b
          JOIN flights f ON b.flight_id = f.id
          JOIN airports ao ON f.origin_iata = ao.iata_code
          JOIN airports ad ON f.destination_iata = ad.iata_code
+         LEFT JOIN flights rf ON b.return_flight_id = rf.id
+         LEFT JOIN airports rfo ON rf.origin_iata = rfo.iata_code
+         LEFT JOIN airports rfd ON rf.destination_iata = rfd.iata_code
          WHERE b.user_id = $1
            AND (
              -- Completed trips: confirmed + paid + already departed
@@ -754,6 +794,9 @@ class BookingController {
         contact_email: b.contact_email,
         contact_phone: b.contact_phone,
         created_at: b.created_at,
+        refund_amount: b.refund_amount ? parseFloat(b.refund_amount) : null,
+        cancelled_at: b.cancelled_at,
+        cancellation_reason: b.cancellation_reason,
         passenger_count: parseInt(b.passenger_count),
         passengers: b.passengers || [],
         flight: {
@@ -772,6 +815,23 @@ class BookingController {
           duration_minutes: b.duration_minutes,
           stops: b.stops,
         },
+        // Return flight — only populated for round_trip bookings
+        return_flight: b.rf_flight_number ? {
+          flight_number: b.rf_flight_number,
+          airline_name: b.rf_airline_name,
+          airline_code: b.rf_airline_code,
+          airline_logo_url: b.rf_airline_logo_url,
+          origin_iata: b.rf_origin_iata,
+          destination_iata: b.rf_destination_iata,
+          origin_city: b.rf_origin_city,
+          origin_name: b.rf_origin_name,
+          destination_city: b.rf_destination_city,
+          destination_name: b.rf_destination_name,
+          departure_time: b.rf_departure_time,
+          arrival_time: b.rf_arrival_time,
+          duration_minutes: b.rf_duration_minutes,
+          stops: b.rf_stops,
+        } : null,
       }));
 
       // Cache 5 minutes — history is stable

@@ -1,6 +1,6 @@
 // trip_card.dart — FLIGHTLY Trip Card Widget
 // Displays a single booking summary in the My Trips list.
-// Shows: route, airline, dates/times, booking ref, status badge.
+// Supports both one-way (single leg) and round-trip (two legs) cards.
 
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -36,7 +36,6 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final f = trip.flight;
     final cfg = _statusConfig;
 
     return GestureDetector(
@@ -49,7 +48,7 @@ class TripCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // ── Header: airline + status badge ──────────────────────────────
+            // ── Header: trip type + status badge ────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
               child: Row(
@@ -57,11 +56,18 @@ class TripCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(LucideIcons.plane, size: 14, color: AppColors.textSecondary),
+                      Icon(
+                        trip.isRoundTrip ? LucideIcons.arrowLeftRight : LucideIcons.arrowRight,
+                        size: 14,
+                        color: AppColors.textSecondary,
+                      ),
                       const SizedBox(width: 6),
-                      Text(f.airlineName, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                      Text(
+                        trip.isRoundTrip ? 'Round Trip' : 'One Way',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+                      ),
                       const SizedBox(width: 6),
-                      Text('· ${f.flightNumber}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
+                      Text('· ${trip.flight.airlineName}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
                     ],
                   ),
                   Container(
@@ -83,59 +89,63 @@ class TripCard extends StatelessWidget {
               ),
             ),
 
-            // ── Route display ────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Row(
-                children: [
-                  // Origin
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(f.originIata, style: AppTextStyles.displayMedium),
-                        const SizedBox(height: 2),
-                        Text(_formatTime(f.departureTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-                        Text(_formatDate(f.departureTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
-                      ],
-                    ),
-                  ),
-
-                  // Middle: duration + arrow
-                  Column(
-                    children: [
-                      Text(_formatDuration(f.durationMinutes), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
-                      const SizedBox(height: 6),
-                      Row(
+            // ── Outbound leg ─────────────────────────────────────────────────
+            if (trip.isRoundTrip)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(width: 40, height: 1, color: AppColors.surfaceBorder),
-                          const Icon(LucideIcons.plane, size: 16, color: AppColors.primary),
-                          Container(width: 40, height: 1, color: AppColors.surfaceBorder),
+                          const Icon(LucideIcons.planeTakeoff, size: 11, color: AppColors.primary),
+                          const SizedBox(width: 4),
+                          Text('Outbound', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        f.stops == 0 ? 'Direct' : '${f.stops} stop${f.stops > 1 ? 's' : ''}',
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-
-                  // Destination
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(f.destinationIata, style: AppTextStyles.displayMedium),
-                        const SizedBox(height: 2),
-                        Text(_formatTime(f.arrivalTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-                        Text(_formatDate(f.arrivalTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
-                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+
+            _buildFlightLegRow(trip.flight),
+
+            // ── Return leg (round-trip only) ─────────────────────────────────
+            if (trip.isRoundTrip && trip.returnFlight != null) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Divider(color: AppColors.surfaceBorder.withValues(alpha: 0.6), height: 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(LucideIcons.planeLanding, size: 11, color: AppColors.accent),
+                          const SizedBox(width: 4),
+                          Text('Return', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildFlightLegRow(trip.returnFlight!),
+            ],
 
             // ── Footer: booking ref + passengers + price ─────────────────────
             Container(
@@ -180,6 +190,61 @@ class TripCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFlightLegRow(TripFlight f) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          // Origin
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(f.originIata, style: AppTextStyles.displayMedium),
+                const SizedBox(height: 2),
+                Text(_formatTime(f.departureTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(_formatDate(f.departureTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
+              ],
+            ),
+          ),
+
+          // Middle: duration + arrow
+          Column(
+            children: [
+              Text(_formatDuration(f.durationMinutes), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Container(width: 36, height: 1, color: AppColors.surfaceBorder),
+                  const Icon(LucideIcons.plane, size: 16, color: AppColors.primary),
+                  Container(width: 36, height: 1, color: AppColors.surfaceBorder),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                f.stops == 0 ? 'Direct' : '${f.stops} stop${f.stops > 1 ? 's' : ''}',
+                style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+              ),
+            ],
+          ),
+
+          // Destination
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(f.destinationIata, style: AppTextStyles.displayMedium),
+                const SizedBox(height: 2),
+                Text(_formatTime(f.arrivalTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(_formatDate(f.arrivalTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

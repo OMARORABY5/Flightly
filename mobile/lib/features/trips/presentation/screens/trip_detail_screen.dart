@@ -118,7 +118,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             if (trip.isUpcoming) _buildArrivalAdvisoryBanner(trip),
 
             // ── Flight Itinerary ───────────────────────────────────────────────
-            Text('Outbound Flight', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textSecondary)),
+            Text(
+              trip.isRoundTrip ? 'Outbound Flight' : 'Flight Itinerary',
+              style: AppTextStyles.headingSmall.copyWith(color: AppColors.textSecondary),
+            ),
             const SizedBox(height: 10),
             GlassCard(
               padding: const EdgeInsets.all(20),
@@ -215,6 +218,107 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // ── Return Flight (round-trip only) ────────────────────────────────
+            if (trip.isRoundTrip && trip.returnFlight != null) ...[
+              Text('Return Flight', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textSecondary)),
+              const SizedBox(height: 10),
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Airline row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            trip.returnFlight!.airlineName,
+                            style: AppTextStyles.labelMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(trip.returnFlight!.flightNumber, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Route
+                    Row(
+                      children: [
+                        // Origin
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(_formatTime(trip.returnFlight!.departureTime), style: AppTextStyles.displayMedium),
+                              const SizedBox(height: 2),
+                              Text(trip.returnFlight!.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.accent)),
+                              const SizedBox(height: 2),
+                              Text(trip.returnFlight!.originCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+
+                        // Arrow + duration
+                        Column(
+                          children: [
+                            Text(_formatDuration(trip.returnFlight!.durationMinutes), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                            const SizedBox(height: 6),
+                            const Icon(LucideIcons.arrowRight, color: AppColors.accent, size: 22),
+                            const SizedBox(height: 4),
+                            Text(
+                              trip.returnFlight!.stops == 0 ? 'Direct' : '${trip.returnFlight!.stops} stop${trip.returnFlight!.stops > 1 ? 's' : ''}',
+                              style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+
+                        // Destination
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(_formatTime(trip.returnFlight!.arrivalTime), style: AppTextStyles.displayMedium),
+                              const SizedBox(height: 2),
+                              Text(trip.returnFlight!.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.accent)),
+                              const SizedBox(height: 2),
+                              Text(trip.returnFlight!.destinationCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(color: AppColors.surfaceBorder),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _formatDate(trip.returnFlight!.departureTime),
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            _formatDate(trip.returnFlight!.arrivalTime),
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
             // ── Booking Summary ────────────────────────────────────────────────
             Text('Booking Summary', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textSecondary)),
