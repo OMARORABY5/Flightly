@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
+import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/features/onboarding/presentation/screens/onboarding_screen.dart';
-import 'package:flightly/features/auth/presentation/screens/auth_landing_screen.dart';
 import 'package:flightly/features/auth/presentation/screens/login_screen.dart';
 import 'package:flightly/features/auth/presentation/screens/register_screen.dart';
 import 'package:flightly/features/auth/presentation/screens/forgot_password_screen.dart';
@@ -39,33 +39,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   if (isOnboardingCompleted) {
     initial = authState is AuthAuthenticated 
         ? RouteConstants.home 
-        : RouteConstants.authLanding;
+        : RouteConstants.login;
   }
 
   return GoRouter(
     initialLocation: initial,
+    errorBuilder: (context, state) {
+      // Any unknown route (typo, cached old URL, stale deep link)
+      // silently redirects to login instead of crashing.
+      Future.microtask(() => context.go(RouteConstants.login));
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    },
     routes: [
+      GoRoute(
+        path: '/auth',
+        redirect: (context, state) => RouteConstants.login,
+      ),
       GoRoute(
         path: RouteConstants.onboarding,
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
-        path: RouteConstants.authLanding,
-        builder: (context, state) => const AuthLandingScreen(),
-        routes: [
-          GoRoute(
-            path: 'login',
-            builder: (context, state) => const LoginScreen(),
-          ),
-          GoRoute(
-            path: 'register',
-            builder: (context, state) => const RegisterScreen(),
-          ),
-          GoRoute(
-            path: 'forgot-password',
-            builder: (context, state) => const ForgotPasswordScreen(),
-          ),
-        ],
+        path: RouteConstants.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.register,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: RouteConstants.home,

@@ -9,7 +9,6 @@ class RouteConstants {
   static const String onboarding = '/onboarding';
 
   // ─── Auth ────────────────────────────────────────────────────────────────
-  static const String authLanding = '/auth';
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String forgotPassword = '/auth/forgot-password';

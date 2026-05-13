@@ -17,7 +17,7 @@ class OnboardingScreen extends ConsumerWidget {
     // Mark onboarding as completed
     await ref.read(onboardingProvider.notifier).completeOnboarding();
     if (context.mounted) {
-      context.go(RouteConstants.authLanding);
+      context.go(RouteConstants.login);
     }
   }
 
