@@ -11,6 +11,7 @@ import 'package:flightly/features/booking/domain/models/booking.dart';
 import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/notifications/services/travel_reminder_scheduler.dart';
+import 'package:flightly/features/home/presentation/screens/home_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:confetti/confetti.dart';
@@ -123,7 +124,10 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                               Navigator.of(context).popUntil((r) => r.isFirst); 
                               // Force My Trips to show the 'Upcoming' tab
                               ref.read(tripsTabProvider.notifier).state = 0;
-                              context.go('/home', extra: {'tabIndex': 1}); 
+                              // Force Home to show 'My Trips' tab
+                              ref.read(homeTabProvider.notifier).state = 1;
+                              
+                              context.go('/home'); 
                             },
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 52),
