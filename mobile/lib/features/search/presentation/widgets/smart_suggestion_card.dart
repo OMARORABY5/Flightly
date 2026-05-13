@@ -27,50 +27,16 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (_dismissed || !widget.recommendation.isActionable) {
+    if (_dismissed) {
       return const SizedBox.shrink();
     }
 
     final isAffirmation = widget.recommendation.type == RecommendationType.bestChoice;
-
-    if (isAffirmation) {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.success.withOpacity(0.3)),
-        ),
-        child: Row(
-          children: [
-            Icon(LucideIcons.checkCircle, color: AppColors.success, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.recommendation.headline,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (widget.recommendation.subline != null && !widget.compact) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.recommendation.subline!,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                    ),
-                  ]
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    
+    // Choose colors based on affirmation or suggestion
+    final iconColor = isAffirmation ? AppColors.success : AppColors.primary;
+    final iconData = isAffirmation ? LucideIcons.checkCircle : LucideIcons.lightbulb;
+    final titleColor = isAffirmation ? AppColors.success : AppColors.primary;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -85,10 +51,10 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
+                    color: iconColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(LucideIcons.lightbulb, color: AppColors.primary, size: 20),
+                  child: Icon(iconData, color: iconColor, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -97,7 +63,7 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                     children: [
                       Text(
                         widget.recommendation.headline,
-                        style: AppTextStyles.headingSmall.copyWith(color: AppColors.primary),
+                        style: AppTextStyles.headingSmall.copyWith(color: titleColor),
                       ),
                       if (widget.recommendation.subline != null) ...[
                         const SizedBox(height: 4),
@@ -124,7 +90,7 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       children: [
-                        const Icon(LucideIcons.check, size: 14, color: AppColors.success),
+                        Icon(LucideIcons.check, size: 14, color: isAffirmation ? AppColors.success : AppColors.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(

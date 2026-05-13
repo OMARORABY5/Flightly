@@ -148,10 +148,12 @@ class FlightRecommendationEngine {
       );
     }
 
-    // ── Rule 5: noAction ─────────────────────────────────────────────────────
-    return const FlightRecommendation(
-      type: RecommendationType.noAction,
-      headline: '',
+    // ── Rule 5: Fallback ─────────────────────────────────────────────────────
+    return FlightRecommendation(
+      type: RecommendationType.bestChoice,
+      headline: 'Recommended Choice',
+      subline: 'Best balance of price and duration available.',
+      highlights: _buildPositiveHighlights(selected.flight),
     );
   }
 

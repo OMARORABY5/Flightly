@@ -234,19 +234,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     _buildPassengersSection(selectedPassengers),
                     const SizedBox(height: 24),
                     _buildContactSection(),
-                    const SizedBox(height: 120),
+                    const SizedBox(height: 32),
                   ]),
                 ),
               ),
             ],
           ),
-
-          // Bottom Sticky Bar
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
+        ],
+      ),
+      // Bottom Sticky Bar handles safe area and keyboard automatically
+      bottomNavigationBar: Container(
               padding: EdgeInsets.only(
                 left: 20,
                 right: 20,
@@ -311,9 +308,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -446,9 +440,39 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           ),
           const SizedBox(height: 12),
           if (selectedPassengers.isEmpty)
-            Text('No passengers selected.',
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.error))
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(10 * (1 - value), 0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withOpacity(0.1),
+                        border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.userX, size: 20, color: AppColors.warning),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Please select at least one passenger to continue.',
+                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.warning),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
           else
             ...selectedPassengers.map((p) => Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),

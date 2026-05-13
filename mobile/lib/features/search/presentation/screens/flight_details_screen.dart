@@ -557,35 +557,230 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   }
 
   Widget _buildPolicies(Flight flight) {
-    final policy = flight.policy;
-    if (policy == null) return const SizedBox();
+    final hoursUntilDeparture = flight.departureTime.difference(DateTime.now()).inHours;
+    final isRefundable = flight.isRefundable;
+    
+    // We default to 10% for the gap between 16 and 24 hours (>= 16h)
+    final double cancelFeePercentage = hoursUntilDeparture >= 16 ? 0.10 : 0.20;
+    
+    final double basePrice = flight.basePrice;
+    final double cancelFeeAmount = basePrice * cancelFeePercentage;
+    final double estimatedRefund = basePrice - cancelFeeAmount;
 
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Policies', style: AppTextStyles.headingMedium),
-          const SizedBox(height: 16),
-          _detailRow(
-            LucideIcons.ban,
-            'Cancellation',
-            policy['cancellation_policy'] ?? (flight.isRefundable ? 'Refundable' : 'Non-refundable'),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text('Policies', style: AppTextStyles.headingMedium),
           ),
-          const SizedBox(height: 12),
-          _detailRow(
-            LucideIcons.refreshCcw,
-            'Changes',
-            policy['change_policy'] ?? 'Changes may incur fees',
-          ),
-          if (policy['change_fee'] != null) ...[
-            const SizedBox(height: 12),
-            _detailRow(
-              LucideIcons.banknote,
-              'Change Fee',
-              '${policy['change_fee']} EGP',
+          
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: Column(
+              children: [
+                _buildCancellationPolicyTile(isRefundable, hoursUntilDeparture, cancelFeePercentage),
+                const Divider(color: AppColors.surfaceBorder, height: 1),
+                _buildModificationPolicyTile(),
+                if (isRefundable) ...[
+                  const Divider(color: AppColors.surfaceBorder, height: 1),
+                  _buildRefundInfoTile(estimatedRefund),
+                ],
+              ],
             ),
-          ]
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCancellationPolicyTile(bool isRefundable, int hoursUntilDeparture, double feePercentage) {
+    final feeText = '${(feePercentage * 100).toInt()}%';
+    
+    return ExpansionTile(
+      iconColor: AppColors.primary,
+      collapsedIconColor: AppColors.textSecondary,
+      tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isRefundable ? AppColors.info.withOpacity(0.1) : AppColors.error.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          isRefundable ? LucideIcons.refreshCcw : LucideIcons.ban, 
+          size: 20, 
+          color: isRefundable ? AppColors.info : AppColors.error,
+        ),
+      ),
+      title: Text('Cancellation Policy', style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+      subtitle: Text(
+        isRefundable ? 'Refundable (Conditions Apply)' : 'Non-Refundable',
+        style: AppTextStyles.labelSmall.copyWith(
+          color: isRefundable ? AppColors.success : AppColors.error,
+        ),
+      ),
+      childrenPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!isRefundable)
+          Text(
+            'This fare type is strictly non-refundable. Cancellations will not yield any refund to the original payment method.',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+          )
+        else ...[
+          Text(
+            'Cancellation Fees:',
+            style: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: 8),
+          _bulletPoint('More than 16h before departure → 10% fee'),
+          _bulletPoint('Less than 16h before departure → 20% fee'),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.surfaceBorder),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.clock, size: 16, color: AppColors.accent),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    hoursUntilDeparture > 0 
+                        ? 'You have $hoursUntilDeparture hours left. Current cancellation fee: $feeText.'
+                        : 'Flight has already departed. Cancellation may not be available.',
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildModificationPolicyTile() {
+    return ExpansionTile(
+      iconColor: AppColors.primary,
+      collapsedIconColor: AppColors.textSecondary,
+      tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(LucideIcons.edit3, size: 20, color: AppColors.primary),
+      ),
+      title: Text('Modification Policy', style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+      subtitle: Text('Changes allowed with restrictions', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+      childrenPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Allowed modifications after booking:',
+          style: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
+        ),
+        const SizedBox(height: 8),
+        _bulletPoint('Passenger details (e.g., spelling corrections)'),
+        _bulletPoint('Contact information'),
+        _bulletPoint('Cabin upgrades (subject to availability)'),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.warning.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.alertCircle, size: 16, color: AppColors.warning),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Note: Changing the actual flight route or date is currently unsupported.',
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.warning),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRefundInfoTile(double estimatedRefund) {
+    return ExpansionTile(
+      iconColor: AppColors.primary,
+      collapsedIconColor: AppColors.textSecondary,
+      tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.success.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(LucideIcons.banknote, size: 20, color: AppColors.success),
+      ),
+      title: Text('Refund Information', style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+      subtitle: Text('Estimated calculation & timelines', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+      childrenPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.surfaceBorder),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Estimated Refund:', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+              Text('${estimatedRefund.toStringAsFixed(2)} EGP', style: AppTextStyles.labelMedium.copyWith(color: AppColors.success)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(LucideIcons.info, size: 16, color: AppColors.textSecondary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Refunds are processed to the original payment method within 5-7 business days after cancellation confirmation.',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _bulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 6.0, right: 8.0),
+            child: Icon(Icons.circle, size: 4, color: AppColors.textSecondary),
+          ),
+          Expanded(
+            child: Text(text, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+          ),
         ],
       ),
     );
