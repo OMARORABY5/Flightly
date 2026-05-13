@@ -17,6 +17,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flightly/features/notifications/services/travel_reminder_service.dart';
 import 'package:flightly/features/notifications/domain/logic/airport_arrival_advisor.dart';
+import 'package:flightly/features/trips/domain/services/ticket_pdf_service.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
   final Trip trip;
@@ -46,6 +47,21 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     );
   }
 
+  void _downloadTicket(BuildContext context) async {
+    try {
+      await TicketPdfService.generateAndShareTicket(widget.trip);
+    } catch (e, stack) {
+      print('[PDF ERROR] $e');
+      print('[PDF STACK] $stack');
+      if (mounted) {
+        showTopSnackBar(
+          Overlay.of(context),
+          const CustomSnackBar.error(message: 'Failed to generate ticket. Please try again.'),
+        );
+      }
+    }
+  }
+
   ({Color bg, Color text, String label}) get _statusConfig {
     if (widget.trip.isCancelled) return (bg: AppColors.error.withValues(alpha: 0.15), text: AppColors.error, label: 'CANCELLED');
     if (widget.trip.isCompleted) return (bg: AppColors.success.withValues(alpha: 0.15), text: AppColors.success, label: 'COMPLETED');
@@ -68,6 +84,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.download, color: AppColors.primary),
+            onPressed: () => _downloadTicket(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

@@ -113,7 +113,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
           const Padding(padding: EdgeInsets.symmetric(horizontal: 20), child: Divider(color: AppColors.surface)),
           _buildCounterRow(
             title: 'Infants',
-            subtitle: 'Under 2 (on lap)',
+            subtitle: 'Under 2 years (on lap)',
             value: infants,
             onDecrease: infants > 0 ? () => setState(() => infants--) : null,
             onIncrease: (_canAddPassenger() && infants < adults) ? () => setState(() => infants++) : null,

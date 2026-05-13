@@ -61,6 +61,8 @@ dependencies:
   timezone: ^0.9.4               # Required by flutter_local_notifications for zonedSchedule
   permission_handler: ^11.3.1    # Native OS permission prompts
   country_picker: ^2.0.27
+  pdf: ^3.12.0
+  printing: ^5.14.3
 
 dev_dependencies:
   flutter_test:

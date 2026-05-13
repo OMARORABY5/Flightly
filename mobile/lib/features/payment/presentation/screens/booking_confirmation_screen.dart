@@ -12,6 +12,7 @@ import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:flightly/features/search/domain/providers/search_form_provider.dart';
 import 'package:flightly/features/notifications/services/travel_reminder_scheduler.dart';
 import 'package:flightly/features/home/presentation/screens/home_screen.dart';
+import 'package:flightly/features/trips/domain/services/ticket_pdf_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:confetti/confetti.dart';
@@ -63,11 +64,19 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
     );
   }
 
-  void _downloadTicket() {
-    showTopSnackBar(
-      Overlay.of(context),
-      const CustomSnackBar.info(message: 'Download Ticket coming soon!'),
-    );
+  void _downloadTicket() async {
+    try {
+      await TicketPdfService.generateForBooking(widget.booking);
+    } catch (e, stack) {
+      print('[PDF ERROR] $e');
+      print('[PDF STACK] $stack');
+      if (mounted) {
+        showTopSnackBar(
+          Overlay.of(context),
+          const CustomSnackBar.error(message: 'Failed to generate ticket. Please try again.'),
+        );
+      }
+    }
   }
 
   @override

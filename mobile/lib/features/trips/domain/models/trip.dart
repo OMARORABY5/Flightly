@@ -46,8 +46,8 @@ class TripFlight {
       originName: json['origin_name'],
       destinationCity: json['destination_city'],
       destinationName: json['destination_name'],
-      departureTime: DateTime.parse(json['departure_time']),
-      arrivalTime: DateTime.parse(json['arrival_time']),
+      departureTime: DateTime.parse(json['departure_time']).toLocal(),
+      arrivalTime: DateTime.parse(json['arrival_time']).toLocal(),
       durationMinutes: json['duration_minutes'] ?? 0,
       stops: json['stops'] ?? 0,
     );

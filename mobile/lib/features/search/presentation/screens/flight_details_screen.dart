@@ -41,6 +41,7 @@ class FlightDetailsScreen extends ConsumerStatefulWidget {
 
 class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   bool _isCheckingPrice = false;
+  bool? _optimisticSavedState;
 
   String _formatTime(DateTime time) => DateFormat('HH:mm').format(time);
   String _formatDate(DateTime date) => DateFormat('EEE, d MMM').format(date);
@@ -51,30 +52,27 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
   }
 
   Future<void> _toggleSave(bool isCurrentlySaved) async {
+    setState(() {
+      _optimisticSavedState = !isCurrentlySaved;
+    });
+
     final repo = ref.read(searchRepositoryProvider);
     const testUserId = '11111111-1111-1111-1111-111111111111';
 
     try {
       if (isCurrentlySaved) {
         await repo.unsaveFlight(testUserId, widget.flightId);
-        showTopSnackBar(
-          Overlay.of(context),
-          const CustomSnackBar.info(message: 'Flight removed from watchlist'),
-        );
       } else {
         await repo.saveFlight(testUserId, widget.flightId);
-        showTopSnackBar(
-          Overlay.of(context),
-          const CustomSnackBar.success(message: 'Flight saved to watchlist'),
-        );
       }
       ref.invalidate(isFlightSavedProvider(widget.flightId));
       ref.invalidate(savedFlightsProvider);
     } catch (e) {
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.error(message: 'Failed to update watchlist'),
-      );
+      if (mounted) {
+        setState(() {
+          _optimisticSavedState = isCurrentlySaved; // revert on fail
+        });
+      }
     }
   }
 
@@ -198,7 +196,9 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
     final recommendation = widget.outboundFlight != null 
         ? ref.watch(returnFlightRecommendationProvider(widget.flightId))
         : ref.watch(flightRecommendationProvider(widget.flightId));
-    final isSaved = savedAsync.value?['is_saved'] == true;
+    
+    // Use optimistic state if available, otherwise fall back to backend state
+    final isSaved = _optimisticSavedState ?? (savedAsync.value?['is_saved'] == true);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -210,9 +210,16 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
         title: null,
         actions: [
           IconButton(
-            icon: Icon(
-              isSaved ? Icons.favorite : Icons.favorite_border,
-              color: isSaved ? AppColors.error : AppColors.textSecondary,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: Icon(
+                isSaved ? Icons.favorite : Icons.favorite_border,
+                key: ValueKey<bool>(isSaved),
+                color: isSaved ? AppColors.error : AppColors.textSecondary,
+              ),
             ),
             onPressed: () => _toggleSave(isSaved),
           ),

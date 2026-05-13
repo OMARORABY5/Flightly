@@ -1,5 +1,6 @@
 // booking_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
@@ -44,13 +45,23 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _emailController.text = ref.read(contactEmailProvider);
-      _phoneController.text = ref.read(contactPhoneProvider);
+      final savedPhone = ref.read(contactPhoneProvider);
+      if (savedPhone.startsWith('+20')) {
+        _phoneController.text = savedPhone.substring(3).trim().replaceFirst(RegExp(r'^0+'), '');
+      } else {
+        _phoneController.text = savedPhone.replaceFirst(RegExp(r'^0+'), '');
+      }
 
       _emailController.addListener(() {
         ref.read(contactEmailProvider.notifier).state = _emailController.text;
       });
       _phoneController.addListener(() {
-        ref.read(contactPhoneProvider.notifier).state = _phoneController.text;
+        final digits = _phoneController.text.trim();
+        if (digits.isNotEmpty) {
+          ref.read(contactPhoneProvider.notifier).state = '+20$digits';
+        } else {
+          ref.read(contactPhoneProvider.notifier).state = '';
+        }
       });
     });
   }
@@ -116,6 +127,42 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             .hasMatch(_emailController.text.trim())) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid contact email.')),
+      );
+      return;
+    }
+
+    final phoneText = _phoneController.text.trim();
+    if (phoneText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your phone number.')),
+      );
+      return;
+    }
+
+    if (!RegExp(r'^\d+$').hasMatch(phoneText)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number contains invalid characters. Please use digits only.')),
+      );
+      return;
+    }
+
+    if (phoneText.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number is too short. It must be exactly 10 digits after +20.')),
+      );
+      return;
+    }
+
+    if (phoneText.length > 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number is too long. It must be exactly 10 digits after +20.')),
+      );
+      return;
+    }
+
+    if (!phoneText.startsWith('1')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid Egyptian mobile number. It should start with 1 (e.g., 10, 11, 12, 15).')),
       );
       return;
     }
@@ -452,8 +499,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           TextField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              _NoLeadingZeroFormatter(),
+              LengthLimitingTextInputFormatter(10),
+            ],
             decoration: InputDecoration(
-              labelText: 'Phone Number',
+              labelText: 'Phone Number *',
+              hintText: '101 234 5678',
+              prefixIcon: Container(
+                padding: const EdgeInsets.only(left: 16, right: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('+20', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
+                    const SizedBox(width: 12),
+                    Container(width: 1, height: 24, color: AppColors.surfaceBorder),
+                  ],
+                ),
+              ),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -461,5 +525,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         ],
       ),
     );
+  }
+}
+
+class _NoLeadingZeroFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.startsWith('0')) {
+      final newText = newValue.text.replaceFirst(RegExp(r'^0+'), '');
+      return TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newText.length),
+      );
+    }
+    return newValue;
   }
 }

@@ -22,7 +22,7 @@ class FlightCard extends StatelessWidget {
   });
 
   String _formatTime(DateTime time) {
-    return DateFormat('HH:mm').format(time.toLocal());
+    return DateFormat('HH:mm').format(time);
   }
 
   String _formatDuration(int minutes) {

@@ -247,8 +247,8 @@ class FlightController {
           f.airline_logo_url,
           f.origin_iata,
           f.destination_iata,
-          f.departure_time,
-          f.arrival_time,
+          to_char(f.departure_time AT TIME ZONE oa.timezone, 'YYYY-MM-DD"T"HH24:MI:SS') AS departure_time,
+          to_char(f.arrival_time AT TIME ZONE da.timezone, 'YYYY-MM-DD"T"HH24:MI:SS') AS arrival_time,
           f.duration_minutes,
           f.stops,
           f.cabin_class,
@@ -363,7 +363,10 @@ class FlightController {
 
       const result = await this.db.query(
         `SELECT
-           f.*,
+           f.id, f.flight_number, f.airline_code, f.airline_name, f.airline_logo_url, f.origin_iata, f.destination_iata,
+           to_char(f.departure_time AT TIME ZONE oa.timezone, 'YYYY-MM-DD"T"HH24:MI:SS') AS departure_time,
+           to_char(f.arrival_time AT TIME ZONE da.timezone, 'YYYY-MM-DD"T"HH24:MI:SS') AS arrival_time,
+           f.duration_minutes, f.stops, f.cabin_class, f.base_price, f.available_seats, f.baggage_cabin_kg, f.baggage_checked_kg, f.is_refundable, f.is_active, f.created_at, f.updated_at,
            oa.name       AS origin_name,
            oa.city       AS origin_city,
            oa.country    AS origin_country,
