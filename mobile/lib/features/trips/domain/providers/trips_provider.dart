@@ -15,6 +15,10 @@ final tripsRepositoryProvider = Provider<TripsRepository>((ref) {
   return TripsRepositoryImpl(dioClient: DioClient.instance());
 });
 
+// ─── Trips Tab State ──────────────────────────────────────────────────────────
+// Controls the active tab (0: Upcoming, 1: History) in MyTripsScreen.
+final tripsTabProvider = StateProvider<int>((ref) => 0);
+
 // ─── Upcoming Trips ───────────────────────────────────────────────────────────
 // Returns [] if user is not authenticated to avoid pointless API calls
 // autoDispose: refreshes automatically every time the screen is revisited

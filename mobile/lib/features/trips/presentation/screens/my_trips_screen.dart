@@ -30,13 +30,17 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: ref.read(tripsTabProvider));
     // Refresh the active tab's data every time user switches to it
     _tabController.addListener(_onTabChanged);
   }
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) return;
+    
+    // Sync the local tab controller back to the global provider
+    ref.read(tripsTabProvider.notifier).state = _tabController.index;
+    
     if (_tabController.index == 0) {
       ref.invalidate(upcomingTripsProvider);
     } else {
@@ -54,6 +58,13 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+
+    // Listen to external tab changes
+    ref.listen<int>(tripsTabProvider, (previous, next) {
+      if (_tabController.index != next) {
+        _tabController.animateTo(next);
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,

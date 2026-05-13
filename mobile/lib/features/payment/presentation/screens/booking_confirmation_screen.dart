@@ -119,7 +119,12 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () { Navigator.of(context).popUntil((r) => r.isFirst); context.go('/home', extra: {'tabIndex': 1}); },
+                            onPressed: () { 
+                              Navigator.of(context).popUntil((r) => r.isFirst); 
+                              // Force My Trips to show the 'Upcoming' tab
+                              ref.read(tripsTabProvider.notifier).state = 0;
+                              context.go('/home', extra: {'tabIndex': 1}); 
+                            },
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(double.infinity, 52),
                               side: const BorderSide(color: AppColors.primary),
