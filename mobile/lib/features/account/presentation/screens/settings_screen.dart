@@ -109,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: LucideIcons.coins,
                     onTap: () => _showOptionsDialog(
                       'Currency',
-                      ['USD', 'EGP', 'AED', 'EUR', 'GBP'],
+                      ['EGP', 'USD', 'AED', 'EUR', 'GBP'],
                       settings.currency,
                       (val) => _updateSetting('currency', val),
                     ),

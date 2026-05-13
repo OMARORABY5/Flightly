@@ -139,7 +139,7 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
                           Text('Max Price (EGP)', style: AppTextStyles.headingMedium),
                           if (_maxPrice != null)
                             Text(
-                              'EGP ${_maxPrice!.toStringAsFixed(0)}',
+                              '${_maxPrice!.toStringAsFixed(0)} EGP',
                               style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary),
                             ),
                         ],
@@ -162,7 +162,7 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
                                 min: 500,
                                 max: 100000,
                                 divisions: 40,
-                                label: 'EGP ${(_maxPrice ?? 100000).toStringAsFixed(0)}',
+                                label: '${(_maxPrice ?? 100000).toStringAsFixed(0)} EGP',
                                 onChanged: (value) => setState(() => _maxPrice = value),
                               ),
                             ),
@@ -171,8 +171,8 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('EGP 500', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
-                                  Text('EGP 100,000+', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                                  Text('500 EGP', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                                  Text('100,000+ EGP', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
                                 ],
                               ),
                             ),

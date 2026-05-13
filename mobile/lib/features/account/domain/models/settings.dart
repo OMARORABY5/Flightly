@@ -16,7 +16,7 @@ class Settings {
     return Settings(
       language: json['language'] ?? 'en',
       country: json['country'] ?? 'Egypt',
-      currency: json['currency'] ?? 'USD',
+      currency: json['currency'] ?? 'EGP',
     );
   }
 

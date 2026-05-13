@@ -352,7 +352,7 @@ class _BookingOverviewScreenState
                 style: AppTextStyles.bodyMedium,
               ),
               Text(
-                'EGP ${outboundTotal.toStringAsFixed(0)}',
+                '${outboundTotal.toStringAsFixed(0)} EGP',
                 style: AppTextStyles.bodyMedium,
               ),
             ],
@@ -368,7 +368,7 @@ class _BookingOverviewScreenState
                   style: AppTextStyles.bodyMedium,
                 ),
                 Text(
-                  'EGP ${returnTotal.toStringAsFixed(0)}',
+                  '${returnTotal.toStringAsFixed(0)} EGP',
                   style: AppTextStyles.bodyMedium,
                 ),
               ],
@@ -380,7 +380,7 @@ class _BookingOverviewScreenState
             children: [
               Text('Total', style: AppTextStyles.headingMedium),
               Text(
-                'EGP ${grand.toStringAsFixed(0)}',
+                '${grand.toStringAsFixed(0)} EGP',
                 style: AppTextStyles.headingMedium
                     .copyWith(color: AppColors.primary),
               ),

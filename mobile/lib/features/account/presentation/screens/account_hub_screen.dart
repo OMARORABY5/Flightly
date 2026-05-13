@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
+import 'package:flightly/core/utils/helpers.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/account/domain/providers/account_provider.dart';
 
@@ -78,9 +79,7 @@ class AccountHubScreen extends ConsumerWidget {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                          backgroundImage: profile.photoUrl != null
-                              ? CachedNetworkImageProvider(profile.photoUrl!)
-                              : null,
+                          backgroundImage: AppHelpers.getAvatarProvider(profile.photoUrl),
                           child: profile.photoUrl == null
                               ? const Icon(LucideIcons.user, size: 30, color: AppColors.primary)
                               : null,
@@ -89,17 +88,14 @@ class AccountHubScreen extends ConsumerWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 profile.displayName ?? 'Traveler',
                                 style: AppTextStyles.headingMedium,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                profile.email,
-                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                               ),
                             ],
                           ),
@@ -123,7 +119,7 @@ class AccountHubScreen extends ConsumerWidget {
               _MenuItem(
                 icon: LucideIcons.plane,
                 title: 'My Bookings',
-                onTap: () => context.go('/home'), // Home tab 1 (My Trips) is handled via bottom nav, but we can navigate to Home and switch tab if we want, or just let them use the bottom bar. For now, pushing a dummy or just go to trips.
+                onTap: () => context.go('/home', extra: {'tabIndex': 1}),
               ),
               _MenuItem(
                 icon: LucideIcons.users,
@@ -133,7 +129,7 @@ class AccountHubScreen extends ConsumerWidget {
               _MenuItem(
                 icon: LucideIcons.heart,
                 title: 'Saved Flights',
-                onTap: () => context.go('/home'), // Handled via bottom nav Watchlist
+                onTap: () => context.go('/home', extra: {'tabIndex': 2}),
               ),
             ]),
             

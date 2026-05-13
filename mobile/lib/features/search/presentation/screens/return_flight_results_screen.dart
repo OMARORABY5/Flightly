@@ -189,7 +189,7 @@ class _ReturnFlightResultsScreenState
                             'Outbound: ${widget.outboundFlight.originIata} → '
                             '${widget.outboundFlight.destinationIata}  '
                             '${DateFormat('HH:mm').format(widget.outboundFlight.departureTime)}  '
-                            '• EGP ${widget.outboundFlight.basePrice.toStringAsFixed(0)}',
+                            '• ${widget.outboundFlight.basePrice.toStringAsFixed(0)} EGP',
                             style: AppTextStyles.labelSmall
                                 .copyWith(color: AppColors.textSecondary),
                             overflow: TextOverflow.ellipsis,

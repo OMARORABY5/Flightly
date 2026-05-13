@@ -7,7 +7,7 @@
 //     currentPrice < savedPrice AND drop ≥ minDropPercent (8%)
 //
 //   Rule 2 — flexibleDate:
-//     A nearby date price < currentPrice AND saving ≥ minFlexibleSaving ($30)
+//     A nearby date price < currentPrice AND saving ≥ minFlexibleSaving (30 EGP)
 //     Reports the single best (cheapest) nearby date found.
 //
 //   Rule 3 — goodPriceWindow:
@@ -44,7 +44,7 @@ class PriceDropEvaluator {
   static const double minDropPercent = 0.08; // 8%
 
   /// Minimum absolute saving on a nearby date to trigger a flexibleDate alert.
-  static const double minFlexibleSaving = 30.0; // $30
+  static const double minFlexibleSaving = 30.0; // 30 EGP
 
   // ── Public API ──────────────────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ class PriceDropEvaluator {
 
     // ── Rule 2: Flexible Date ─────────────────────────────────────────────────
     if (nearbyPrices.isNotEmpty) {
-      // Find the single best (cheapest) nearby date that saves ≥ $30 vs current
+      // Find the single best (cheapest) nearby date that saves ≥ 30 EGP vs current
       NearbyDatePrice? bestNearby;
       double bestSaving = 0;
 
@@ -157,7 +157,7 @@ class PriceDropEvaluator {
       final allPrices = [currentPrice, ...nearbyPrices.map((n) => n.price)];
       final minPrice = allPrices.reduce((a, b) => a < b ? a : b);
 
-      // Current price is the cheapest in the spread (within $5 rounding tolerance)
+      // Current price is the cheapest in the spread (within 5 EGP rounding tolerance)
       if ((currentPrice - minPrice).abs() <= 5.0) {
         alerts.add(WatchlistAlert(
           saveId: saveId,

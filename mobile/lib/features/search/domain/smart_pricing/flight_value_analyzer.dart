@@ -75,52 +75,79 @@ class FlightValueAnalyzer {
     }
 
     // ── Step 4: Identify badge winners ────────────────────────────────────────
-    // Cheapest — lowest price
+
+    // Pre-calculate sets for quick lookup
     final cheapestId = flights
         .reduce((a, b) => a.totalPrice <= b.totalPrice ? a : b)
         .id;
 
-    // Fastest — shortest duration
     final fastestId = flights
         .reduce((a, b) => a.durationMinutes <= b.durationMinutes ? a : b)
         .id;
 
-    // Best Value — highest composite score
     final bestValueId = rawScores.entries
         .reduce((a, b) => a.value >= b.value ? a : b)
         .key;
 
-    // Recommended — top-3 by score, not already labelled above
     final sortedByScore = rawScores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final alreadyLabelled = {cheapestId, fastestId, bestValueId};
-    String? recommendedId;
-    for (final entry in sortedByScore.take(3)) {
-      if (!alreadyLabelled.contains(entry.key)) {
-        recommendedId = entry.key;
-        break;
+    // We only assign one badge per flight to avoid clutter. We keep track of assigned.
+    final assignedBadges = <String, SmartBadgeType>{};
+
+    // Priority 1: Limited Seats (Available Seats <= 5 and > 0)
+    for (final f in flights) {
+      if (f.availableSeats > 0 && f.availableSeats <= 5) {
+        assignedBadges[f.id] = SmartBadgeType.limitedSeats;
+      }
+    }
+
+    // Priority 2: Popular Choice
+    for (final f in flights) {
+      if (assignedBadges.containsKey(f.id)) continue;
+      final isPopular = f.labels.any((l) => l.toLowerCase().contains('popular'));
+      if (isPopular) {
+        assignedBadges[f.id] = SmartBadgeType.popularChoice;
+      }
+    }
+
+    // Priority 3: Best Value (strong price compared to flight quality)
+    if (!assignedBadges.containsKey(bestValueId)) {
+      assignedBadges[bestValueId] = SmartBadgeType.bestValue;
+    }
+
+    // Priority 4: Cheapest (lowest available price)
+    if (!assignedBadges.containsKey(cheapestId)) {
+      assignedBadges[cheapestId] = SmartBadgeType.cheapest;
+    }
+
+    // Priority 5: Fastest (shortest total duration)
+    if (!assignedBadges.containsKey(fastestId)) {
+      assignedBadges[fastestId] = SmartBadgeType.fastest;
+    }
+
+    // Priority 6: Recommended / Best / Smart Suggestion (balanced options)
+    int recommendedCount = 0;
+    for (final entry in sortedByScore) {
+      if (recommendedCount >= 3) break; // Provide a few balanced options
+      if (!assignedBadges.containsKey(entry.key)) {
+        if (recommendedCount == 0) {
+          assignedBadges[entry.key] = SmartBadgeType.recommended;
+        } else if (recommendedCount == 1) {
+          assignedBadges[entry.key] = SmartBadgeType.best;
+        } else {
+          assignedBadges[entry.key] = SmartBadgeType.smartSuggestion;
+        }
+        recommendedCount++;
       }
     }
 
     // ── Step 5: Build results ─────────────────────────────────────────────────
     return flights.map((f) {
-      SmartBadgeType? badge;
-      // Priority order matters: Best Value > Cheapest > Fastest > Recommended
-      if (f.id == bestValueId) {
-        badge = SmartBadgeType.bestValue;
-      } else if (f.id == cheapestId) {
-        badge = SmartBadgeType.cheapest;
-      } else if (f.id == fastestId) {
-        badge = SmartBadgeType.fastest;
-      } else if (f.id == recommendedId) {
-        badge = SmartBadgeType.recommended;
-      }
-
       return FlightValueScore(
         flight: f,
         score: rawScores[f.id] ?? 0,
-        badge: badge,
+        badge: assignedBadges[f.id],
       );
     }).toList();
   }

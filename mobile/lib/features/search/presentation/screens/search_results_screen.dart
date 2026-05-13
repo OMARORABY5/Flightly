@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
@@ -58,202 +59,214 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     final paxStr = '${query.totalPassengers} Passenger${query.totalPassengers > 1 ? 's' : ''}';
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: AppColors.background,
-      body: AmbientBackground(
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(query.origin?.iataCode ?? '', style: AppTextStyles.headingMedium),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Icon(Icons.arrow_forward, size: 16, color: AppColors.textSecondary),
-                              ),
-                              Text(query.destination?.iataCode ?? '', style: AppTextStyles.headingMedium),
-                            ],
-                          ),
-                          Text('$dateStr • $paxStr • ${query.cabinClass}', 
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.tune, color: AppColors.primary),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const FilterScreen()),
-                            );
-                          },
-                        ),
-                        if (filters.hasActiveFilters)
-                          Positioned(
-                            right: 8,
-                            top: 8,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.error,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
-                  ],
+      appBar: PremiumAppBar(
+        height: 80, // Taller header to comfortably fit two lines of text
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Text(query.origin?.iataCode ?? '', style: AppTextStyles.headingMedium),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Icon(Icons.arrow_forward, size: 16, color: AppColors.textSecondary),
                 ),
+                Text(query.destination?.iataCode ?? '', style: AppTextStyles.headingMedium),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text('$dateStr • $paxStr • ${query.cabinClass}', 
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.tune, color: AppColors.primary),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FilterScreen()),
+                  );
+                },
+              ),
+              if (filters.hasActiveFilters)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.error,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                )
+            ],
+          ),
+        ],
+      ),
+      body: AmbientBackground(
+        child: RefreshIndicator(
+          onRefresh: () => ref.read(flightResultsProvider.notifier).searchFlights(),
+          color: AppColors.primary,
+          edgeOffset: MediaQuery.of(context).padding.top + 80 + 16,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: SizedBox(height: MediaQuery.of(context).padding.top + 80 + 16),
               ),
 
               // Step indicator for round-trip
-              if (query.tripType == TripType.roundTrip) ...[
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.15),
-                        AppColors.primary.withValues(alpha: 0.05),
+              if (query.tripType == TripType.roundTrip)
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary.withOpacity(0.15),
+                          AppColors.primary.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.looks_one, size: 18, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Step 1: Select Outbound Flight',
+                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.looks_one, size: 18, color: AppColors.primary),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Step 1: Select Outbound Flight',
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-              ],
 
               // Sort Chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Row(
-                  children: SortOption.values.map((option) {
-                    final isSelected = filters.sortOption == option;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        selected: isSelected,
-                        label: Text(option.label, style: AppTextStyles.labelMedium.copyWith(
-                          color: isSelected ? AppColors.surface : AppColors.textSecondary
-                        )),
-                        backgroundColor: Colors.transparent,
-                        selectedColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(
-                            color: isSelected ? AppColors.primary : AppColors.surfaceBorder,
+              SliverToBoxAdapter(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Row(
+                    children: SortOption.values.map((option) {
+                      final isSelected = filters.sortOption == option;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          selected: isSelected,
+                          label: Text(option.label, style: AppTextStyles.labelMedium.copyWith(
+                            color: isSelected ? AppColors.surface : AppColors.textSecondary
+                          )),
+                          backgroundColor: Colors.transparent,
+                          selectedColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(
+                              color: isSelected ? AppColors.primary : AppColors.surfaceBorder,
+                            ),
                           ),
+                          onSelected: (selected) {
+                            if (selected) {
+                              ref.read(filterOptionsProvider.notifier).state = 
+                                  filters.copyWith(sortOption: option);
+                              ref.read(flightResultsProvider.notifier).searchFlights();
+                            }
+                          },
                         ),
-                        onSelected: (selected) {
-                          if (selected) {
-                            ref.read(filterOptionsProvider.notifier).state = 
-                                filters.copyWith(sortOption: option);
-                            ref.read(flightResultsProvider.notifier).searchFlights();
-                          }
-                        },
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
 
               // Results List
-              Expanded(
-                child: resultsState.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : resultsState.error != null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                                const SizedBox(height: 16),
-                                Text('Failed to load flights', style: AppTextStyles.headingMedium),
-                                Text(resultsState.error!, style: AppTextStyles.bodyMedium),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: () => ref.read(flightResultsProvider.notifier).searchFlights(),
-                                  child: const Text('Retry'),
-                                )
-                              ],
-                            ),
-                          )
-                        : resultsState.flights.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.airplanemode_inactive, size: 64, color: AppColors.textSecondary),
-                                    const SizedBox(height: 16),
-                                    Text('No flights found', style: AppTextStyles.headingMedium),
-                                    const SizedBox(height: 8),
-                                    Text('Try adjusting your filters or changing dates', 
-                                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                                    ),
-                                  ],
+              if (resultsState.isLoading)
+                const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (resultsState.error != null)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                        const SizedBox(height: 16),
+                        Text('Failed to load flights', style: AppTextStyles.headingMedium),
+                        Text(resultsState.error!, style: AppTextStyles.bodyMedium),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => ref.read(flightResultsProvider.notifier).searchFlights(),
+                          child: const Text('Retry'),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              else if (resultsState.flights.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.airplanemode_inactive, size: 64, color: AppColors.textSecondary),
+                        const SizedBox(height: 16),
+                        Text('No flights found', style: AppTextStyles.headingMedium),
+                        const SizedBox(height: 8),
+                        Text('Try adjusting your filters or changing dates', 
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == resultsState.flights.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: FlightCard(
+                            flight: resultsState.flights[index],
+                            badgeLabel: badgeMap[resultsState.flights[index].id],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FlightDetailsScreen(
+                                    flightId: resultsState.flights[index].id,
+                                    seenPrice: resultsState.flights[index].basePrice,
+                                  ),
                                 ),
-                              )
-                            : RefreshIndicator(
-                                onRefresh: () => ref.read(flightResultsProvider.notifier).searchFlights(),
-                                color: AppColors.primary,
-                                child: ListView.builder(
-                                  controller: _scrollController,
-                                  padding: const EdgeInsets.all(20),
-                                  itemCount: resultsState.flights.length + (resultsState.hasMore ? 1 : 0),
-                                  itemBuilder: (context, index) {
-                                    if (index == resultsState.flights.length) {
-                                      return const Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 20),
-                                        child: Center(child: CircularProgressIndicator()),
-                                      );
-                                    }
-                                    return FlightCard(
-                                      flight: resultsState.flights[index],
-                                      badgeLabel: badgeMap[resultsState.flights[index].id],
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => FlightDetailsScreen(
-                                              flightId: resultsState.flights[index].id,
-                                              seenPrice: resultsState.flights[index].basePrice,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-              ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      childCount: resultsState.flights.length + (resultsState.hasMore ? 1 : 0),
+                    ),
+                  ),
+                ),
+                
+              const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
           ),
         ),

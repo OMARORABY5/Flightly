@@ -57,7 +57,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       Text('Current Balance', style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
                       const SizedBox(height: 8),
                       Text(
-                        '\$${wallet.balance.toStringAsFixed(2)}',
+                        '${wallet.balance.toStringAsFixed(2)} EGP',
                         style: AppTextStyles.displayMedium.copyWith(color: AppColors.primary, fontSize: 40),
                       ),
                       const SizedBox(height: 32),
@@ -118,7 +118,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                                     Text(tx.type.toUpperCase(), style: AppTextStyles.labelSmall),
                                     const SizedBox(height: 4),
                                     Text(
-                                      tx.description ?? (tx.bookingReference != null ? 'Booking \${tx.bookingReference}' : 'Transaction'),
+                                      tx.description ?? (tx.bookingReference != null ? 'Booking ${tx.bookingReference}' : 'Transaction'),
                                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -129,7 +129,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                                 ),
                               ),
                               Text(
-                                '\$${tx.amount.toStringAsFixed(2)}',
+                                '${tx.amount.toStringAsFixed(2)} EGP',
                                 style: AppTextStyles.headingSmall.copyWith(color: isCredit ? AppColors.success : AppColors.textPrimary),
                               ),
                             ],

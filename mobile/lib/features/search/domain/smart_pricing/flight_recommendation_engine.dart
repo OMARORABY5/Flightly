@@ -8,8 +8,8 @@
 // Rules are evaluated in priority order:
 //   1. bestChoice        → selected has highest score in set
 //   2. cheaperSimilar    → same stops, duration diff ≤60 min, saves ≥15% price
-//   3. fasterAlternative → saves ≥3 h travel, price diff ≤$30
-//   4. betterValue       → alternative score 10+ pts higher, price diff ≤$50
+//   3. fasterAlternative → saves ≥3 h travel, price diff ≤30 EGP
+//   4. betterValue       → alternative score 10+ pts higher, price diff ≤50 EGP
 //   5. noAction          → no useful recommendation to surface
 
 import 'package:flightly/features/search/domain/models/flight.dart';
@@ -29,7 +29,7 @@ class FlightRecommendation {
   /// The category of recommendation.
   final RecommendationType type;
 
-  /// Primary headline shown in the card, e.g. "Save $45 on a similar itinerary".
+  /// Primary headline shown in the card, e.g. "Save 45 EGP on a similar itinerary".
   final String headline;
 
   /// Optional supporting line shown below the headline.
@@ -62,9 +62,9 @@ class FlightRecommendationEngine {
   static const double _cheaperSavingsPercent = 0.15;   // 15% cheaper
   static const int    _cheaperDurationMaxDiff = 60;     // ≤ 60 min difference
   static const int    _fasterDurationSaving  = 180;    // ≥ 3 hours faster
-  static const double _fasterMaxPriceDiff    = 30.0;   // ≤ $30 more expensive
+  static const double _fasterMaxPriceDiff    = 30.0;   // ≤ 30 EGP more expensive
   static const double _betterValueMinScoreDiff = 10.0; // ≥ 10 score points better
-  static const double _betterValueMaxPriceDiff = 50.0; // ≤ $50 more expensive
+  static const double _betterValueMaxPriceDiff = 50.0; // ≤ 50 EGP more expensive
 
   /// Analyse [selected] against all [allScored] flights and return
   /// the single most relevant recommendation.
@@ -104,7 +104,7 @@ class FlightRecommendationEngine {
       final durationDiff = (selected.flight.durationMinutes - cheaperSimilar.flight.durationMinutes).abs();
       return FlightRecommendation(
         type: RecommendationType.cheaperSimilar,
-        headline: 'Save \$${savings.toStringAsFixed(0)} with a very similar itinerary.',
+        headline: 'Save ${savings.toStringAsFixed(0)} EGP with a very similar itinerary.',
         subline: durationDiff <= 10
             ? 'Nearly identical travel time at a lower price.'
             : 'Only ${_formatDuration(durationDiff)} difference in travel time.',
@@ -114,13 +114,13 @@ class FlightRecommendationEngine {
     }
 
     // ── Rule 3: fasterAlternative ────────────────────────────────────────────
-    // Saves ≥3 h, costs at most $30 more.
+    // Saves ≥3 h, costs at most 30 EGP more.
     final fasterAlt = _findFasterAlternative(selected.flight, others);
     if (fasterAlt != null) {
       final saving = selected.flight.durationMinutes - fasterAlt.flight.durationMinutes;
       final priceDiff = fasterAlt.flight.totalPrice - selected.flight.totalPrice;
       final priceStr = priceDiff > 0
-          ? 'for only +\$${priceDiff.toStringAsFixed(0)}'
+          ? 'for only +${priceDiff.toStringAsFixed(0)} EGP'
           : 'at the same price or less';
       return FlightRecommendation(
         type: RecommendationType.fasterAlternative,
@@ -132,12 +132,12 @@ class FlightRecommendationEngine {
     }
 
     // ── Rule 4: betterValue ──────────────────────────────────────────────────
-    // Alternative score 10+ pts higher, costs at most $50 more.
+    // Alternative score 10+ pts higher, costs at most 50 EGP more.
     final betterAlt = _findBetterValue(selected, others);
     if (betterAlt != null) {
       final priceDiff = betterAlt.flight.totalPrice - selected.flight.totalPrice;
       final priceStr = priceDiff > 0
-          ? 'for only +\$${priceDiff.toStringAsFixed(0)}'
+          ? 'for only +${priceDiff.toStringAsFixed(0)} EGP'
           : 'at a similar price';
       return FlightRecommendation(
         type: RecommendationType.betterValue,
@@ -227,7 +227,7 @@ class FlightRecommendationEngine {
     }
     if (alt.totalPrice < selected.totalPrice) {
       final diff = selected.totalPrice - alt.totalPrice;
-      items.add('\$${diff.toStringAsFixed(0)} cheaper');
+      items.add('${diff.toStringAsFixed(0)} EGP cheaper');
     }
     return items.take(3).toList();
   }

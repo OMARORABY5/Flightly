@@ -241,7 +241,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Total Paid', style: AppTextStyles.labelMedium),
-                      Text('\$${trip.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary)),
+                      Text('${trip.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary)),
                     ],
                   ),
                 ],
@@ -363,7 +363,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Total Paid', style: AppTextStyles.bodyMedium),
-                  Text('\$${widget.trip.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.bodyMedium),
+                  Text('${widget.trip.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.bodyMedium),
                 ],
               ),
               const SizedBox(height: 8),
@@ -371,7 +371,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Cancellation Fee', style: AppTextStyles.bodyMedium),
-                  Text('-\$${feeAmount.toStringAsFixed(2)}', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error)),
+                  Text('-${feeAmount.toStringAsFixed(2)} EGP', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error)),
                 ],
               ),
               const Padding(
@@ -382,7 +382,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Refund to Wallet', style: AppTextStyles.labelMedium),
-                  Text('\$${refundAmount.toStringAsFixed(2)}', style: AppTextStyles.headingSmall.copyWith(color: AppColors.success)),
+                  Text('${refundAmount.toStringAsFixed(2)} EGP', style: AppTextStyles.headingSmall.copyWith(color: AppColors.success)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -447,7 +447,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       final refundAmount = _calculateRefundAmount();
       showTopSnackBar(
         Overlay.of(context),
-        CustomSnackBar.success(message: 'Ticket cancelled. \$${refundAmount.toStringAsFixed(2)} refunded to your wallet.'),
+        CustomSnackBar.success(message: 'Ticket cancelled. ${refundAmount.toStringAsFixed(2)} EGP refunded to your wallet.'),
       );
 
       // Invalidate the trips provider so it fetches the fresh lists

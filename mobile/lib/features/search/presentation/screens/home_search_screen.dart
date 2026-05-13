@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -23,79 +24,81 @@ class HomeSearchScreen extends ConsumerWidget {
     final query = ref.watch(searchFormProvider);
 
     return Scaffold(
-      body: AmbientBackground(
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                sliver: SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Where to?', style: AppTextStyles.displayLarge),
-                              const SizedBox(height: 4),
-                              Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () => context.push('/notifications'),
-                                child: Stack(
-                                  children: [
-                                    const CircleAvatar(
-                                      backgroundColor: AppColors.surface,
-                                      child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
-                                    ),
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        final notificationState = ref.watch(notificationNotifierProvider);
-                                        if (notificationState.unreadCount > 0) {
-                                          return Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: const BoxDecoration(
-                                                color: AppColors.error,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Text(
-                                                '${notificationState.unreadCount}',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                        return const SizedBox.shrink();
-                                      },
-                                    ),
-                                  ],
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.background,
+      appBar: PremiumAppBar(
+        height: 72,
+        leading: const SizedBox.shrink(), // No back button on home
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Where to?', style: AppTextStyles.displayLarge),
+            const SizedBox(height: 4),
+            Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => context.push('/notifications'),
+                child: Stack(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: AppColors.surface,
+                      child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
+                    ),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final notificationState = ref.watch(notificationNotifierProvider);
+                        if (notificationState.unreadCount > 0) {
+                          return Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                '${notificationState.unreadCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              const CircleAvatar(
-                                backgroundColor: AppColors.surface,
-                                child: Icon(LucideIcons.user, color: AppColors.textSecondary),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      
-                      // Search Card
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        ],
+      ),
+      body: AmbientBackground(
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 72 + 24,
+                left: 24,
+                right: 24,
+                bottom: 24,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Search Card
                       GlassCard(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -258,7 +261,6 @@ class HomeSearchScreen extends ConsumerWidget {
             ],
           ),
         ),
-      ),
     );
   }
 

@@ -170,7 +170,7 @@ class SavedFlightCard extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Saved at \$${savedFlight.savedPrice.toStringAsFixed(2)}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                      Text('Saved at ${savedFlight.savedPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -178,7 +178,7 @@ class SavedFlightCard extends ConsumerWidget {
                             Icon(differenceIcon, size: 14, color: differenceColor),
                             const SizedBox(width: 4),
                             Text(
-                              '\$${savedFlight.priceDifference.abs().toStringAsFixed(2)}',
+                              '${savedFlight.priceDifference.abs().toStringAsFixed(2)} EGP',
                               style: AppTextStyles.labelSmall.copyWith(color: differenceColor),
                             ),
                           ] else ...[
@@ -189,7 +189,7 @@ class SavedFlightCard extends ConsumerWidget {
                     ],
                   ),
                   Text(
-                    '\$${savedFlight.currentPrice.toStringAsFixed(2)}',
+                    '${savedFlight.currentPrice.toStringAsFixed(2)} EGP',
                     style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary),
                   ),
                 ],

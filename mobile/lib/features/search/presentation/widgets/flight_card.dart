@@ -73,12 +73,14 @@ class FlightCard extends StatelessWidget {
             children: [
               if (badgeLabel != null) ...[
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SmartBadge.fromLabel(badgeLabel!),
+                    Expanded(
+                      child: SmartBadge.fromLabel(badgeLabel!, showExplanation: true),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
               ],
               // Main Flight Leg Row
               Row(

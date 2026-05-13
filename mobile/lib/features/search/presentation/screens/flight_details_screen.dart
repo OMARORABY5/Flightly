@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
@@ -201,15 +202,12 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: PremiumAppBar(
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: null,
-        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(
@@ -240,7 +238,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: SizedBox(
-                      height: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
+                      height: MediaQuery.of(context).padding.top + kToolbarHeight + 16 + 16, // PremiumAppBar height + padding
                     ),
                   ),
                   SliverPadding(
@@ -326,7 +324,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                                   .copyWith(color: AppColors.textSecondary),
                             ),
                             Text(
-                              'EGP ${flight.basePrice.toStringAsFixed(0)}',
+                              '${flight.basePrice.toStringAsFixed(0)} EGP',
                               style: AppTextStyles.displayMedium
                                   .copyWith(color: AppColors.primary),
                             ),
@@ -578,7 +576,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
             _detailRow(
               LucideIcons.banknote,
               'Change Fee',
-              '\$${policy['change_fee']}',
+              '${policy['change_fee']} EGP',
             ),
           ]
         ],

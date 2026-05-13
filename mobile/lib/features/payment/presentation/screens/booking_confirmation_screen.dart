@@ -252,7 +252,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
             children: [
               Text('${flight.originIata} → ${flight.destinationIata}', style: AppTextStyles.headingSmall),
               const Spacer(),
-              Text('\$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.headingSmall.copyWith(color: AppColors.primary)),
+              Text('${widget.booking.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.headingSmall.copyWith(color: AppColors.primary)),
             ],
           ),
           const SizedBox(height: 8),

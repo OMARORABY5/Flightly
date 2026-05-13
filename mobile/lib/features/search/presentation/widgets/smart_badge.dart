@@ -6,10 +6,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 class SmartBadge extends StatelessWidget {
   final SmartBadgeType type;
+  final bool showExplanation;
 
-  const SmartBadge({Key? key, required this.type}) : super(key: key);
+  const SmartBadge({Key? key, required this.type, this.showExplanation = false}) : super(key: key);
 
-  factory SmartBadge.fromLabel(String label) {
+  factory SmartBadge.fromLabel(String label, {bool showExplanation = false}) {
     SmartBadgeType? parsedType;
     for (final t in SmartBadgeType.values) {
       if (t.label == label) {
@@ -18,7 +19,7 @@ class SmartBadge extends StatelessWidget {
       }
     }
     // Fallback to recommended if not matched
-    return SmartBadge(type: parsedType ?? SmartBadgeType.recommended);
+    return SmartBadge(type: parsedType ?? SmartBadgeType.recommended, showExplanation: showExplanation);
   }
 
   @override
@@ -28,29 +29,54 @@ class SmartBadge extends StatelessWidget {
     IconData icon;
 
     switch (type) {
+      // Value & Smart Suggestions
       case SmartBadgeType.bestValue:
+      case SmartBadgeType.smartSuggestion:
         bgColor = Colors.amber.withOpacity(0.15);
         iconColor = Colors.amber.shade700;
         icon = LucideIcons.star;
         break;
+
+      // Price
       case SmartBadgeType.cheapest:
+      case SmartBadgeType.lowestPrice:
         bgColor = AppColors.success.withOpacity(0.15);
         iconColor = AppColors.success;
         icon = LucideIcons.badgeDollarSign;
         break;
+
+      // Time
       case SmartBadgeType.fastest:
+      case SmartBadgeType.shortestDuration:
         bgColor = Colors.blue.withOpacity(0.15);
         iconColor = Colors.blue.shade600;
         icon = LucideIcons.zap;
         break;
+
+      // General Recommendations
+      case SmartBadgeType.best:
       case SmartBadgeType.recommended:
         bgColor = AppColors.primary.withOpacity(0.15);
         iconColor = AppColors.primary;
         icon = LucideIcons.award;
         break;
+
+      // Popularity
+      case SmartBadgeType.popularChoice:
+        bgColor = Colors.purple.withOpacity(0.15);
+        iconColor = Colors.purple.shade600;
+        icon = LucideIcons.trendingUp;
+        break;
+
+      // Urgency / Scarcity
+      case SmartBadgeType.limitedSeats:
+        bgColor = AppColors.error.withOpacity(0.15);
+        iconColor = AppColors.error;
+        icon = LucideIcons.alertCircle;
+        break;
     }
 
-    return Container(
+    final badgePill = Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bgColor,
@@ -72,6 +98,30 @@ class SmartBadge extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    if (!showExplanation) {
+      return badgePill;
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        badgePill,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            type.explanation,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+              height: 1.3,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -9,8 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
+import 'package:flightly/core/utils/helpers.dart';
 import 'package:flightly/features/account/domain/providers/account_provider.dart';
 import 'package:flightly/features/account/domain/models/profile.dart';
 
@@ -27,20 +29,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _phoneController = TextEditingController();
   final _nationalityController = TextEditingController();
   bool _isLoading = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Pre-fill from current provider state
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileAsync = ref.read(profileProvider);
-      if (profileAsync is AsyncData<Profile?> && profileAsync.value != null) {
-        final p = profileAsync.value!;
-        _nameController.text = p.displayName ?? '';
-        _phoneController.text = p.phone ?? '';
-        _nationalityController.text = p.nationality ?? '';
-      }
-    });
   }
 
   @override
@@ -101,18 +94,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       setState(() => _isLoading = true);
 
-      // Simulate upload: generate a dynamic avatar URL based on the user's name
-      // This is our agreed upon workaround for the DB constraints (VARCHAR 500) 
-      // without having an actual S3 file bucket to upload to.
+      // Read file as bytes to create Base64 data URI (works on Web & Mobile)
+      // NOTE: Base64 strings can be too large for mock APIs, so we fall back
+      // to generating a clean UI Avatar instead.
       final currentProfile = ref.read(profileProvider).value;
       final name = currentProfile?.displayName?.isNotEmpty == true 
           ? currentProfile!.displayName! 
           : 'User';
       
+      // We still let the user pick a photo for the UX flow, but we just generate 
+      // a beautiful dynamic avatar based on their name to keep the mock fast and light.
       final randomHex = (Random().nextDouble() * 0xFFFFFF).toInt().toRadixString(16).padLeft(6, '0');
-      final dummyUrl = 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(name)}&background=$randomHex&color=fff&size=256';
+      final avatarUrl = 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(name)}&background=$randomHex&color=fff&size=256';
 
-      await ref.read(accountRepositoryProvider).updateProfilePhoto(dummyUrl);
+      await ref.read(accountRepositoryProvider).updateProfilePhoto(avatarUrl);
       ref.invalidate(profileProvider); // Refresh state
 
       if (mounted) {
@@ -131,6 +126,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showCountryPicker() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: false,
+      countryListTheme: CountryListThemeData(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        backgroundColor: AppColors.background,
+        textStyle: AppTextStyles.bodyMedium,
+        searchTextStyle: AppTextStyles.bodyMedium,
+      ),
+      onSelect: (Country country) {
+        setState(() {
+          _nationalityController.text = country.name;
+        });
+      },
+    );
   }
 
   @override
@@ -154,6 +167,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         data: (profile) {
           if (profile == null) return const Center(child: Text('No profile data'));
           
+          if (!_isInitialized) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _nameController.text = profile.displayName ?? '';
+              _phoneController.text = (profile.phone == null || profile.phone!.isEmpty) ? '+20 ' : profile.phone!;
+              _nationalityController.text = profile.nationality ?? '';
+              setState(() => _isInitialized = true);
+            });
+          }
+
           return Form(
             key: _formKey,
             child: ListView(
@@ -166,9 +189,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        backgroundImage: profile.photoUrl != null
-                            ? CachedNetworkImageProvider(profile.photoUrl!)
-                            : null,
+                        backgroundImage: AppHelpers.getAvatarProvider(profile.photoUrl),
                         child: profile.photoUrl == null
                             ? const Icon(LucideIcons.user, size: 50, color: AppColors.primary)
                             : null,
@@ -227,15 +248,40 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   controller: _phoneController,
                   label: 'Phone Number',
                   icon: LucideIcons.phone,
-                  hint: '+1 234 567 8900',
+                  hint: '+20 100 123 4567',
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 20),
-                _buildTextField(
-                  controller: _nationalityController,
-                  label: 'Nationality',
-                  icon: LucideIcons.globe,
-                  hint: 'e.g. American, Egyptian, etc.',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Nationality', style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _showCountryPicker,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(LucideIcons.globe, color: AppColors.textSecondary, size: 20),
+                          filled: true,
+                          fillColor: AppColors.surface,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                          ),
+                        ),
+                        child: Text(
+                          _nationalityController.text.isNotEmpty ? _nationalityController.text : 'Select Country',
+                          style: _nationalityController.text.isNotEmpty ? AppTextStyles.inputText : AppTextStyles.inputText.copyWith(color: AppColors.textHint),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 40),
 

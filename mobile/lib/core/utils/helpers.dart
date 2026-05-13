@@ -1,7 +1,10 @@
 // helpers.dart — FLIGHTLY General Utilities
 // Formatting, date helpers, string utilities used across the app
 
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AppHelpers {
   AppHelpers._();
@@ -46,10 +49,11 @@ class AppHelpers {
 
   // ─── Currency / Price ─────────────────────────────────────────────────────
 
-  /// Format price → "USD 1,250.00"
-  static String formatPrice(double amount, {String currency = 'USD'}) {
+  /// Format price → "1,250 EGP"
+  static String formatPrice(double amount, {String currency = 'EGP'}) {
     final formatter = NumberFormat.currency(
-      symbol: '$currency ',
+      customPattern: '#,##0 $currency',
+      symbol: currency,
       decimalDigits: 0,
     );
     return formatter.format(amount);
@@ -102,5 +106,22 @@ class AppHelpers {
     if (stops == 0) return 'Direct';
     if (stops == 1) return '1 Stop';
     return '$stops Stops';
+  }
+
+  /// Get image provider for avatar
+  static ImageProvider? getAvatarProvider(String? url) {
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('http')) {
+      return CachedNetworkImageProvider(url);
+    }
+    if (url.startsWith('data:image')) {
+      try {
+        final base64Str = url.split(',').last;
+        return MemoryImage(base64Decode(base64Str));
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 }

@@ -241,7 +241,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   .copyWith(color: AppColors.textSecondary),
                             ),
                             Text(
-                              'EGP ${totalPrice.toStringAsFixed(0)}',
+                              '${totalPrice.toStringAsFixed(0)} EGP',
                               style: AppTextStyles.displayMedium
                                   .copyWith(color: AppColors.primary),
                             ),
@@ -359,7 +359,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     .copyWith(color: AppColors.textSecondary),
               ),
               Text(
-                'EGP ${flight.basePrice.toStringAsFixed(0)}',
+                '${flight.basePrice.toStringAsFixed(0)} EGP',
                 style: AppTextStyles.labelMedium
                     .copyWith(color: AppColors.primary),
               ),

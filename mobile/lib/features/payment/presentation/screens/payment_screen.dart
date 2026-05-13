@@ -137,7 +137,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                       ),
                       child: _isProcessing
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(remainingToPay == 0 ? 'Confirm Booking' : 'Pay \$${remainingToPay.toStringAsFixed(2)}', style: AppTextStyles.button),
+                          : Text(remainingToPay == 0 ? 'Confirm Booking' : 'Pay ${remainingToPay.toStringAsFixed(2)} EGP', style: AppTextStyles.button),
                     ),
                   ],
                 ),
@@ -175,7 +175,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Total Amount:', style: AppTextStyles.bodyMedium),
-              Text('\$${widget.booking.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.headingMedium),
+              Text('${widget.booking.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.headingMedium),
             ],
           ),
           if (walletBalance > 0) ...[
@@ -188,7 +188,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     children: [
                       const Icon(LucideIcons.wallet, size: 16, color: AppColors.primary),
                       const SizedBox(width: 8),
-                      Expanded(child: Text('Apply Wallet Balance (\$${walletBalance.toStringAsFixed(2)})', style: AppTextStyles.bodyMedium, overflow: TextOverflow.ellipsis)),
+                      Expanded(child: Text('Apply Wallet Balance (${walletBalance.toStringAsFixed(2)} EGP)', style: AppTextStyles.bodyMedium, overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                 ),
@@ -205,7 +205,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Wallet Applied:', style: AppTextStyles.bodyMedium),
-                  Text('-\$${walletApplied.toStringAsFixed(2)}', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.success)),
+                  Text('-${walletApplied.toStringAsFixed(2)} EGP', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.success)),
                 ],
               ),
               const SizedBox(height: 8),
@@ -215,7 +215,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Remaining to Pay:', style: AppTextStyles.headingSmall),
-                  Text('\$${remainingToPay.toStringAsFixed(2)}', style: AppTextStyles.headingMedium),
+                  Text('${remainingToPay.toStringAsFixed(2)} EGP', style: AppTextStyles.headingMedium),
                 ],
               ),
             ]

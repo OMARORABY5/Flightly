@@ -6,19 +6,52 @@ import 'package:flightly/features/search/domain/models/flight.dart';
 
 /// The smart badge types that can be surfaced on a flight card.
 enum SmartBadgeType {
-  bestValue,    // Highest overall weighted score
-  cheapest,     // Lowest total price
-  fastest,      // Shortest duration
-  recommended,  // Top-3 score but not already labelled
+  best,
+  cheapest,
+  fastest,
+  recommended,
+  lowestPrice,
+  shortestDuration,
+  bestValue,
+  popularChoice,
+  limitedSeats,
+  smartSuggestion,
 }
 
 extension SmartBadgeTypeLabel on SmartBadgeType {
   String get label {
     switch (this) {
-      case SmartBadgeType.bestValue:   return 'Best Value';
-      case SmartBadgeType.cheapest:    return 'Cheapest';
-      case SmartBadgeType.fastest:     return 'Fastest';
-      case SmartBadgeType.recommended: return 'Recommended';
+      case SmartBadgeType.best:             return 'Best';
+      case SmartBadgeType.cheapest:         return 'Cheapest';
+      case SmartBadgeType.fastest:          return 'Fastest';
+      case SmartBadgeType.recommended:      return 'Recommended';
+      case SmartBadgeType.lowestPrice:      return 'Lowest Price';
+      case SmartBadgeType.shortestDuration: return 'Shortest Duration';
+      case SmartBadgeType.bestValue:        return 'Best Value';
+      case SmartBadgeType.popularChoice:    return 'Popular Choice';
+      case SmartBadgeType.limitedSeats:     return 'Limited Seats';
+      case SmartBadgeType.smartSuggestion:  return 'Smart Suggestion';
+    }
+  }
+
+  String get explanation {
+    switch (this) {
+      case SmartBadgeType.best:
+      case SmartBadgeType.smartSuggestion:
+      case SmartBadgeType.recommended:
+        return 'Best balance between price, duration, and comfort.';
+      case SmartBadgeType.cheapest:
+      case SmartBadgeType.lowestPrice:
+        return 'Lowest available price for this route.';
+      case SmartBadgeType.fastest:
+      case SmartBadgeType.shortestDuration:
+        return 'Shortest total travel duration.';
+      case SmartBadgeType.popularChoice:
+        return 'Popular choice with strong overall value.';
+      case SmartBadgeType.bestValue:
+        return 'Good price compared to flight quality and timing.';
+      case SmartBadgeType.limitedSeats:
+        return 'Few seats remaining at this price.';
     }
   }
 }

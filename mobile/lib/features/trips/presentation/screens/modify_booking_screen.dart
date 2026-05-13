@@ -70,7 +70,7 @@ class _ModifyBookingScreenState extends ConsumerState<ModifyBookingScreen> {
       context.pop();
     } catch (e) {
       if (!mounted) return;
-      showTopSnackBar(Overlay.of(context), CustomSnackBar.error(message: 'Failed to modify booking: \${e.toString()}'));
+      showTopSnackBar(Overlay.of(context), CustomSnackBar.error(message: 'Failed to modify booking: ${e.toString()}'));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

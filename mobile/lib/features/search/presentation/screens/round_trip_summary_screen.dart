@@ -208,7 +208,7 @@ class _RoundTripSummaryScreenState extends ConsumerState<RoundTripSummaryScreen>
                       children: [
                         Text('Total Trip Price',
                             style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary)),
-                        Text('EGP ${totalPrice.toStringAsFixed(0)}',
+                        Text('${totalPrice.toStringAsFixed(0)} EGP',
                             style: AppTextStyles.displayMedium.copyWith(color: AppColors.primary)),
                       ],
                     ),
@@ -313,7 +313,7 @@ class _RoundTripSummaryScreenState extends ConsumerState<RoundTripSummaryScreen>
             children: [
               Text('${_formatDate(flight.departureTime)} • ${flight.fareLabel ?? flight.cabinClass.toUpperCase()}',
                   style: AppTextStyles.bodyMedium),
-              Text('EGP ${flight.basePrice.toStringAsFixed(0)}', style: AppTextStyles.labelMedium),
+              Text('${flight.basePrice.toStringAsFixed(0)} EGP', style: AppTextStyles.labelMedium),
             ],
           ),
         ],

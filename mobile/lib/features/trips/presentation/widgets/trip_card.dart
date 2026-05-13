@@ -162,9 +162,9 @@ class TripCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       if (trip.isCancelled && trip.refundAmount != null)
-                        Text('Refunded: \$${trip.refundAmount!.toStringAsFixed(2)}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.error))
+                        Text('Refunded: ${trip.refundAmount!.toStringAsFixed(2)} EGP', style: AppTextStyles.labelMedium.copyWith(color: AppColors.error))
                       else
-                        Text('\$${trip.totalPrice.toStringAsFixed(2)}', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textPrimary)),
+                        Text('${trip.totalPrice.toStringAsFixed(2)} EGP', style: AppTextStyles.headingSmall.copyWith(color: AppColors.textPrimary)),
                       const SizedBox(height: 2),
                       Row(
                         children: [
