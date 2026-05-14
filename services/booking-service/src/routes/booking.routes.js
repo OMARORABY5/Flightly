@@ -41,6 +41,9 @@ router.get('/wallet', authMiddleware, async (req, res) => {
   await getWalletController(req).getWallet(req, res);
 });
 
+// Health ping — must be before /:id to avoid being swallowed
+router.get('/ping', (req, res) => res.json({ success: true, message: 'booking-service is running' }));
+
 // ─── POST /bookings/create ─────────────────────────────────────────────────────
 // Create a new booking with passengers
 router.post('/create', async (req, res) => {
@@ -80,8 +83,5 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   await getController(req).cancelBooking(req, res);
 });
-
-// Health ping
-router.get('/ping', (req, res) => res.json({ success: true, message: 'booking-service is running' }));
 
 module.exports = router;
