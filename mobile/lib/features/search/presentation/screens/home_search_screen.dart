@@ -14,6 +14,9 @@ import 'package:flightly/features/search/presentation/widgets/date_selection_scr
 import 'package:flightly/features/search/presentation/widgets/passenger_class_popup.dart';
 import 'package:flightly/features/search/presentation/screens/search_results_screen.dart';
 import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
+import 'package:flightly/features/account/domain/providers/account_provider.dart';
+import 'package:flightly/features/home/presentation/screens/home_screen.dart';
+import 'package:flightly/core/utils/helpers.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeSearchScreen extends ConsumerStatefulWidget {
@@ -67,21 +70,21 @@ class _HomeSearchScreenState extends ConsumerState<HomeSearchScreen> {
                             clipBehavior: Clip.none,
                             children: [
                               Container(
-                                width: 48,
-                                height: 48,
+                                width: 44, // Slightly smaller to fit both
+                                height: 44,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: AppColors.surface,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.06),
-                                      blurRadius: 16,
+                                      color: Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
                                 child: const Center(
-                                  child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 22),
+                                  child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
                                 ),
                               ),
                               Consumer(
@@ -89,20 +92,23 @@ class _HomeSearchScreenState extends ConsumerState<HomeSearchScreen> {
                                   final notificationState = ref.watch(notificationNotifierProvider);
                                   if (notificationState.unreadCount > 0) {
                                     return Positioned(
-                                      top: -2,
-                                      right: -2,
+                                      top: -1,
+                                      right: -1,
                                       child: Container(
-                                        padding: const EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(4),
                                         decoration: const BoxDecoration(
                                           color: AppColors.error,
                                           shape: BoxShape.circle,
                                         ),
-                                        child: Text(
-                                          '${notificationState.unreadCount}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                        child: Center(
+                                          child: Text(
+                                            '${notificationState.unreadCount}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -112,6 +118,51 @@ class _HomeSearchScreenState extends ConsumerState<HomeSearchScreen> {
                                 },
                               ),
                             ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => ref.read(homeTabProvider.notifier).state = 3,
+                          child: Consumer(
+                            builder: (context, ref, child) {
+                              final profileAsync = ref.watch(profileProvider);
+                              return Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.5),
+                                  color: AppColors.surface,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(22),
+                                  child: profileAsync.when(
+                                    data: (profile) => profile?.photoUrl != null
+                                        ? Image(
+                                            image: AppHelpers.getAvatarProvider(profile!.photoUrl)!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Center(
+                                            child: Text(
+                                              (profile?.displayName?.isNotEmpty == true)
+                                                  ? profile!.displayName![0].toUpperCase()
+                                                  : '?',
+                                              style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
+                                            ),
+                                          ),
+                                    loading: () => const Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))),
+                                    error: (_, __) => const Icon(LucideIcons.user, size: 20, color: AppColors.textSecondary),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],

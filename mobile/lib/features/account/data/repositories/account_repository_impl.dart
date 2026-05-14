@@ -61,6 +61,17 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
+  Future<void> deleteProfilePhoto() async {
+    final response = await _dioClient.post(
+      '/users/profile/photo',
+      data: {'photo_url': null},
+    );
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to delete photo');
+    }
+  }
+
+  @override
   Future<Settings> getSettings() async {
     final response = await _dioClient.get('/users/settings');
     if (response.data['success'] == true) {

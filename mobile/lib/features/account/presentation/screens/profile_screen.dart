@@ -123,6 +123,82 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  Future<void> _deletePhoto() async {
+    try {
+      setState(() => _isLoading = true);
+      await ref.read(accountRepositoryProvider).deleteProfilePhoto();
+      ref.invalidate(profileProvider);
+
+      if (mounted) {
+        showTopSnackBar(
+          Overlay.of(context),
+          const CustomSnackBar.success(message: 'Profile photo deleted'),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(message: 'Failed to delete photo: $e'),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showPhotoOptions(String? currentPhotoUrl) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceBorder,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text('Profile Photo', style: AppTextStyles.headingMedium),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(LucideIcons.imagePlus, color: AppColors.primary),
+              title: Text('Upload New Photo', style: AppTextStyles.bodyMedium),
+              onTap: () {
+                Navigator.pop(context);
+                _pickAndUploadPhoto();
+              },
+            ),
+            if (currentPhotoUrl != null)
+              ListTile(
+                leading: const Icon(LucideIcons.trash2, color: AppColors.error),
+                title: Text('Delete Current Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deletePhoto();
+                },
+              ),
+            ListTile(
+              leading: const Icon(LucideIcons.x, color: AppColors.textSecondary),
+              title: Text('Cancel', style: AppTextStyles.bodyMedium),
+              onTap: () => Navigator.pop(context),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showCountryPicker() {
     showCountryPicker(
       context: context,
@@ -175,24 +251,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Center(
                   child: Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        backgroundImage: AppHelpers.getAvatarProvider(profile.photoUrl),
-                        child: profile.photoUrl == null
-                            ? const Icon(LucideIcons.user, size: 50, color: AppColors.primary)
-                            : null,
+                      GestureDetector(
+                        onTap: _isLoading ? null : () => _showPhotoOptions(profile.photoUrl),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          backgroundImage: AppHelpers.getAvatarProvider(profile.photoUrl),
+                          child: profile.photoUrl == null
+                              ? const Icon(LucideIcons.user, size: 50, color: AppColors.primary)
+                              : null,
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: _isLoading ? null : _pickAndUploadPhoto,
+                          onTap: _isLoading ? null : () => _showPhotoOptions(profile.photoUrl),
                           child: Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.surface, width: 2),
                             ),
                             child: const Icon(LucideIcons.camera, color: Colors.white, size: 20),
                           ),

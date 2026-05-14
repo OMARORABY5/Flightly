@@ -40,12 +40,10 @@ class ProfileController {
   async updatePhoto(req, res) {
     try {
       const { photo_url } = req.body;
-      if (!photo_url) {
-        return res.status(400).json({ success: false, message: 'photo_url is required' });
-      }
+      // Allow photo_url to be null or empty for deletion/clearing
       const result = await this.db.query(
         'UPDATE users SET photo_url = $1, updated_at = NOW() WHERE id = $2 RETURNING photo_url',
-        [photo_url, req.userId]
+        [photo_url || null, req.userId]
       );
       if (result.rows.length === 0) {
         return res.status(404).json({ success: false, message: 'User not found' });
