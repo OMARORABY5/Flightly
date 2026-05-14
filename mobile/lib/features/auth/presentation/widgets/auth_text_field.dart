@@ -25,10 +25,10 @@ class AuthTextField extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface, // Pure white — visible on gray background
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.surfaceBorder, width: 1),
+        border: Border.all(color: const Color(0xFFCDD5E0), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -44,7 +44,7 @@ class AuthTextField extends StatelessWidget {
           hintText: hint,
           hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 15),
           prefixIcon: prefixIcon != null
-              ? Icon(prefixIcon, color: AppColors.textSecondary, size: 20)
+              ? Icon(prefixIcon, color: const Color(0xFF5A6478), size: 20)
               : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

@@ -19,8 +19,16 @@ class SocialAuthButton extends StatelessWidget {
       child: Container(
         height: 56,
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.surfaceBorder),
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFFCDD5E0)),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Center(child: icon),
       ),

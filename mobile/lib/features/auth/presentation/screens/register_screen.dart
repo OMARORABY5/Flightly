@@ -8,7 +8,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
-import 'package:flightly/core/presentation/widgets/ambient_background.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flightly/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:flightly/features/auth/presentation/widgets/auth_button.dart';
 
@@ -128,7 +128,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: const Color(0xFFF0F4FF),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -139,10 +139,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Icon(
-                        LucideIcons.plane,
-                        size: 56,
-                        color: AppColors.primary,
+                      Text(
+                        'Flightly',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.marckScript(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -151,7 +155,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: const Color(0xFF1A2340),
+                          letterSpacing: -0.5,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -189,8 +194,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceElevated,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFCDD5E0)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

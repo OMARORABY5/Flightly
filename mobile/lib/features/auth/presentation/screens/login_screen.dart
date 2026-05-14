@@ -9,6 +9,7 @@ import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/home/presentation/screens/home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:flightly/features/auth/presentation/widgets/auth_button.dart';
@@ -68,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: const Color(0xFFF0F4FF),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -79,10 +80,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(
-                    LucideIcons.plane,
-                    size: 56,
-                    color: AppColors.primary,
+                  Text(
+                    'Flightly',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.marckScript(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -91,7 +96,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: const Color(0xFF1A2340),
+                      letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -161,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
                   const Row(
                     children: [
-                      Expanded(child: Divider(color: AppColors.surfaceBorder)),
+                      Expanded(child: Divider(color: Color(0xFFCDD5E0))),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
@@ -169,7 +175,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                         ),
                       ),
-                      Expanded(child: Divider(color: AppColors.surfaceBorder)),
+                      Expanded(child: Divider(color: Color(0xFFCDD5E0))),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -190,6 +196,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: _continueAsGuest,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      'Continue as Guest',
+                      style: TextStyle(
+                        color: Color(0xFF4A5568),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ],
               ),
