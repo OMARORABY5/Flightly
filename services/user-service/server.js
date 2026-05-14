@@ -25,6 +25,8 @@ const PORT = process.env.PORT || 3004;
 
 app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
 app.use(express.json({ limit: '50mb' })); // Larger limit for profile photo uploads
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 const db = new Pool({
   host: process.env.DB_HOST || 'localhost',

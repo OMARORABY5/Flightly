@@ -7,6 +7,7 @@ abstract class AccountRepository {
   Future<Profile> getProfile();
   Future<Profile> updateProfile(Profile profile);
   Future<String> updateProfilePhoto(String photoUrl);
+  Future<String> uploadProfilePhotoFile(List<int> bytes, String filename);
   
   Future<Settings> getSettings();
   Future<Settings> updateSettings(Settings settings);

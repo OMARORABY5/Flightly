@@ -95,20 +95,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       setState(() => _isLoading = true);
 
-      // Read file as bytes to create Base64 data URI (works on Web & Mobile)
-      // NOTE: Base64 strings can be too large for mock APIs, so we fall back
-      // to generating a clean UI Avatar instead.
-      final currentProfile = ref.read(profileProvider).value;
-      final name = currentProfile?.displayName?.isNotEmpty == true 
-          ? currentProfile!.displayName! 
-          : 'User';
-      
-      // We still let the user pick a photo for the UX flow, but we just generate 
-      // a beautiful dynamic avatar based on their name to keep the mock fast and light.
-      final randomHex = (Random().nextDouble() * 0xFFFFFF).toInt().toRadixString(16).padLeft(6, '0');
-      final avatarUrl = 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(name)}&background=$randomHex&color=fff&size=256';
+      // Read file as bytes (works on Web & Mobile)
+      final bytes = await pickedFile.readAsBytes();
 
-      await ref.read(accountRepositoryProvider).updateProfilePhoto(avatarUrl);
+      await ref.read(accountRepositoryProvider).uploadProfilePhotoFile(
+        bytes,
+        pickedFile.name,
+      );
+
       ref.invalidate(profileProvider); // Refresh state
 
       if (mounted) {

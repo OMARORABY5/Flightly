@@ -198,7 +198,7 @@ class FlightCard extends StatelessWidget {
                         style: AppTextStyles.priceLarge,
                       ),
                       Text(
-                        'per person',
+                        'per passenger',
                         style: AppTextStyles.labelSmall,
                       ),
                     ],

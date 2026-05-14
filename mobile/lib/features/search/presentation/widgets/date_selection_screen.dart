@@ -144,27 +144,77 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
                     rightChevronIcon: const Icon(LucideIcons.chevronRight, color: AppColors.textPrimary),
                   ),
                   calendarStyle: CalendarStyle(
-                    defaultTextStyle: AppTextStyles.bodyMedium,
-                    weekendTextStyle: AppTextStyles.bodyMedium,
+                    // ── Day number typography ──────────────────────────────
+                    // Darker, bolder default so every date reads clearly
+                    defaultTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: const Color(0xFF1A2340), // near-navy, not harsh black
+                      fontWeight: FontWeight.w600,
+                    ),
+                    weekendTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primary.withValues(alpha: 0.75),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    // Disabled / past dates — clearly muted
+                    disabledTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: const Color(0xFFBEC8D8),
+                      fontWeight: FontWeight.w400,
+                    ),
+                    // Outside-month days hidden
                     outsideDaysVisible: false,
+
+                    // ── Today — clean ring, no fill ────────────────────────
+                    todayDecoration: BoxDecoration(
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primary, width: 1.8),
+                    ),
+                    todayTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+
+                    // ── Selected single day ────────────────────────────────
                     selectedDecoration: const BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
+                    selectedTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+
+                    // ── Range endpoints ────────────────────────────────────
                     rangeStartDecoration: const BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
+                    ),
+                    rangeStartTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
                     rangeEndDecoration: const BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
-                    rangeHighlightColor: AppColors.primary.withValues(alpha: 0.2),
-                    todayDecoration: BoxDecoration(
-                      color: Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primary, width: 2),
+                    rangeEndTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
+
+                    // ── Range fill between endpoints ───────────────────────
+                    rangeHighlightColor: AppColors.primary.withValues(alpha: 0.12),
+
+                    // ── Within-range days ──────────────────────────────────
+                    withinRangeTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    withinRangeDecoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.07),
+                    ),
+
+                    // ── Cell margin (breathing room between days) ──────────
+                    cellMargin: const EdgeInsets.all(4),
                   ),
                 ),
               ),

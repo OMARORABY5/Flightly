@@ -1,5 +1,6 @@
 // account_repository_impl.dart — FLIGHTLY Account Repository Implementation
 
+import 'package:dio/dio.dart';
 import 'package:flightly/core/network/dio_client.dart';
 import 'package:flightly/features/account/domain/models/profile.dart';
 import 'package:flightly/features/account/domain/models/settings.dart';
@@ -41,6 +42,22 @@ class AccountRepositoryImpl implements AccountRepository {
       return response.data['data']['photo_url'] ?? photoUrl;
     }
     throw Exception(response.data['message'] ?? 'Failed to update photo');
+  }
+
+  @override
+  Future<String> uploadProfilePhotoFile(List<int> bytes, String filename) async {
+    final formData = FormData.fromMap({
+      'photo': MultipartFile.fromBytes(bytes, filename: filename),
+    });
+
+    final response = await _dioClient.post(
+      '/users/profile/photo/upload',
+      data: formData,
+    );
+    if (response.data['success'] == true) {
+      return response.data['data']['photo_url'];
+    }
+    throw Exception(response.data['message'] ?? 'Failed to upload photo');
   }
 
   @override

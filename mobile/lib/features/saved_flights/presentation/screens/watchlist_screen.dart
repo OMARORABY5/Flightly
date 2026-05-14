@@ -21,20 +21,29 @@ class WatchlistScreen extends ConsumerStatefulWidget {
 
 class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
   bool _isChecking = false;
+  // Result state after a manual check
+  int _dealsFound = 0;
+  bool _showResult = false;
 
   Future<void> _runCheck() async {
     final authState = ref.read(authProvider);
     if (authState is! AuthAuthenticated) return;
 
-    setState(() => _isChecking = true);
-    
+    setState(() {
+      _isChecking = true;
+      _showResult = false;
+    });
+
     // Invalidate so we get fresh data
     ref.invalidate(savedFlightsProvider);
     await ref.read(savedFlightsProvider.future);
 
     // Run manual pass (±5 days)
     final monitor = ref.read(watchlistPriceMonitorProvider);
-    await monitor.runMonitoringPass(userId: authState.user.id, isManual: true);
+    final alerts = await monitor.runMonitoringPass(
+      userId: authState.user.id,
+      isManual: true,
+    );
 
     // Refresh again in case prices changed or alerts were generated
     ref.invalidate(savedFlightsProvider);
@@ -42,10 +51,19 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     await ref.read(savedFlightsProvider.future);
 
     if (mounted) {
-      setState(() => _isChecking = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Watchlist checked for new prices!')),
-      );
+      // Only show deal count when simulation is active.
+      // Without simulation, real price changes are unlikely in a demo environment,
+      // and showing false positives would be misleading.
+      final prefs = await SharedPreferences.getInstance();
+      final isSimulated = prefs.getBool('sim_discount') ?? false;
+
+      setState(() {
+        _isChecking = false;
+        _dealsFound = isSimulated
+            ? alerts.map((a) => a.saveId).toSet().length
+            : 0;
+        _showResult = true;
+      });
     }
   }
 
@@ -124,17 +142,102 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
 
           return ListView.separated(
             padding: const EdgeInsets.all(16),
-            itemCount: savedFlights.length + 1,
-            separatorBuilder: (context, index) => const SizedBox(height: 24),
+            itemCount: savedFlights.length + 1 + (_showResult ? 1 : 0),
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
               if (index == 0) {
                 return _buildMonitoringBanner(context, savedFlights.length);
               }
-              final savedFlight = savedFlights[index - 1];
+              if (_showResult && index == 1) {
+                return _buildResultBanner();
+              }
+              final offset = _showResult ? 2 : 1;
+              final savedFlight = savedFlights[index - offset];
               return SavedFlightCard(savedFlight: savedFlight);
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildResultBanner() {
+    final hasDeals = _dealsFound > 0;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: hasDeals
+              ? [
+                  AppColors.success.withValues(alpha: 0.14),
+                  AppColors.success.withValues(alpha: 0.04),
+                ]
+              : [
+                  AppColors.primary.withValues(alpha: 0.08),
+                  AppColors.primary.withValues(alpha: 0.02),
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: hasDeals
+              ? AppColors.success.withValues(alpha: 0.35)
+              : AppColors.primary.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: hasDeals
+                  ? AppColors.success.withValues(alpha: 0.15)
+                  : AppColors.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              hasDeals ? LucideIcons.badgeCheck : LucideIcons.searchCheck,
+              size: 20,
+              color: hasDeals ? AppColors.success : AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  hasDeals
+                      ? '$_dealsFound Deal${_dealsFound > 1 ? 's' : ''} Found!'
+                      : 'All Prices Checked',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color:
+                        hasDeals ? AppColors.success : AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  hasDeals
+                      ? 'Scroll down — your flights with price drops are highlighted below.'
+                      : 'No significant price changes right now. We\'ll keep watching.',
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => setState(() => _showResult = false),
+            child: Icon(LucideIcons.x,
+                size: 16,
+                color: AppColors.textHint),
+          ),
+        ],
       ),
     );
   }
@@ -155,28 +258,32 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     });
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        color: AppColors.primary.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          const Icon(LucideIcons.activity, color: AppColors.primary, size: 24),
+          const Icon(LucideIcons.activity, color: AppColors.primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Monitoring $count route${count == 1 ? '' : 's'}',
-                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+                  'Tracking $count route${count == 1 ? '' : 's'}',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   lastCheckedText,
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary.withValues(alpha: 0.8)),
+                  style: AppTextStyles.labelSmall
+                      .copyWith(color: AppColors.primary.withValues(alpha: 0.7)),
                 ),
               ],
             ),

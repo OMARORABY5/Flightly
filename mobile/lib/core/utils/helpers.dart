@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flightly/core/constants/app_constants.dart';
 
 class AppHelpers {
   AppHelpers._();
@@ -113,6 +114,10 @@ class AppHelpers {
     if (url == null || url.isEmpty) return null;
     if (url.startsWith('http')) {
       return CachedNetworkImageProvider(url);
+    }
+    if (url.startsWith('/uploads')) {
+      final host = AppConstants.baseUrl.replaceAll('/api', '');
+      return CachedNetworkImageProvider('$host$url');
     }
     if (url.startsWith('data:image')) {
       try {
