@@ -16,80 +16,28 @@ import 'package:flightly/features/search/presentation/screens/search_results_scr
 import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeSearchScreen extends ConsumerWidget {
+class HomeSearchScreen extends ConsumerStatefulWidget {
   const HomeSearchScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeSearchScreen> createState() => _HomeSearchScreenState();
+}
+
+class _HomeSearchScreenState extends ConsumerState<HomeSearchScreen> {
+
+  @override
+  Widget build(BuildContext context) {
     final query = ref.watch(searchFormProvider);
+    final isRoundTrip = query.tripType == TripType.roundTrip;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: AppColors.background,
-      appBar: PremiumAppBar(
-        height: 72,
-        leading: const SizedBox.shrink(), // No back button on home
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Where to?', style: AppTextStyles.displayLarge),
-            const SizedBox(height: 4),
-            Text('Let\'s explore the world', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-          ],
-        ),
-        actions: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => context.push('/notifications'),
-                child: Stack(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: AppColors.surface,
-                      child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 20),
-                    ),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final notificationState = ref.watch(notificationNotifierProvider);
-                        if (notificationState.unreadCount > 0) {
-                          return Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: AppColors.error,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(
-                                '${notificationState.unreadCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-        ],
-      ),
       body: AmbientBackground(
         child: CustomScrollView(
           slivers: [
             SliverPadding(
               padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 72 + 24,
+                top: MediaQuery.of(context).padding.top + 24, // Compact top padding directly below status bar
                 left: 24,
                 right: 24,
                 bottom: 24,
@@ -98,6 +46,77 @@ class HomeSearchScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header Section
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Where next?', style: AppTextStyles.displayLarge),
+                              const SizedBox(height: 4),
+                              Text('Find smarter flights in seconds.', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.push('/notifications'),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.surface,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.06),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Icon(LucideIcons.bell, color: AppColors.textSecondary, size: 22),
+                                ),
+                              ),
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final notificationState = ref.watch(notificationNotifierProvider);
+                                  if (notificationState.unreadCount > 0) {
+                                    return Positioned(
+                                      top: -2,
+                                      right: -2,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.error,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Text(
+                                          '${notificationState.unreadCount}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28), // 28px gap before search card
                     // Search Card
                       GlassCard(
                         padding: const EdgeInsets.all(20),
@@ -105,33 +124,76 @@ class HomeSearchScreen extends ConsumerWidget {
                           children: [
                             // Trip Type Toggle
                             Container(
+                              height: 48,
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceElevated,
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Row(
+                              child: Stack(
                                 children: [
-                                  Expanded(
-                                    child: _buildTripTypeButton(
-                                      title: 'One-way',
-                                      isSelected: query.tripType == TripType.oneWay,
-                                      onTap: () {
-                                        ref.read(searchFormProvider.notifier).updateQuery(
-                                          query.copyWith(tripType: TripType.oneWay, returnDate: null),
-                                        );
-                                      },
+                                  AnimatedAlign(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOutCubic,
+                                    alignment: isRoundTrip ? Alignment.centerRight : Alignment.centerLeft,
+                                    child: FractionallySizedBox(
+                                      widthFactor: 0.5,
+                                      child: Container(
+                                        margin: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary,
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primary.withValues(alpha: 0.3),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: _buildTripTypeButton(
-                                      title: 'Round-trip',
-                                      isSelected: query.tripType == TripType.roundTrip,
-                                      onTap: () {
-                                        ref.read(searchFormProvider.notifier).updateQuery(
-                                          query.copyWith(tripType: TripType.roundTrip),
-                                        );
-                                      },
-                                    ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            ref.read(searchFormProvider.notifier).updateQuery(
+                                              query.copyWith(tripType: TripType.oneWay, returnDate: null),
+                                            );
+                                          },
+                                          behavior: HitTestBehavior.opaque,
+                                          child: Center(
+                                            child: Text(
+                                              'One-way',
+                                              style: AppTextStyles.bodyMedium.copyWith(
+                                                color: !isRoundTrip ? Colors.white : AppColors.textSecondary,
+                                                fontWeight: !isRoundTrip ? FontWeight.w600 : FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            ref.read(searchFormProvider.notifier).updateQuery(
+                                              query.copyWith(tripType: TripType.roundTrip),
+                                            );
+                                          },
+                                          behavior: HitTestBehavior.opaque,
+                                          child: Center(
+                                            child: Text(
+                                              'Round-trip',
+                                              style: AppTextStyles.bodyMedium.copyWith(
+                                                color: isRoundTrip ? Colors.white : AppColors.textSecondary,
+                                                fontWeight: isRoundTrip ? FontWeight.w600 : FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -154,8 +216,8 @@ class HomeSearchScreen extends ConsumerWidget {
                                       isOrigin: true,
                                     ),
                                     const Padding(
-                                      padding: EdgeInsets.only(left: 40),
-                                      child: Divider(color: AppColors.surface, height: 1),
+                                      padding: EdgeInsets.only(left: 52),
+                                      child: Divider(color: AppColors.surfaceBorder, height: 1),
                                     ),
                                     _buildAirportField(
                                       context: context,
@@ -203,27 +265,43 @@ class HomeSearchScreen extends ConsumerWidget {
                               value: query.departureDate != null ? DateFormat('E, d MMM').format(query.departureDate!) : 'Select',
                               onTap: () => DateSelectionScreen.show(context),
                             ),
-                            const SizedBox(height: 16),
-
-                            // Return Date (only for round-trip)
-                            if (query.tripType == TripType.roundTrip) ...[
-                              _buildInfoField(
-                                context: context,
-                                icon: LucideIcons.calendarCheck,
-                                label: 'Return',
-                                value: query.returnDate != null ? DateFormat('E, d MMM').format(query.returnDate!) : 'Select',
-                                onTap: () => DateSelectionScreen.show(context),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
                             
+                            // Return Date (Animated)
+                            AnimatedSize(
+                              duration: const Duration(milliseconds: 280),
+                              curve: Curves.easeInOutCubic,
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 220),
+                                opacity: isRoundTrip ? 1.0 : 0.0,
+                                child: isRoundTrip
+                                    ? Column(
+                                        children: [
+                                          const SizedBox(height: 16),
+                                          _buildInfoField(
+                                            context: context,
+                                            icon: LucideIcons.calendarCheck,
+                                            label: 'Return',
+                                            value: query.returnDate != null ? DateFormat('E, d MMM').format(query.returnDate!) : 'Select',
+                                            onTap: () => DateSelectionScreen.show(context),
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 16),
                             // Passengers & Class
                             _buildInfoField(
                               context: context,
                               icon: LucideIcons.users,
                               label: 'Passengers & Class',
-                              value: '${query.totalPassengers} Passenger${query.totalPassengers > 1 ? 's' : ''}',
-                              subValue: query.cabinClass.name.replaceAll('Economy', ' Economy').toUpperCase(),
+                              value: query.totalPassengers > 0 
+                                  ? '${query.totalPassengers} Passenger${query.totalPassengers > 1 ? 's' : ''}'
+                                  : 'Select',
+                              subValue: query.totalPassengers > 0 
+                                  ? query.cabinClass.name.replaceAll('Economy', ' Economy').toUpperCase()
+                                  : null,
                               onTap: () => PassengerClassPopup.show(context),
                             ),
                             const SizedBox(height: 24),
@@ -264,35 +342,6 @@ class HomeSearchScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTripTypeButton({required String title, required bool isSelected, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            )
-          ] : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          title,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildAirportField({
     required BuildContext context,
     required WidgetRef ref,
@@ -312,8 +361,14 @@ class HomeSearchScreen extends ConsumerWidget {
           );
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.surfaceBorder, width: 0.6),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         child: Row(
           children: [
             Icon(icon, color: AppColors.primary, size: 24),
@@ -329,7 +384,7 @@ class HomeSearchScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(value, style: AppTextStyles.headingMedium),
+                        Text(value, style: AppTextStyles.displayMedium),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(subValue ?? '', 
@@ -360,12 +415,20 @@ class HomeSearchScreen extends ConsumerWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.surfaceBorder.withValues(alpha: 0.8), width: 0.7),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -377,7 +440,7 @@ class HomeSearchScreen extends ConsumerWidget {
                 children: [
                   Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
                   const SizedBox(height: 4),
-                  Text(value, style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
+                  Text(value, style: AppTextStyles.headingMedium),
                   if (subValue != null) ...[
                     const SizedBox(height: 2),
                     Text(subValue, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),

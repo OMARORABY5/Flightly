@@ -94,7 +94,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
             title: 'Adults',
             subtitle: '12+ years',
             value: adults,
-            onDecrease: adults > 1 ? () {
+            onDecrease: adults > 0 ? () {
               setState(() {
                 adults--;
                 if (infants > adults) infants = adults;
