@@ -58,9 +58,14 @@ class SkyBackground extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: Color(0x17000000), // ~9% black, matches card system
                     blurRadius: 20,
                     offset: Offset(0, -5),
+                  ),
+                  BoxShadow(
+                    color: Color(0x0A000000), // ~4% ambient
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
                   ),
                 ],
               ),

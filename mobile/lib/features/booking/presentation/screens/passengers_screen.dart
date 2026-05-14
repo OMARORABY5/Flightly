@@ -167,9 +167,14 @@ class PassengersScreen extends ConsumerWidget {
             color: AppColors.surface.withValues(alpha: 0.9),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
+                color: Colors.black.withValues(alpha: 0.09),
+                blurRadius: 20,
                 offset: const Offset(0, -5),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
               ),
             ],
           ),

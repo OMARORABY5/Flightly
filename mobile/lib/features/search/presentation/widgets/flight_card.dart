@@ -40,10 +40,19 @@ class FlightCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
+          // Primary elevation shadow
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 28,
+            spreadRadius: 0,
+            offset: const Offset(0, 7),
+          ),
+          // Ambient depth layer
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: const Offset(0, 3),
           ),
         ],
       ),

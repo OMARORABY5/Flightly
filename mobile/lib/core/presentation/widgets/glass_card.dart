@@ -42,11 +42,19 @@ class GlassCard extends StatelessWidget {
           width: 0.8,
         ),
         boxShadow: [
+          // Primary elevation shadow
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.07),
-            blurRadius: 20,
+            color: AppColors.black.withValues(alpha: 0.12),
+            blurRadius: 38,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
+          ),
+          // Ambient depth layer — adds subtle halo
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.06),
+            blurRadius: 14,
+            spreadRadius: 1,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
