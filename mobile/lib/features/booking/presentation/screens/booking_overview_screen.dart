@@ -109,6 +109,7 @@ class _BookingOverviewScreenState
     final totalPrice = outboundPrice + returnPrice;
 
     return Scaffold(
+      backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Review Booking', style: AppTextStyles.headingMedium),

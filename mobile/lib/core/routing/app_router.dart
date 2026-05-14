@@ -45,18 +45,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: initial,
     errorBuilder: (context, state) {
-      // Any unknown route (typo, cached old URL, stale deep link)
-      // silently redirects to login instead of crashing.
-      Future.microtask(() => context.go(RouteConstants.login));
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
-      );
+      // silently redirects to login by returning the LoginScreen
+      return const LoginScreen();
     },
     routes: [
       GoRoute(
         path: '/auth',
-        redirect: (context, state) => RouteConstants.login,
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: RouteConstants.onboarding,

@@ -32,7 +32,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final walletAsync = ref.watch(walletProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,

@@ -44,7 +44,7 @@ class AccountHubScreen extends ConsumerWidget {
     final profileAsync = ref.watch(profileProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
@@ -191,7 +191,7 @@ class AccountHubScreen extends ConsumerWidget {
 
   Widget _buildGuestState(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,

@@ -128,15 +128,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const AmbientBackground(child: SizedBox.shrink()),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      backgroundColor: AppColors.surfaceElevated,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -145,20 +141,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     children: [
                       const Icon(
                         LucideIcons.plane,
-                        size: 64,
+                        size: 56,
                         color: AppColors.primary,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       const Text(
                         'Create an account',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
                       AuthTextField(
                         controller: _nameController,
                         hint: 'Full Name',
@@ -193,7 +189,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.surface.withOpacity(0.5),
+                          color: AppColors.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -219,7 +215,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
                       AuthButton(
                         text: 'Create Account',
                         onPressed: _onRegister,
@@ -242,15 +238,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
     );
   }
 }

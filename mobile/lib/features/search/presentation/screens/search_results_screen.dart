@@ -60,7 +60,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: PremiumAppBar(
         height: 80, // Taller header to comfortably fit two lines of text
         title: Column(

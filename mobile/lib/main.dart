@@ -31,9 +31,9 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light, // Light icons on dark bg
+      statusBarIconBrightness: Brightness.dark, // Dark icons on light bg
       systemNavigationBarColor: AppColors.background,
-      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -88,7 +88,7 @@ class _FlightlyAppState extends ConsumerState<FlightlyApp> {
     return MaterialApp.router(
       title: 'FLIGHTLY',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       routerConfig: router,
     );
   }

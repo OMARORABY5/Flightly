@@ -82,6 +82,7 @@ class _BookingConfirmationScreenState extends ConsumerState<BookingConfirmationS
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         automaticallyImplyLeading: false, // User shouldn't be able to go back to payment

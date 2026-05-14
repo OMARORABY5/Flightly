@@ -1,5 +1,5 @@
 // app_theme.dart — FLIGHTLY Full ThemeData
-// Configures the entire Material 3 dark theme for the app
+// Configures the entire Material 3 light theme for the app
 // WHY: Centralizing theme prevents scattered styling and ensures consistency
 
 import 'package:flutter/material.dart';
@@ -10,13 +10,13 @@ import 'app_text_styles.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get dark {
+  static ThemeData get light {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
 
       // ─── Color Scheme ────────────────────────────────────────────────────
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.surface,
@@ -31,9 +31,9 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
 
       // ─── Typography ───────────────────────────────────────────────────────
-      // Base text theme uses Inter font
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
+      // Base text theme uses DM Sans font
+      textTheme: GoogleFonts.dmSansTextTheme(
+        ThemeData.light().textTheme,
       ).apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
@@ -55,7 +55,6 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.surfaceBorder, width: 1),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
@@ -63,15 +62,15 @@ class AppTheme {
       // ─── Input Fields ─────────────────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.surfaceElevated,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -133,9 +132,9 @@ class AppTheme {
       // ─── Chip (filter tags) ───────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surface,
-        selectedColor: AppColors.primary.withAlpha((0.2 * 255).round()),
+        selectedColor: AppColors.paleBlue,
         checkmarkColor: AppColors.primary,
-        labelStyle: AppTextStyles.labelMedium,
+        labelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
         side: const BorderSide(color: AppColors.surfaceBorder),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

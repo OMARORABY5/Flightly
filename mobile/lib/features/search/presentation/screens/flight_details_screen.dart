@@ -226,7 +226,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       extendBody: true,
       body: Stack(
         fit: StackFit.expand,
@@ -301,7 +301,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
               color: AppColors.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 16,
                   offset: const Offset(0, -4),
                 ),
@@ -606,7 +606,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isRefundable ? AppColors.info.withOpacity(0.1) : AppColors.error.withOpacity(0.1),
+          color: isRefundable ? AppColors.info.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -674,7 +674,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(LucideIcons.edit3, size: 20, color: AppColors.primary),
@@ -696,9 +696,9 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.warning.withOpacity(0.1),
+            color: AppColors.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -725,7 +725,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.1),
+          color: AppColors.success.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(LucideIcons.banknote, size: 20, color: AppColors.success),

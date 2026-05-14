@@ -32,7 +32,7 @@ class SmartBadge extends StatelessWidget {
       // Value & Smart Suggestions
       case SmartBadgeType.bestValue:
       case SmartBadgeType.smartSuggestion:
-        bgColor = Colors.amber.withOpacity(0.15);
+        bgColor = Colors.amber.withValues(alpha: 0.15);
         iconColor = Colors.amber.shade700;
         icon = LucideIcons.star;
         break;
@@ -40,7 +40,7 @@ class SmartBadge extends StatelessWidget {
       // Price
       case SmartBadgeType.cheapest:
       case SmartBadgeType.lowestPrice:
-        bgColor = AppColors.success.withOpacity(0.15);
+        bgColor = AppColors.success.withValues(alpha: 0.15);
         iconColor = AppColors.success;
         icon = LucideIcons.badgeDollarSign;
         break;
@@ -48,7 +48,7 @@ class SmartBadge extends StatelessWidget {
       // Time
       case SmartBadgeType.fastest:
       case SmartBadgeType.shortestDuration:
-        bgColor = Colors.blue.withOpacity(0.15);
+        bgColor = Colors.blue.withValues(alpha: 0.15);
         iconColor = Colors.blue.shade600;
         icon = LucideIcons.zap;
         break;
@@ -56,21 +56,21 @@ class SmartBadge extends StatelessWidget {
       // General Recommendations
       case SmartBadgeType.best:
       case SmartBadgeType.recommended:
-        bgColor = AppColors.primary.withOpacity(0.15);
+        bgColor = AppColors.primary.withValues(alpha: 0.15);
         iconColor = AppColors.primary;
         icon = LucideIcons.award;
         break;
 
       // Popularity
       case SmartBadgeType.popularChoice:
-        bgColor = Colors.purple.withOpacity(0.15);
+        bgColor = Colors.purple.withValues(alpha: 0.15);
         iconColor = Colors.purple.shade600;
         icon = LucideIcons.trendingUp;
         break;
 
       // Urgency / Scarcity
       case SmartBadgeType.limitedSeats:
-        bgColor = AppColors.error.withOpacity(0.15);
+        bgColor = AppColors.error.withValues(alpha: 0.15);
         iconColor = AppColors.error;
         icon = LucideIcons.alertCircle;
         break;
@@ -81,7 +81,7 @@ class SmartBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: iconColor.withOpacity(0.3), width: 1),
+        border: Border.all(color: iconColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

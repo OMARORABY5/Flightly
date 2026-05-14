@@ -53,7 +53,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
@@ -155,9 +155,9 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -174,7 +174,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                 const SizedBox(height: 2),
                 Text(
                   lastCheckedText,
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary.withOpacity(0.8)),
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary.withValues(alpha: 0.8)),
                 ),
               ],
             ),

@@ -37,25 +37,18 @@ class GlassCard extends StatelessWidget {
       // radius without a separate ClipRRect that can cut content too early.
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
+        color: AppColors.surface,
         borderRadius: effectiveBorderRadius,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.surfaceElevated,
-            AppColors.surface,
-          ],
-        ),
         border: Border.all(
-          color: AppColors.surfaceBorder.withValues(alpha: 0.6),
-          width: 1.5,
+          color: AppColors.surfaceBorder.withValues(alpha: 0.8),
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
-            spreadRadius: -4,
-            offset: const Offset(0, 4),
+            color: AppColors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
           ),
         ],
       ),

@@ -7,9 +7,8 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
-import 'package:flightly/core/presentation/widgets/ambient_background.dart';
-import 'package:flightly/core/presentation/widgets/glass_card.dart';
-import 'package:flightly/core/presentation/widgets/custom_text_field.dart';
+import 'package:flightly/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:flightly/features/auth/presentation/widgets/auth_button.dart';
 import 'package:flightly/features/auth/data/repositories/auth_repository_impl.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -120,35 +119,37 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
-      body: AmbientBackground(
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: GlassCard(
-              blur: 20.0,
-              opacity: 0.08,
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    const Icon(
+                      LucideIcons.plane,
+                      size: 56,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
                       'Reset Password',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -157,17 +158,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       _otpSent 
                         ? 'Enter the 6-digit OTP sent to your email to create a new password.'
                         : 'Enter your email address and we will send you an OTP to reset your password.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: const TextStyle(
+                        fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     
                     // Always show email field, but disable if OTP sent
-                    CustomTextField(
-                      label: 'Email',
-                      hint: 'name@example.com',
+                    AuthTextField(
+                      hint: 'Email (name@example.com)',
                       prefixIcon: LucideIcons.mail,
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -178,30 +179,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ),
                     
                     if (!_otpSent) ...[
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: _isRequestingOtp ? null : _onRequestOtp,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: _isRequestingOtp
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              )
-                            : const Text('Send OTP', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 24),
+                      AuthButton(
+                        text: 'Send OTP',
+                        onPressed: _onRequestOtp,
+                        isLoading: _isRequestingOtp,
                       ),
                     ],
 
                     if (_otpSent) ...[
-                      const SizedBox(height: 20),
-                      CustomTextField(
-                        label: 'OTP Code',
-                        hint: '123456',
+                      const SizedBox(height: 16),
+                      AuthTextField(
+                        hint: 'OTP Code (123456)',
                         prefixIcon: LucideIcons.key,
                         controller: _otpController,
                         keyboardType: TextInputType.number,
@@ -211,35 +200,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
-                      CustomTextField(
-                        label: 'New Password',
-                        hint: 'At least 8 characters',
+                      const SizedBox(height: 16),
+                      AuthTextField(
+                        hint: 'New Password (Min 8 chars)',
                         prefixIcon: LucideIcons.lock,
                         isPassword: true,
                         controller: _newPasswordController,
-                        textInputAction: TextInputAction.done,
                         validator: (value) {
                           if (value == null || value.length < 8) return 'Password must be at least 8 characters';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: _isResetting ? null : _onResetPassword,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: _isResetting
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              )
-                            : const Text('Reset Password', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 24),
+                      AuthButton(
+                        text: 'Reset Password',
+                        onPressed: _onResetPassword,
+                        isLoading: _isResetting,
                       ),
                     ],
                   ],
@@ -248,7 +224,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }

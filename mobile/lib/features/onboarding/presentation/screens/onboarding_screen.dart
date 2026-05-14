@@ -34,15 +34,15 @@ class OnboardingScreen extends ConsumerWidget {
             height: 1.6,
           ),
       bodyPadding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16.0),
-      pageColor: AppColors.background,
+      pageColor: AppColors.surfaceElevated,
       imagePadding: const EdgeInsets.only(top: 60, bottom: 24),
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       body: SafeArea(
         child: IntroductionScreen(
-          globalBackgroundColor: AppColors.background,
+          globalBackgroundColor: AppColors.surfaceElevated,
           allowImplicitScrolling: true,
           initialPage: 0,
           pages: [

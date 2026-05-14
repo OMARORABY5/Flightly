@@ -44,7 +44,7 @@ class _AmbientBackgroundState extends State<AmbientBackground>
       clipBehavior: Clip.none,
       children: [
         // ── Solid background colour ──────────────────────────────────────────
-        const ColoredBox(color: AppColors.background),
+        // Removed to let Scaffold background color shine through
 
         // ── Orb 1: Top Right ────────────────────────────────────────────────
         AnimatedBuilder(
@@ -52,7 +52,7 @@ class _AmbientBackgroundState extends State<AmbientBackground>
           builder: (context, _) => Positioned(
             top: -100 + (sin(_controller.value * 2 * pi) * 50),
             right: -100 + (cos(_controller.value * 2 * pi) * 30),
-            child: _buildOrb(AppColors.primary, size: 400, opacity: 0.15),
+            child: _buildOrb(AppColors.skyBlue, size: 400, opacity: 0.05),
           ),
         ),
 
@@ -62,7 +62,7 @@ class _AmbientBackgroundState extends State<AmbientBackground>
           builder: (context, _) => Positioned(
             bottom: -150 + (cos(_controller.value * 2 * pi) * 60),
             left: -100 + (sin(_controller.value * 2 * pi) * 40),
-            child: _buildOrb(AppColors.badgeBest, size: 450, opacity: 0.12),
+            child: _buildOrb(AppColors.primary, size: 450, opacity: 0.03),
           ),
         ),
 

@@ -106,7 +106,7 @@ class HomeSearchScreen extends ConsumerWidget {
                             // Trip Type Toggle
                             Container(
                               decoration: BoxDecoration(
-                                color: AppColors.surface.withOpacity(0.5),
+                                color: AppColors.surfaceElevated,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
@@ -181,7 +181,7 @@ class HomeSearchScreen extends ConsumerWidget {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppColors.primary.withOpacity(0.3),
+                                            color: AppColors.primary.withValues(alpha: 0.3),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           )
@@ -247,7 +247,7 @@ class HomeSearchScreen extends ConsumerWidget {
                                 minimumSize: const Size(double.infinity, 56),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                 elevation: query.isValid ? 8 : 0,
-                                shadowColor: AppColors.primary.withOpacity(0.5),
+                                shadowColor: AppColors.primary.withValues(alpha: 0.5),
                               ),
                               child: Text('Search Flights', style: AppTextStyles.button),
                             ),
@@ -275,7 +275,7 @@ class HomeSearchScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected ? [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             )
@@ -340,7 +340,7 @@ class HomeSearchScreen extends ConsumerWidget {
                       ],
                     )
                   else
-                    Text('Select Airport', style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary.withOpacity(0.5))),
+                    Text('Select Airport', style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary.withValues(alpha: 0.5))),
                 ],
               ),
             ),
@@ -364,7 +364,7 @@ class HomeSearchScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.5),
+          color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

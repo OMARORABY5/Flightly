@@ -104,6 +104,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     final remainingToPay = widget.booking.totalPrice - walletApplied;
 
     return Scaffold(
+      backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Payment', style: AppTextStyles.headingMedium),

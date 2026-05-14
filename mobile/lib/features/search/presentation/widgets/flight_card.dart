@@ -36,12 +36,12 @@ class FlightCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceBorder, width: 1),
+        border: Border.all(color: AppColors.surfaceBorder.withValues(alpha: 0.8), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -175,7 +175,7 @@ class FlightCard extends StatelessWidget {
                   ),
                   Text(
                     '${flight.totalPrice.toStringAsFixed(0)} EGP',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary),
                   ),
                 ],
               ),

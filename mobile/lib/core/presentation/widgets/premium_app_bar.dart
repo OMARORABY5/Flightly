@@ -35,14 +35,15 @@ class PremiumAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: EdgeInsets.only(top: topPadding)
               .add(padding),
           decoration: BoxDecoration(
-            color: AppColors.background.withOpacity(0.65),
-            border: showBottomBorder
-                ? Border(
-                    bottom: BorderSide(
-                      color: AppColors.surfaceBorder.withOpacity(0.3),
-                      width: 1,
+            color: AppColors.background.withValues(alpha: 0.90),
+            boxShadow: showBottomBorder
+                ? [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                  )
+                  ]
                 : null,
           ),
           child: Row(

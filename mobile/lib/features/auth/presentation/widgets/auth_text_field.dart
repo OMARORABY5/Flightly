@@ -52,7 +52,7 @@ class AuthTextField extends StatelessWidget {
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.surfaceElevated,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
     );

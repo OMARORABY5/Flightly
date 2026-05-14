@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
-import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/domain/smart_pricing/flight_recommendation_engine.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -40,8 +40,20 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: GlassCard(
-        padding: const EdgeInsets.all(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.paleBlue,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,7 +63,7 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.15),
+                    color: iconColor.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(iconData, color: iconColor, size: 20),
@@ -109,7 +121,7 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                 child: ElevatedButton(
                   onPressed: () => widget.onViewAlternative!(widget.recommendation.alternativeFlight!),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary.withOpacity(0.15),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
                     foregroundColor: AppColors.primary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

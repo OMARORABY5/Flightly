@@ -23,6 +23,7 @@ class PassengersScreen extends ConsumerWidget {
     // Guard: require login before making any API call
     if (authState is! AuthAuthenticated) {
       return Scaffold(
+        backgroundColor: AppColors.surfaceElevated,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           title: Text('Select Passengers', style: AppTextStyles.headingMedium),
@@ -70,6 +71,7 @@ class PassengersScreen extends ConsumerWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: AppColors.surfaceElevated,
         extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Select Passengers', style: AppTextStyles.headingMedium),
@@ -167,10 +169,10 @@ class PassengersScreen extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.background.withOpacity(0.9),
+            color: AppColors.surface.withValues(alpha: 0.9),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -200,14 +202,14 @@ class PassengersScreen extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           disabledBackgroundColor: AppColors.surface,
-                          disabledForegroundColor: AppColors.textSecondary.withOpacity(0.5),
+                          disabledForegroundColor: AppColors.textSecondary.withValues(alpha: 0.5),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: Text(
                           'Done (${selectedPassengers.length})',
                           style: AppTextStyles.button.copyWith(
-                            color: selectedPassengers.isNotEmpty ? Colors.white : AppColors.textSecondary.withOpacity(0.5),
+                            color: selectedPassengers.isNotEmpty ? Colors.white : AppColors.textSecondary.withValues(alpha: 0.5),
                           ),
                         ),
                       ),

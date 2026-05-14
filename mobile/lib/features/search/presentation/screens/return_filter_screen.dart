@@ -97,7 +97,7 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
     final airlinesAsync = ref.watch(availableAirlinesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       body: AmbientBackground(
         child: SafeArea(
           child: Column(
@@ -278,7 +278,7 @@ class _ReturnFilterScreenState extends ConsumerState<ReturnFilterScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: AppColors.background.withValues(alpha: 0.9),
+        color: AppColors.surface.withValues(alpha: 0.9),
         padding: EdgeInsets.only(
           left: 20,
           right: 20,

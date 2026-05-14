@@ -75,7 +75,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final cfg = _statusConfig;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,

@@ -196,6 +196,7 @@ class _AddEditPassengerScreenState extends ConsumerState<AddEditPassengerScreen>
     final isEditing = widget.passenger != null;
 
     return Scaffold(
+      backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(isEditing ? 'Edit Passenger' : 'Add Passenger', style: AppTextStyles.headingMedium),

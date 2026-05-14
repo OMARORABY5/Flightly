@@ -25,7 +25,7 @@ class NotificationsScreen extends ConsumerWidget {
     final notifier = ref.read(notificationNotifierProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
@@ -118,7 +118,7 @@ class NotificationsScreen extends ConsumerWidget {
 
   Widget _buildGuestState(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceElevated,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
@@ -246,14 +246,14 @@ class NotificationsScreen extends ConsumerWidget {
         },
         child: Container(
           padding: const EdgeInsets.all(16),
-          color: notification.isRead ? Colors.transparent : AppColors.primary.withOpacity(0.05),
+          color: notification.isRead ? Colors.transparent : AppColors.primary.withValues(alpha: 0.05),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(iconData, color: iconColor, size: 20),

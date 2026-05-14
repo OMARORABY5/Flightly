@@ -188,6 +188,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         pricePerPax * (selectedPassengers.isEmpty ? 1 : selectedPassengers.length);
 
     return Scaffold(
+      backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
@@ -452,8 +453,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withOpacity(0.1),
-                        border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                        color: AppColors.warning.withValues(alpha: 0.1),
+                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

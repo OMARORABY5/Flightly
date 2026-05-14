@@ -68,154 +68,134 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState is AuthLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const AmbientBackground(child: SizedBox.shrink()),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Icon(
-                        LucideIcons.plane,
-                        size: 64,
-                        color: AppColors.primary,
+      backgroundColor: AppColors.surfaceElevated,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(
+                    LucideIcons.plane,
+                    size: 56,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Login to your account',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  AuthTextField(
+                    controller: _emailController,
+                    hint: 'Email',
+                    prefixIcon: LucideIcons.mail,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Please enter your email';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AuthTextField(
+                    controller: _passwordController,
+                    hint: 'Password',
+                    prefixIcon: LucideIcons.lock,
+                    isPassword: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Please enter your password';
+                      return null;
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => context.push(RouteConstants.forgotPassword),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Login to your account',
-                        textAlign: TextAlign.center,
+                      child: const Text(
+                        'Forgot Password?',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      AuthTextField(
-                        controller: _emailController,
-                        hint: 'Email',
-                        prefixIcon: LucideIcons.mail,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return 'Please enter your email';
-                          return null;
-                        },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AuthButton(
+                    text: 'Sign In',
+                    onPressed: _onLogin,
+                    isLoading: isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Don't have an account? ",
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                       ),
-                      const SizedBox(height: 16),
-                      AuthTextField(
-                        controller: _passwordController,
-                        hint: 'Password',
-                        prefixIcon: LucideIcons.lock,
-                        isPassword: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return 'Please enter your password';
-                          return null;
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => context.push(RouteConstants.forgotPassword),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      AuthButton(
-                        text: 'Sign In',
-                        onPressed: _onLogin,
-                        isLoading: isLoading,
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Don't have an account? ",
-                            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                          ),
-                          GestureDetector(
-                            onTap: () => context.pushReplacement(RouteConstants.register),
-                            child: const Text(
-                              'Sign up',
-                              style: TextStyle(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      const Row(
-                        children: [
-                          Expanded(child: Divider(color: AppColors.surfaceBorder)),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'Or',
-                              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                            ),
-                          ),
-                          Expanded(child: Divider(color: AppColors.surfaceBorder)),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: SocialAuthButton(
-                              icon: Image.asset('assets/icons/google_logo.png', width: 24, height: 24),
-                              onPressed: () {},
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: SocialAuthButton(
-                              icon: Image.asset('assets/icons/facebook_logo.png', width: 24, height: 24),
-                              onPressed: () {},
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      Center(
-                        child: TextButton(
-                          onPressed: _continueAsGuest,
-                          child: const Text(
-                            'Continue as Guest',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
+                      GestureDetector(
+                        onTap: () => context.pushReplacement(RouteConstants.register),
+                        child: const Text(
+                          'Sign up',
+                          style: TextStyle(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  const Row(
+                    children: [
+                      Expanded(child: Divider(color: AppColors.surfaceBorder)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Or',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: AppColors.surfaceBorder)),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: SocialAuthButton(
+                          icon: Image.asset('assets/icons/google_logo.png', width: 24, height: 24),
+                          onPressed: () {},
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: SocialAuthButton(
+                          icon: Image.asset('assets/icons/facebook_logo.png', width: 24, height: 24),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
