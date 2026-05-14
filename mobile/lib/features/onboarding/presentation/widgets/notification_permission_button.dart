@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flightly/core/providers/storage_provider.dart';
 import 'package:flightly/core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flightly/core/constants/route_constants.dart';
+import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
 
 class NotificationPermissionButton extends ConsumerStatefulWidget {
   const NotificationPermissionButton({super.key});
@@ -35,6 +38,13 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
     }
   }
 
+  Future<void> _finishOnboarding() async {
+    await ref.read(onboardingProvider.notifier).completeOnboarding();
+    if (mounted) {
+      context.go(RouteConstants.login);
+    }
+  }
+
   Future<void> _requestPermission() async {
     setState(() => _isRequesting = true);
     
@@ -45,27 +55,19 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
       await ref.read(storageServiceProvider).setNotificationPermissionStatus(
         status.isGranted ? 'granted' : 'denied'
       );
-
-      if (mounted) {
-        setState(() {
-          _isGranted = status.isGranted;
-          _isRequesting = false;
-        });
-      }
     } catch (e) {
       debugPrint('Permission request failed: $e');
-      if (mounted) {
-        setState(() {
-          _isRequesting = false;
-        });
-      }
     }
+    
+    await _finishOnboarding();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isGranted) {
-      return Container(
+      return GestureDetector(
+        onTap: _finishOnboarding,
+        child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         decoration: BoxDecoration(
           color: AppColors.success.withValues(alpha: 0.1),
@@ -95,54 +97,44 @@ class _NotificationPermissionButtonState extends ConsumerState<NotificationPermi
             ),
           ],
         ),
+        ),
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: AppColors.primaryGradient,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.4),
-            blurRadius: 24,
-            spreadRadius: 2,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _isRequesting ? null : _requestPermission,
+    return ElevatedButton(
+      onPressed: _isRequesting ? null : _requestPermission,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 32),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _isRequesting 
-                    ? const SizedBox(
-                        width: 24, 
-                        height: 24, 
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white)
-                      )
-                    : const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 24),
-                const SizedBox(width: 12),
-                const Text(
-                  'Enable Notifications',
-                  style: TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.w700, 
-                    color: Colors.white,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
+        ),
+        elevation: 4,
+        shadowColor: AppColors.primary.withValues(alpha: 0.4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_isRequesting)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+            )
+          else
+            const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 24),
+          const SizedBox(width: 12),
+          const Text(
+            'Enable Notifications',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: 0.5,
             ),
           ),
-        ),
+        ],
       ),
     );
   }

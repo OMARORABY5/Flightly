@@ -6,6 +6,7 @@ class RouteConstants {
   RouteConstants._();
 
   // ─── Onboarding ───────────────────────────────────────────────────────────
+  static const String welcome = '/welcome';
   static const String onboarding = '/onboarding';
 
   // ─── Auth ────────────────────────────────────────────────────────────────

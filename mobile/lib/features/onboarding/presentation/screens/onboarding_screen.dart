@@ -10,8 +10,15 @@ import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/features/onboarding/providers/onboarding_provider.dart';
 import 'package:flightly/features/onboarding/presentation/widgets/notification_permission_button.dart';
 
-class OnboardingScreen extends ConsumerWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
+
+  @override
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+  int _currentPage = 0;
 
   void _onIntroEnd(BuildContext context, WidgetRef ref) async {
     // Mark onboarding as completed
@@ -22,172 +29,118 @@ class OnboardingScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final pageDecoration = PageDecoration(
       titleTextStyle: Theme.of(context).textTheme.headlineMedium!.copyWith(
             fontWeight: FontWeight.w900,
             letterSpacing: -0.5,
-            color: AppColors.textPrimary,
+            color: const Color(0xFF1A2340),
           ),
       bodyTextStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-            color: AppColors.textSecondary,
+            color: const Color(0xFF4A5568),
             height: 1.6,
           ),
       bodyPadding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16.0),
-      pageColor: AppColors.surfaceElevated,
-      imagePadding: const EdgeInsets.only(top: 60, bottom: 24),
+      pageColor: const Color(0xFFF0F4FF),
+      imagePadding: const EdgeInsets.only(top: 40, bottom: 0),
     );
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: const Color(0xFFF0F4FF),
       body: SafeArea(
-        child: IntroductionScreen(
-          globalBackgroundColor: AppColors.surfaceElevated,
-          allowImplicitScrolling: true,
-          initialPage: 0,
-          pages: [
-            PageViewModel(
-              title: "Find Your Perfect Flight",
-              body: "Explore the world's best destinations with our intelligent search engine. We make discovering your next journey effortless.",
-              image: const _IllustrationPlaceholder(
-                icon: LucideIcons.globe,
-                color: AppColors.primary,
+        child: Stack(
+          children: [
+            IntroductionScreen(
+              globalBackgroundColor: const Color(0xFFF0F4FF),
+              allowImplicitScrolling: true,
+              initialPage: 0,
+              onChange: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              pages: [
+                PageViewModel(
+                  title: "Find Your Perfect Flight",
+                  body: "Explore the world's best destinations with our intelligent search engine. We make discovering your next journey effortless.",
+                  image: const _OnboardingIllustration('assets/images/Welcome One.png'),
+                  decoration: pageDecoration,
+                ),
+                PageViewModel(
+                  title: "Compare & Save",
+                  body: "Seamless booking experience with smart pricing. We compare thousands of flights to get you the absolute best deal.",
+                  image: const _OnboardingIllustration('assets/images/Welcome Two.png'),
+                  decoration: pageDecoration,
+                ),
+                PageViewModel(
+                  title: "Stay Updated",
+                  body: "Never miss a flight update. Enable notifications to receive instant alerts about gate changes, delays, and exclusive deals.",
+                  image: const _OnboardingIllustration('assets/images/Welcome Three.png'),
+                  decoration: pageDecoration,
+                ),
+              ],
+              onDone: () => _onIntroEnd(context, ref),
+              onSkip: () => _onIntroEnd(context, ref),
+              showSkipButton: _currentPage != 2,
+              isProgress: _currentPage != 2,
+              showDoneButton: false,
+              skipOrBackFlex: 0,
+              nextFlex: 0,
+              showBackButton: false,
+              back: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+              skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF4A5568))),
+              next: const Icon(Icons.arrow_forward_rounded, color: AppColors.primary, size: 28),
+              done: const Text('Get Started', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.primary)),
+              curve: Curves.fastLinearToSlowEaseIn,
+              controlsMargin: const EdgeInsets.only(bottom: 40, left: 24, right: 24),
+              controlsPadding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+              dotsDecorator: const DotsDecorator(
+                size: Size(8.0, 8.0),
+                color: Color(0xFFBBCCEE),
+                activeSize: Size(24.0, 8.0),
+                activeColor: AppColors.primary,
+                activeShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
               ),
-              decoration: pageDecoration,
             ),
-            PageViewModel(
-              title: "Compare & Save",
-              body: "Seamless booking experience with smart pricing. We compare thousands of flights to get you the absolute best deal.",
-              image: const _IllustrationPlaceholder(
-                icon: LucideIcons.planeTakeoff,
-                color: AppColors.accent,
-              ),
-              decoration: pageDecoration,
-            ),
-            PageViewModel(
-              title: "Stay Updated",
-              body: "Never miss a flight update. Enable notifications to receive instant alerts about gate changes, delays, and exclusive deals.",
-              image: const _IllustrationPlaceholder(
-                icon: LucideIcons.bellRing,
-                color: AppColors.success,
-              ),
-              footer: const Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                child: NotificationPermissionButton(),
-              ),
-              decoration: pageDecoration,
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              bottom: _currentPage == 2 ? 40 : -100, // Slide up exactly when needed
+              left: 24,
+              right: 24,
+              child: const NotificationPermissionButton(),
             ),
           ],
-          onDone: () => _onIntroEnd(context, ref),
-          onSkip: () => _onIntroEnd(context, ref),
-          showSkipButton: true,
-          skipOrBackFlex: 0,
-          nextFlex: 0,
-          showBackButton: false,
-          back: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textSecondary)),
-          next: const Icon(Icons.arrow_forward_rounded, color: AppColors.primary, size: 28),
-          done: const Text('Get Started', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.primary)),
-          curve: Curves.fastLinearToSlowEaseIn,
-          controlsMargin: const EdgeInsets.all(24),
-          controlsPadding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          dotsDecorator: DotsDecorator(
-            size: const Size(10.0, 10.0),
-            color: AppColors.surfaceBorder,
-            activeSize: const Size(24.0, 10.0),
-            activeColor: AppColors.primary,
-            activeShape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            ),
-          ),
         ),
       ),
     );
   }
 }
 
-/// A highly stylized, multi-layered glowing icon container to serve as 
-/// a premium placeholder illustration.
-class _IllustrationPlaceholder extends StatelessWidget {
-  final IconData icon;
-  final Color color;
+class _OnboardingIllustration extends StatelessWidget {
+  final String assetPath;
 
-  const _IllustrationPlaceholder({
-    required this.icon,
-    required this.color,
-  });
+  const _OnboardingIllustration(this.assetPath);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Outer Glow
-          Container(
-            width: 240,
-            height: 240,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.15),
-                  blurRadius: 60,
-                  spreadRadius: 20,
-                ),
-              ],
-            ),
-          ),
-          // Inner translucent container
-          Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  color.withValues(alpha: 0.2),
-                  color.withValues(alpha: 0.05),
-                ],
-              ),
-              border: Border.all(
-                color: color.withValues(alpha: 0.3),
-                width: 2,
-              ),
-            ),
-          ),
-          // Core Icon container
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  color,
-                  color.withValues(alpha: 0.7),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              size: 56,
-              color: Colors.white,
-            ),
+    return Container(
+      height: 280,
+      alignment: Alignment.bottomCenter,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.05),
+            blurRadius: 30,
+            offset: const Offset(0, 20),
           ),
         ],
+      ),
+      child: Image.asset(
+        assetPath,
+        fit: BoxFit.contain,
       ),
     );
   }

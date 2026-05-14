@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
+import 'package:flightly/features/onboarding/presentation/screens/welcome_screen.dart';
 import 'package:flightly/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flightly/features/auth/presentation/screens/login_screen.dart';
 import 'package:flightly/features/auth/presentation/screens/register_screen.dart';
@@ -35,7 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   // and destroying the navigation stack every time auth state changes (e.g. to Loading)
   final authState = ref.read(authProvider);
 
-  String initial = RouteConstants.onboarding;
+  String initial = RouteConstants.welcome;
   if (isOnboardingCompleted) {
     initial = authState is AuthAuthenticated 
         ? RouteConstants.home 
@@ -52,6 +53,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/auth',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: RouteConstants.onboarding,
