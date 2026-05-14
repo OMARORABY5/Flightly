@@ -170,11 +170,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_formatTime(f.departureTime), style: AppTextStyles.displayMedium),
+                            Text(_formatTime(f.departureTime), style: AppTextStyles.timeDisplay),
                             const SizedBox(height: 2),
-                            Text(f.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary)),
+                            Text(f.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
                             const SizedBox(height: 2),
-                            Text(f.originCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                            Text(f.originCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint)),
                           ],
                         ),
                       ),
@@ -198,11 +198,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(_formatTime(f.arrivalTime), style: AppTextStyles.displayMedium),
+                            Text(_formatTime(f.arrivalTime), style: AppTextStyles.timeDisplay),
                             const SizedBox(height: 2),
-                            Text(f.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.primary)),
+                            Text(f.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
                             const SizedBox(height: 2),
-                            Text(f.destinationCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                            Text(f.destinationCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint)),
                           ],
                         ),
                       ),
@@ -270,11 +270,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(_formatTime(trip.returnFlight!.departureTime), style: AppTextStyles.displayMedium),
+                              Text(_formatTime(trip.returnFlight!.departureTime), style: AppTextStyles.timeDisplay),
                               const SizedBox(height: 2),
-                              Text(trip.returnFlight!.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.accent)),
+                              Text(trip.returnFlight!.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
                               const SizedBox(height: 2),
-                              Text(trip.returnFlight!.originCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                              Text(trip.returnFlight!.originCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint)),
                             ],
                           ),
                         ),
@@ -298,11 +298,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(_formatTime(trip.returnFlight!.arrivalTime), style: AppTextStyles.displayMedium),
+                              Text(_formatTime(trip.returnFlight!.arrivalTime), style: AppTextStyles.timeDisplay),
                               const SizedBox(height: 2),
-                              Text(trip.returnFlight!.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.accent)),
+                              Text(trip.returnFlight!.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
                               const SizedBox(height: 2),
-                              Text(trip.returnFlight!.destinationCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                              Text(trip.returnFlight!.destinationCity ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint)),
                             ],
                           ),
                         ),

@@ -35,24 +35,16 @@ class FlightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFCDD5E0), width: 1),
         boxShadow: [
-          // Primary elevation shadow
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 28,
-            spreadRadius: 0,
-            offset: const Offset(0, 7),
-          ),
-          // Ambient depth layer
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, 3),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -148,7 +140,7 @@ class FlightCard extends StatelessWidget {
                           children: [
                             Text(
                               '${flight.originIata} - ${flight.destinationIata}',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
                             ),
                             const SizedBox(width: 4),
                             Flexible(

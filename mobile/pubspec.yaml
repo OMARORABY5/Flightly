@@ -19,6 +19,7 @@ dependencies:
 
   # ─── Networking ──────────────────────────────────────────────────────────────
   dio: ^5.4.3                    # HTTP client with interceptors
+  http: ^1.2.2                   # Lightweight HTTP for PDF logo fetching
   connectivity_plus: ^6.0.3      # Network connectivity detection
 
   # ─── Secure Storage ──────────────────────────────────────────────────────────

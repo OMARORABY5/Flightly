@@ -55,7 +55,10 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: PremiumAppBar(
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        centerTitle: true,
         title: Text('Watchlist', style: AppTextStyles.headingMedium),
         actions: [
           if (authState is AuthAuthenticated)
@@ -122,7 +125,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: savedFlights.length + 1,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            separatorBuilder: (context, index) => const SizedBox(height: 24),
             itemBuilder: (context, index) {
               if (index == 0) {
                 return _buildMonitoringBanner(context, savedFlights.length);

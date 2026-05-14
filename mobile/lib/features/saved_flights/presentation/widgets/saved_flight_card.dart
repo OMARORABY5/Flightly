@@ -61,9 +61,16 @@ class SavedFlightCard extends ConsumerWidget {
 
     return Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.surfaceBorder),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFCDD5E0), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -126,33 +133,29 @@ class SavedFlightCard extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               
-              // Route
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(flight.originIata, style: AppTextStyles.headingLarge),
-                  const Icon(LucideIcons.arrowRight, color: AppColors.primary, size: 20),
-                  Text(flight.destinationIata, style: AppTextStyles.headingLarge),
-                ],
-              ),
-              const SizedBox(height: 8),
-              
-              // Date & Time
+              // Times & Route
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_formatTime(flight.departureTime), style: AppTextStyles.bodyMedium),
-                      Text(_formatDate(flight.departureTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                      Text(_formatTime(flight.departureTime), style: AppTextStyles.timeDisplay),
+                      const SizedBox(height: 2),
+                      Text(flight.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
+                      const SizedBox(height: 2),
+                      Text(_formatDate(flight.departureTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
                     ],
                   ),
+                  const Icon(LucideIcons.arrowRight, color: AppColors.primary, size: 24),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(_formatTime(flight.arrivalTime), style: AppTextStyles.bodyMedium),
-                      Text(_formatDate(flight.arrivalTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                      Text(_formatTime(flight.arrivalTime), style: AppTextStyles.timeDisplay),
+                      const SizedBox(height: 2),
+                      Text(flight.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
+                      const SizedBox(height: 2),
+                      Text(_formatDate(flight.arrivalTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
                     ],
                   ),
                 ],

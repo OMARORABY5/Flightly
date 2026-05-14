@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:http/http.dart' as http;
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class TicketPdfService {
   // ─── Palette: navy-first, minimal accent ────────────────────────────────────
@@ -18,13 +21,27 @@ class TicketPdfService {
   static const _border = PdfColor.fromInt(0xFFC8D8EE);
   static const _grey   = PdfColor.fromInt(0xFF6B7A99);
 
+  // ─── Resolve ticket status from context ────────────────────────────────────
+  /// Call this from the calling site to get the correct status string to pass
+  /// into [generateAndShareTicket] / [generateForBooking].
+  ///
+  ///  - Booking confirmation → always 'confirmed'
+  ///  - Upcoming trip        → 'confirmed'
+  ///  - Completed trip       → 'flown'
+  ///  - Cancelled trip       → 'cancelled'
+  static String resolveForTrip(Trip trip) {
+    if (trip.isCancelled) return 'cancelled';
+    if (trip.isCompleted) return 'flown';
+    return 'confirmed'; // upcoming
+  }
+
   // ─── Public API ─────────────────────────────────────────────────────────────
   static Future<void> generateAndShareTicket(Trip trip) async {
     final oLogo = await _logo(trip.flight.airlineLogoUrl);
     final rLogo = trip.returnFlight != null ? await _logo(trip.returnFlight!.airlineLogoUrl) : null;
     final bytes = await _render(
       ref: trip.reference, isRT: trip.isRoundTrip,
-      status: trip.status, pay: trip.paymentStatus, created: trip.createdAt,
+      resolvedStatus: resolveForTrip(trip), created: trip.createdAt,
       oCode: trip.flight.originIata,      oCity: trip.flight.originCity ?? '',
       dCode: trip.flight.destinationIata, dCity: trip.flight.destinationCity ?? '',
       oDep: trip.flight.departureTime,    oArr: trip.flight.arrivalTime,
@@ -38,7 +55,8 @@ class TicketPdfService {
       pax: trip.passengers, cabin: trip.cabinClass,
       paxCount: trip.passengerCount, total: trip.totalPrice,
     );
-    await Printing.sharePdf(bytes: bytes, filename: 'Flightly_${trip.reference}.pdf');
+    if (bytes.isEmpty) throw Exception('PDF generation produced empty output');
+    await _downloadBytes(bytes, 'Flightly_${trip.reference}.pdf');
   }
 
   static Future<void> generateForBooking(Booking booking) async {
@@ -46,7 +64,8 @@ class TicketPdfService {
     final rLogo = booking.returnFlight != null ? await _logo(booking.returnFlight!.airlineLogoUrl) : null;
     final bytes = await _render(
       ref: booking.reference, isRT: booking.tripType == 'round_trip',
-      status: booking.status, pay: booking.paymentStatus, created: booking.createdAt,
+      resolvedStatus: 'confirmed', // Always confirmed right after payment
+      created: booking.createdAt,
       oCode: booking.outboundFlight.originIata,      oCity: booking.outboundFlight.originCity ?? '',
       dCode: booking.outboundFlight.destinationIata, dCity: booking.outboundFlight.destinationCity ?? '',
       oDep: booking.outboundFlight.departureTime,    oArr: booking.outboundFlight.arrivalTime,
@@ -60,18 +79,47 @@ class TicketPdfService {
       pax: booking.passengers.map((p) => p.fullName).toList(),
       cabin: booking.cabinClass, paxCount: booking.passengers.length, total: booking.totalPrice,
     );
-    await Printing.sharePdf(bytes: bytes, filename: 'Flightly_${booking.reference}.pdf');
+    if (bytes.isEmpty) throw Exception('PDF generation produced empty output');
+    await _downloadBytes(bytes, 'Flightly_${booking.reference}.pdf');
   }
 
+  // ─── Web-safe download ──────────────────────────────────────────────────────────────
+  // On web, Printing.sharePdf opens the browser print dialog which the user
+  // must then manually save.  Instead, trigger a real file download via
+  // a temporary <a> element so the PDF lands directly in Downloads.
+  static Future<void> _downloadBytes(Uint8List bytes, String filename) async {
+    final blob = html.Blob([bytes], 'application/pdf');
+    final url  = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', filename)
+      ..style.display = 'none';
+    html.document.body!.append(anchor);
+    anchor.click();
+    anchor.remove();
+    html.Url.revokeObjectUrl(url);
+  }
+
+  // ─── Safe logo fetch ─────────────────────────────────────────────────────────────
+  // networkImage() fails on web due to CORS and causes the entire PDF page
+  // to corrupt.  We fetch manually and fall back to null gracefully.
   static Future<pw.ImageProvider?> _logo(String? url) async {
-    if (url == null || url.isEmpty) return null;
-    try { return await networkImage(url); } catch (_) { return null; }
+    if (url == null || url.trim().isEmpty) return null;
+    try {
+      final response = await http.get(Uri.parse(url))
+          .timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+        return pw.MemoryImage(response.bodyBytes);
+      }
+      return null;
+    } catch (_) {
+      return null; // Never let a logo failure break the PDF
+    }
   }
 
   // ─── Core renderer — single pw.Page, no Expanded/Spacer ─────────────────────
   static Future<Uint8List> _render({
     required String ref, required bool isRT,
-    required String status, required String pay, required DateTime created,
+    required String resolvedStatus, required DateTime created,
     required String oCode, required String oCity,
     required String dCode, required String dCity,
     required DateTime oDep, required DateTime oArr,
@@ -83,7 +131,7 @@ class TicketPdfService {
     required List<String> pax, required String cabin,
     required int paxCount, required double total,
   }) async {
-    final badge  = _badge(status, pay);
+    final badge  = _badge(resolvedStatus);
     final cabStr = _cabinLabel(cabin);
     final bag    = cabin.toLowerCase().contains('business') ? '32 kg' : '23 kg';
 
@@ -361,12 +409,14 @@ class TicketPdfService {
     ]),
   );
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-  static ({PdfColor color, String label}) _badge(String status, String pay) {
-    if (status == 'cancelled')     return (color: _red,    label: 'CANCELLED');
-    if (pay == 'refunded')         return (color: _orange, label: 'REFUNDED');
-    if (pay == 'paid')             return (color: _green,  label: 'CONFIRMED');
-    return                                (color: _orange, label: 'PENDING');
+  // ── Status badge — driven by a single resolved status string ────────────────
+  // Statuses: 'confirmed' | 'flown' | 'cancelled'
+  static ({PdfColor color, String label}) _badge(String resolvedStatus) {
+    switch (resolvedStatus) {
+      case 'cancelled': return (color: _red,    label: 'CANCELLED');
+      case 'flown':     return (color: _steel,  label: 'CONFIRMED & FLOWN');
+      default:          return (color: _green,  label: 'CONFIRMED');
+    }
   }
 
   static String _cabinLabel(String c) {

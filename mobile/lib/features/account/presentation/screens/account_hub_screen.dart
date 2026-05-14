@@ -46,7 +46,10 @@ class AccountHubScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: PremiumAppBar(
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        centerTitle: true,
         title: Text('Account', style: AppTextStyles.headingMedium),
       ),
       body: RefreshIndicator(
@@ -194,6 +197,7 @@ class AccountHubScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
+        centerTitle: true,
         title: Text('Account', style: AppTextStyles.headingMedium),
       ),
       body: Center(

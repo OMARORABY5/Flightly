@@ -254,15 +254,6 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                       delegate: SliverChildListDelegate([
                         _buildFlightHeader(flight),
                         const SizedBox(height: 24),
-                        if (flight.seatAvailability != null || flight.priceTrend != null)
-                          _buildSmartPricingBanner(flight),
-                        const SizedBox(height: 24),
-                        _buildTripDetails(flight),
-                        const SizedBox(height: 24),
-                        _buildBaggageAndClass(flight),
-                        const SizedBox(height: 24),
-                        _buildPolicies(flight),
-                        const SizedBox(height: 24),
                         if (recommendation != null) ...[
                           SmartSuggestionCard(
                             recommendation: recommendation,
@@ -279,7 +270,17 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                               );
                             },
                           ),
+                          const SizedBox(height: 24),
                         ],
+                        if (flight.seatAvailability != null || flight.priceTrend != null) ...[
+                          _buildSmartPricingBanner(flight),
+                          const SizedBox(height: 24),
+                        ],
+                        _buildTripDetails(flight),
+                        const SizedBox(height: 24),
+                        _buildBaggageAndClass(flight),
+                        const SizedBox(height: 24),
+                        _buildPolicies(flight),
                         const SizedBox(height: 120), // Padding for bottom booking bar
                       ]),
                     ),
@@ -451,12 +452,28 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
     );
   }
 
+  String _formatAvailability(String availability) {
+    switch (availability.toLowerCase()) {
+      case 'high':
+        return 'High Seat Availability';
+      case 'medium':
+      case 'good':
+        return 'Good Seat Availability';
+      case 'low':
+      case 'limited':
+        return 'Limited Seats Remaining';
+      case 'available':
+      default:
+        return 'Seats Available';
+    }
+  }
+
   Widget _buildSmartPricingBanner(Flight flight) {
     bool isRising = flight.priceTrend == 'rising';
     bool isCritical = flight.seatAvailability == 'critical';
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: isCritical
             ? AppColors.error.withValues(alpha: 0.1)
@@ -478,7 +495,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
               Text('Smart Pricing Insights', style: AppTextStyles.labelMedium),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           if (flight.priceTrend != null)
             Row(
               children: [
@@ -493,12 +510,15 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                 Text(
                   'Prices are ${flight.priceTrend} '
                   '${flight.priceChangePercent != null && flight.priceChangePercent != 0 ? '(${flight.priceChangePercent! > 0 ? '+' : ''}${flight.priceChangePercent}%)' : ''}',
-                  style: AppTextStyles.bodyMedium,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isRising ? AppColors.warning : AppColors.textPrimary,
+                  ),
                 ),
               ],
             ),
           if (flight.seatAvailability != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Row(
               children: [
                 Icon(
@@ -510,10 +530,10 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                 Text(
                   isCritical
                       ? 'Only ${flight.availableSeats} seats left!'
-                      : '${flight.seatAvailability!.toUpperCase()} availability',
+                      : _formatAvailability(flight.seatAvailability!),
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: isCritical ? AppColors.error : AppColors.textPrimary,
-                    fontWeight: isCritical ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isCritical ? FontWeight.w700 : FontWeight.w600,
                   ),
                 ),
               ],

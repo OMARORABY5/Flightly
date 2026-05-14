@@ -42,9 +42,16 @@ class TripCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.surfaceBorder),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFCDD5E0), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -151,8 +158,9 @@ class TripCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
-                color: AppColors.surfaceElevated,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+                color: Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                border: Border(top: BorderSide(color: Color(0xFFCDD5E0), width: 1)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,9 +212,10 @@ class TripCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(f.originIata, style: AppTextStyles.displayMedium),
+                Text(_formatTime(f.departureTime), style: AppTextStyles.timeDisplay),
                 const SizedBox(height: 2),
-                Text(_formatTime(f.departureTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(f.originIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
+                const SizedBox(height: 2),
                 Text(_formatDate(f.departureTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
               ],
             ),
@@ -237,9 +246,10 @@ class TripCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(f.destinationIata, style: AppTextStyles.displayMedium),
+                Text(_formatTime(f.arrivalTime), style: AppTextStyles.timeDisplay),
                 const SizedBox(height: 2),
-                Text(_formatTime(f.arrivalTime), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(f.destinationIata, style: AppTextStyles.headingMedium.copyWith(color: AppColors.textSecondary)),
+                const SizedBox(height: 2),
                 Text(_formatDate(f.arrivalTime), style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint)),
               ],
             ),

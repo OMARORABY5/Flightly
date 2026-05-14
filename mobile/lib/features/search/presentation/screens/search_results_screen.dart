@@ -162,26 +162,31 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                       final isSelected = filters.sortOption == option;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          selected: isSelected,
-                          label: Text(option.label, style: AppTextStyles.labelMedium.copyWith(
-                            color: isSelected ? AppColors.surface : AppColors.textSecondary
-                          )),
-                          backgroundColor: Colors.transparent,
-                          selectedColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                              color: isSelected ? AppColors.primary : AppColors.surfaceBorder,
+                        child: GestureDetector(
+                          onTap: () {
+                            ref.read(filterOptionsProvider.notifier).state =
+                                filters.copyWith(sortOption: option);
+                            ref.read(flightResultsProvider.notifier).searchFlights();
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.primary : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected ? AppColors.primary : AppColors.surfaceBorder,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              option.label,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: isSelected ? AppColors.surface : AppColors.textSecondary,
+                              ),
                             ),
                           ),
-                          onSelected: (selected) {
-                            if (selected) {
-                              ref.read(filterOptionsProvider.notifier).state = 
-                                  filters.copyWith(sortOption: option);
-                              ref.read(flightResultsProvider.notifier).searchFlights();
-                            }
-                          },
                         ),
                       );
                     }).toList(),

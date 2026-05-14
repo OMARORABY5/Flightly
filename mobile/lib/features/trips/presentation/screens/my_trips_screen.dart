@@ -71,6 +71,7 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen>
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
+        centerTitle: true,
         title: Text('My Trips', style: AppTextStyles.headingMedium),
         bottom: TabBar(
           controller: _tabController,
@@ -226,7 +227,7 @@ class _TripsTabView extends ConsumerWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: trips.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      separatorBuilder: (_, __) => const SizedBox(height: 24),
       itemBuilder: (context, index) {
         final trip = trips[index];
         return TripCard(

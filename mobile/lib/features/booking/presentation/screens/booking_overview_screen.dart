@@ -79,12 +79,6 @@ class _BookingOverviewScreenState
 
       if (!mounted) return;
 
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.success(
-            message: 'Booking reserved! Proceeding to Payment...'),
-      );
-
       Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentScreen(booking: booking)));
     } catch (e) {
       showTopSnackBar(

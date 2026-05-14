@@ -5,7 +5,7 @@ import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/domain/smart_pricing/flight_recommendation_engine.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class SmartSuggestionCard extends StatefulWidget {
+class SmartSuggestionCard extends StatelessWidget {
   final FlightRecommendation recommendation;
   final bool compact;
   final void Function(Flight alternativeFlight)? onViewAlternative;
@@ -18,19 +18,9 @@ class SmartSuggestionCard extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SmartSuggestionCard> createState() => _SmartSuggestionCardState();
-}
-
-class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
-  bool _dismissed = false;
-
-  @override
   Widget build(BuildContext context) {
-    if (_dismissed) {
-      return const SizedBox.shrink();
-    }
 
-    final isAffirmation = widget.recommendation.type == RecommendationType.bestChoice;
+    final isAffirmation = recommendation.type == RecommendationType.bestChoice;
     
     // Choose colors based on affirmation or suggestion
     final iconColor = isAffirmation ? AppColors.success : AppColors.primary;
@@ -40,7 +30,7 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: AppColors.paleBlue,
           borderRadius: BorderRadius.circular(24),
@@ -56,53 +46,44 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!widget.compact) ...[
-              Text('SMART PRICING', style: AppTextStyles.sectionLabel),
-              const SizedBox(height: 16),
+            if (!compact) ...[
+              Row(
+                children: [
+                  Icon(LucideIcons.sparkles, size: 16, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text('Smart Pricing Suggestion', style: AppTextStyles.sectionLabel),
+                ],
+              ),
+              const SizedBox(height: 10),
             ],
+            // Inline icon + headline for full-width text flow
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(iconData, color: iconColor, size: 20),
-                ),
-                const SizedBox(width: 12),
+                Icon(iconData, color: iconColor, size: 18),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.recommendation.headline,
-                        style: AppTextStyles.headingMedium.copyWith(color: titleColor),
-                      ),
-                      if (widget.recommendation.subline != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.recommendation.subline!,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ]
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => setState(() => _dismissed = true),
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(LucideIcons.x, size: 18, color: AppColors.textSecondary),
+                  child: Text(
+                    recommendation.headline,
+                    style: AppTextStyles.headingSmall.copyWith(
+                      color: titleColor,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
             ),
-            if (!widget.compact && widget.recommendation.highlights.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              ...widget.recommendation.highlights.map((highlight) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
+            if (recommendation.subline != null) ...[
+              const SizedBox(height: 5),
+              Text(
+                recommendation.subline!,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              ),
+            ],
+            if (!compact && recommendation.highlights.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ...recommendation.highlights.map((highlight) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       children: [
                         Icon(LucideIcons.check, size: 14, color: isAffirmation ? AppColors.success : AppColors.primary),
@@ -110,25 +91,25 @@ class _SmartSuggestionCardState extends State<SmartSuggestionCard> {
                         Expanded(
                           child: Text(
                             highlight,
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
                           ),
                         ),
                       ],
                     ),
                   )),
             ],
-            if (widget.recommendation.hasAlternative && widget.onViewAlternative != null) ...[
+            if (recommendation.hasAlternative && onViewAlternative != null) ...[
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => widget.onViewAlternative!(widget.recommendation.alternativeFlight!),
+                  onPressed: () => onViewAlternative!(recommendation.alternativeFlight!),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary.withValues(alpha: 0.15),
                     foregroundColor: AppColors.primary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   child: Text('View Alternative', style: AppTextStyles.button.copyWith(color: AppColors.primary)),
                 ),
