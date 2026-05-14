@@ -69,7 +69,7 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.textSecondary.withOpacity(0.3),
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -120,7 +120,7 @@ class _AirportSearchPopupState extends ConsumerState<AirportSearchPopup> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.plane, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+                        Icon(LucideIcons.plane, size: 64, color: AppColors.textSecondary.withValues(alpha: 0.5)),
                         const SizedBox(height: 16),
                         Text('No airports found', style: AppTextStyles.headingMedium),
                         const SizedBox(height: 8),

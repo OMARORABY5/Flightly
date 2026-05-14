@@ -4,6 +4,7 @@ import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/core/widgets/loading_widget.dart';
@@ -25,11 +26,8 @@ class PassengersScreen extends ConsumerWidget {
       return Scaffold(
         backgroundColor: AppColors.surfaceElevated,
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
+        appBar: PremiumAppBar(
           title: Text('Select Passengers', style: AppTextStyles.headingMedium),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
         ),
         body: Stack(children: [
           AmbientBackground(child: SizedBox.shrink()),
@@ -73,11 +71,8 @@ class PassengersScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: AppColors.surfaceElevated,
         extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: PremiumAppBar(
         title: Text('Select Passengers', style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
       ),
       body: Stack(
         fit: StackFit.expand,

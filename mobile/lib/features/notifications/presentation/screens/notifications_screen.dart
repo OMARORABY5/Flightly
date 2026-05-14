@@ -9,6 +9,7 @@ import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/notifications/domain/models/app_notification.dart';
 import 'package:flightly/features/notifications/domain/providers/notification_provider.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -26,14 +27,8 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      appBar: PremiumAppBar(
         title: Text('Notifications', style: AppTextStyles.headingMedium),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
         actions: [
           if (notificationState.notifications.isNotEmpty && notificationState.unreadCount > 0)
             TextButton(

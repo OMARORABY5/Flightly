@@ -93,7 +93,7 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.textSecondary.withOpacity(0.3),
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -159,7 +159,7 @@ class _DateSelectionScreenState extends ConsumerState<DateSelectionScreen> {
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
-                    rangeHighlightColor: AppColors.primary.withOpacity(0.2),
+                    rangeHighlightColor: AppColors.primary.withValues(alpha: 0.2),
                     todayDecoration: BoxDecoration(
                       color: Colors.transparent,
                       shape: BoxShape.circle,

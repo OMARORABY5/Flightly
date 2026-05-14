@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flightly/features/saved_flights/presentation/widgets/saved_flight_card.dart';
 import 'package:flightly/core/widgets/empty_widget.dart';
 import 'package:flightly/features/saved_flights/services/watchlist_price_monitor.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WatchlistScreen extends ConsumerStatefulWidget {
@@ -54,9 +55,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      appBar: PremiumAppBar(
         title: Text('Watchlist', style: AppTextStyles.headingMedium),
         actions: [
           if (authState is AuthAuthenticated)

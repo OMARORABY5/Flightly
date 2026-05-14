@@ -10,6 +10,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/utils/helpers.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/auth/providers/auth_provider.dart';
 import 'package:flightly/features/account/domain/providers/account_provider.dart';
 
@@ -45,9 +46,7 @@ class AccountHubScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      appBar: PremiumAppBar(
         title: Text('Account', style: AppTextStyles.headingMedium),
       ),
       body: RefreshIndicator(

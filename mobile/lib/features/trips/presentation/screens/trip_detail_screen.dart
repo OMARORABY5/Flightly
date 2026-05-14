@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/trips/domain/models/trip.dart';
 import 'package:flightly/features/trips/domain/providers/trips_provider.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -76,14 +77,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
+      appBar: PremiumAppBar(
         title: Text('Booking Details', style: AppTextStyles.headingMedium),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.download, color: AppColors.primary),

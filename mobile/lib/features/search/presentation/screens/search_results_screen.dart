@@ -132,12 +132,12 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.primary.withOpacity(0.15),
-                          AppColors.primary.withOpacity(0.05),
+                          AppColors.primary.withValues(alpha: 0.15),
+                          AppColors.primary.withValues(alpha: 0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -236,6 +236,31 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
+                        if (index == 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('AVAILABLE FLIGHTS', style: AppTextStyles.sectionLabel),
+                              const SizedBox(height: 16),
+                              FlightCard(
+                                flight: resultsState.flights[index],
+                                badgeLabel: badgeMap[resultsState.flights[index].id],
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FlightDetailsScreen(
+                                        flightId: resultsState.flights[index].id,
+                                        seenPrice: resultsState.flights[index].basePrice,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                        
                         if (index == resultsState.flights.length) {
                           return const Padding(
                             padding: EdgeInsets.symmetric(vertical: 20),

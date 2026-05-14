@@ -118,7 +118,7 @@ class _CloudIcon extends StatelessWidget {
     return Icon(
       Icons.cloud,
       size: size,
-      color: Colors.white.withOpacity(0.2 * opacity),
+      color: Colors.white.withValues(alpha: 0.2 * opacity),
     );
   }
 }

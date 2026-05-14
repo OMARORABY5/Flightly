@@ -69,7 +69,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.textSecondary.withOpacity(0.3),
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -214,7 +214,7 @@ class _PassengerClassPopupState extends ConsumerState<PassengerClassPopup> {
         child: Icon(
           icon,
           size: 16,
-          color: onPressed == null ? AppColors.textSecondary.withOpacity(0.5) : AppColors.primary,
+          color: onPressed == null ? AppColors.textSecondary.withValues(alpha: 0.5) : AppColors.primary,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flightly/core/theme/app_colors.dart';
+import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/search/presentation/screens/flight_details_screen.dart' as flightly_details;
 import 'package:intl/intl.dart';
@@ -38,11 +39,10 @@ class FlightCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceBorder.withValues(alpha: 0.8), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -67,7 +67,7 @@ class FlightCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -122,22 +122,34 @@ class FlightCard extends StatelessWidget {
                           children: [
                             Text(
                               _formatTime(flight.departureTime),
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              style: AppTextStyles.timeDisplay,
                             ),
                             const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Icon(LucideIcons.plane, size: 16, color: AppColors.primary),
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Icon(LucideIcons.arrowRight, size: 16, color: AppColors.textHint),
                             ),
                             Text(
                               _formatTime(flight.arrivalTime),
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              style: AppTextStyles.timeDisplay,
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          '${flight.originIata} - ${flight.destinationIata}, ${flight.airlineName}',
-                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        Row(
+                          children: [
+                            Text(
+                              '${flight.originIata} - ${flight.destinationIata}',
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                ', ${flight.airlineName}',
+                                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -168,14 +180,27 @@ class FlightCard extends StatelessWidget {
               // Bottom row with Price
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    'Flight to ${flight.destinationCity ?? flight.destinationIata}',
-                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      'Flight to ${flight.destinationCity ?? flight.destinationIata}',
+                      style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                    ),
                   ),
-                  Text(
-                    '${flight.totalPrice.toStringAsFixed(0)} EGP',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${flight.totalPrice.toStringAsFixed(0)} EGP',
+                        style: AppTextStyles.priceLarge,
+                      ),
+                      Text(
+                        'per person',
+                        style: AppTextStyles.labelSmall,
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -136,4 +136,40 @@ class AppTextStyles {
     color: AppColors.white,
     height: 1.2,
   );
+
+  // ─── Flight Data Styles ────────────────────────────────────────────────────
+  // Departure / arrival times — large and scannable
+  static TextStyle get timeDisplay => GoogleFonts.dmSans(
+    fontSize: 22,
+    fontWeight: FontWeight.w800,
+    color: AppColors.textPrimary,
+    height: 1.1,
+    letterSpacing: -0.3,
+  );
+
+  // Primary price display — dominant, blue
+  static TextStyle get priceLarge => GoogleFonts.dmSans(
+    fontSize: 24,
+    fontWeight: FontWeight.w800,
+    color: AppColors.primary,
+    height: 1.1,
+    letterSpacing: -0.3,
+  );
+
+  // Secondary price — smaller but still bold
+  static TextStyle get priceSmall => GoogleFonts.dmSans(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.primary,
+    height: 1.2,
+  );
+
+  // Section group headers — uppercase, spaced, subtle
+  static TextStyle get sectionLabel => GoogleFonts.dmSans(
+    fontSize: 11,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textSecondary,
+    height: 1.3,
+    letterSpacing: 0.8,
+  );
 }

@@ -6,6 +6,7 @@ import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/booking/domain/models/booking.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
 import 'package:flightly/features/payment/presentation/screens/booking_confirmation_screen.dart';
@@ -106,11 +107,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: PremiumAppBar(
         title: Text('Payment', style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
       ),
       body: Stack(
         fit: StackFit.expand,

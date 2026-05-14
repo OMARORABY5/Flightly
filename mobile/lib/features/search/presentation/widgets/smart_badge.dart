@@ -77,7 +77,7 @@ class SmartBadge extends StatelessWidget {
     }
 
     final badgePill = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
@@ -92,8 +92,9 @@ class SmartBadge extends StatelessWidget {
             type.label,
             style: AppTextStyles.bodySmall.copyWith(
               color: iconColor,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
               fontSize: 10,
+              letterSpacing: 0.5,
             ),
           ),
         ],

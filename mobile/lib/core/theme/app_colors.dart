@@ -24,9 +24,9 @@ class AppColors {
 
   // ─── Background Colors ────────────────────────────────────────────────────
   // Light mode backgrounds
-  static const Color background = Color(0xFFFFFFFF);      // Main app background
-  static const Color surface = Color(0xFFFFFFFF);         // Card surface
-  static const Color surfaceElevated = Color(0xFFF1F3F4); // Inputs / elevated elements
+  static const Color background = Color(0xFFF1F3F4);     // Main app background (UI Light Gray)
+  static const Color surface = Color(0xFFFFFFFF);         // Card surface (Pure White)
+  static const Color surfaceElevated = Color(0xFFF1F3F4); // Same as background — consistent gray
   static const Color surfaceBorder = Color(0xFFE8EAED);   // Borders / dividers
 
   // ─── Text Colors ──────────────────────────────────────────────────────────

@@ -6,6 +6,7 @@ import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/search/domain/models/flight.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
 import 'package:flightly/features/booking/presentation/screens/booking_overview_screen.dart';
@@ -190,14 +191,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: PremiumAppBar(
         title: Text(
           _isRoundTrip ? 'Round-trip Booking' : 'Booking',
           style: AppTextStyles.headingMedium,
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -256,8 +254,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
                   ),
                 ],
               ),
@@ -287,8 +285,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             ),
                             Text(
                               '${totalPrice.toStringAsFixed(0)} EGP',
-                              style: AppTextStyles.displayMedium
-                                  .copyWith(color: AppColors.primary),
+                              style: AppTextStyles.priceLarge,
                             ),
                           ],
                         ),

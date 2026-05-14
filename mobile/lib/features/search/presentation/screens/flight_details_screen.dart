@@ -332,8 +332,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                             ),
                             Text(
                               '${flight.basePrice.toStringAsFixed(0)} EGP',
-                              style: AppTextStyles.displayMedium
-                                  .copyWith(color: AppColors.primary),
+                              style: AppTextStyles.priceLarge,
                             ),
                           ],
                         ),
@@ -394,7 +393,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_formatTime(flight.departureTime), style: AppTextStyles.displayLarge),
+                    Text(_formatTime(flight.departureTime), style: AppTextStyles.timeDisplay),
                     const SizedBox(height: 4),
                     Text(flight.originIata, style: AppTextStyles.headingLarge),
                     const SizedBox(height: 4),
@@ -422,7 +421,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(_formatTime(flight.arrivalTime), style: AppTextStyles.displayLarge),
+                    Text(_formatTime(flight.arrivalTime), style: AppTextStyles.timeDisplay),
                     const SizedBox(height: 4),
                     Text(flight.destinationIata, style: AppTextStyles.headingLarge),
                     const SizedBox(height: 4),
@@ -526,7 +525,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Flight Details', style: AppTextStyles.headingMedium),
+          Text('FLIGHT DETAILS', style: AppTextStyles.sectionLabel),
           const SizedBox(height: 16),
           _detailRow(LucideIcons.planeTakeoff, 'Departure', '${flight.originName} (${flight.originIata})'),
           const SizedBox(height: 12),
@@ -544,7 +543,7 @@ class _FlightDetailsScreenState extends ConsumerState<FlightDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Cabin & Baggage', style: AppTextStyles.headingMedium),
+          Text('CABIN & BAGGAGE', style: AppTextStyles.sectionLabel),
           const SizedBox(height: 16),
           _detailRow(LucideIcons.armchair, 'Cabin Class', flight.fareLabel ?? flight.cabinClass.toUpperCase()),
           const SizedBox(height: 12),

@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
 import 'package:flightly/core/presentation/widgets/ambient_background.dart';
+import 'package:flightly/core/presentation/widgets/ambient_background.dart';
 import 'package:flightly/core/presentation/widgets/glass_card.dart';
+import 'package:flightly/core/presentation/widgets/premium_app_bar.dart';
 import 'package:flightly/features/booking/domain/models/passenger.dart';
 import 'package:flightly/features/booking/domain/providers/booking_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -198,11 +200,8 @@ class _AddEditPassengerScreenState extends ConsumerState<AddEditPassengerScreen>
     return Scaffold(
       backgroundColor: AppColors.surfaceElevated,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: PremiumAppBar(
         title: Text(isEditing ? 'Edit Passenger' : 'Add Passenger', style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
         actions: [
           if (isEditing)
             IconButton(

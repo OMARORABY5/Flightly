@@ -28,10 +28,10 @@ class AppTheme {
       ),
 
       // ─── Scaffold Background ─────────────────────────────────────────────
+      // #F1F3F4 UI Light Gray — now the universal app background
       scaffoldBackgroundColor: AppColors.background,
 
       // ─── Typography ───────────────────────────────────────────────────────
-      // Base text theme uses DM Sans font
       textTheme: GoogleFonts.dmSansTextTheme(
         ThemeData.light().textTheme,
       ).apply(
@@ -40,16 +40,19 @@ class AppTheme {
       ),
 
       // ─── AppBar ──────────────────────────────────────────────────────────
+      // White bar floats over the gray background — visible separation
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         elevation: 0,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 0.5,
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         titleTextStyle: AppTextStyles.headingMedium,
+        shadowColor: Colors.black12,
       ),
 
       // ─── Card ─────────────────────────────────────────────────────────────
+      // Pure white cards lift from the gray background naturally
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -57,20 +60,22 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shadowColor: Colors.black,
       ),
 
       // ─── Input Fields ─────────────────────────────────────────────────────
+      // White fill + visible border so inputs stand out on gray background
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceElevated,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: AppColors.surface, // Pure white — visible on #F1F3F4 gray
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -90,13 +95,15 @@ class AppTheme {
       ),
 
       // ─── Elevated Button ──────────────────────────────────────────────────
+      // Subtle blue shadow gives buttons depth on the gray background
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          elevation: 0,
+          elevation: 2,
+          shadowColor: AppColors.primary.withValues(alpha: 0.35),
           textStyle: AppTextStyles.button,
         ),
       ),
@@ -126,7 +133,7 @@ class AppTheme {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
-        elevation: 0,
+        elevation: 8,
       ),
 
       // ─── Chip (filter tags) ───────────────────────────────────────────────
