@@ -5,7 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flightly/core/constants/route_constants.dart';
 import 'package:flightly/core/theme/app_colors.dart';
 import 'package:flightly/core/theme/app_text_styles.dart';
-import 'package:flightly/core/theme/app_text_styles.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -99,26 +99,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                           position: _logoSlide,
                           child: FadeTransition(
                             opacity: _logoFade,
-                            child: Container(
+                            child: SizedBox(
                               width: 200,
                               height: 200,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary.withValues(alpha: 0.15),
-                                    blurRadius: 30,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(24),
-                                child: Image.asset(
-                                  'assets/images/flightly_logo.jpg',
-                                  fit: BoxFit.cover,
-                                ),
+                              child: Image.asset(
+                                'assets/images/FLIGHTLY_Final_Logo.png',
+                                fit: BoxFit.contain,
                               ),
                             ),
                           ),
@@ -133,19 +119,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                             children: [
                               Text(
                                 'Flightly',
-                                style: AppTextStyles.displayLarge.copyWith(
-                                  color: const Color(0xFF1A2340),
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: -0.5,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1E293B), // Premium dark slate
+                                  letterSpacing: -1.0,
+                                  height: 1.1,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 6),
                               Text(
-                                'Fly Lightly',
-                                style: AppTextStyles.bodyLarge.copyWith(
-                                  color: const Color(0xFF4A5568),
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 1.2,
+                                'FLY LIGHTLY',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF64748B), // Subtle muted slate
+                                  letterSpacing: 4.0, // Wide tracking for premium feel
                                 ),
                               ),
                             ],
