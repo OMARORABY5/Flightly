@@ -119,6 +119,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                             children: [
                               Text(
                                 'Flightly',
+                                textAlign: TextAlign.center,
                                 style: GoogleFonts.poppins(
                                   fontSize: 42,
                                   fontWeight: FontWeight.w800,
@@ -127,13 +128,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                                   height: 1.1,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 16),
                               Text(
                                 'FLY LIGHTLY',
+                                textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF64748B), // Subtle muted slate
+                                  color: const Color(0xFF334155), // Darker slate for better visibility
                                   letterSpacing: 4.0, // Wide tracking for premium feel
                                 ),
                               ),
